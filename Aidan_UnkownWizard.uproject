@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{6ECB7A35-495B-3F61-260F-C9B08D9ECF4B}",
+	"EngineAssociation": "5.3",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -38,6 +38,10 @@
 				"Win64",
 				"Android"
 			]
+		},
+		{
+			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
