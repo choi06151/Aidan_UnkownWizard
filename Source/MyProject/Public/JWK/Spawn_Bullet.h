@@ -20,23 +20,28 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// Pooled Bullet 호출
-	UFUNCTION(BlueprintCallable, Category = "Pool_Bullet")
-	ABullet_Pooled* SpawnPooledBullet();
-	
-	UPROPERTY(EditAnywhere, Category = "Pool_Bullet")
+	// Pool에서 Bullet Spawn
+	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation);
+
+	// 풀에 사용할 bullet subClass
+	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
 	TSubclassOf<class ABullet_Pooled> PooledBulletSubclass;
 
-	UPROPERTY(EditAnywhere, Category = "Pool_Bullet")
+	// pool의 크기
+	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
 	int PoolSize = 20;
-	
-	UPROPERTY(EditAnywhere, Category = "Pool_Bullet")
-	float PooledBulletLifeSpan = 0.0f;
 
-	UFUNCTION()
-	void OnPooledBulletDespawn(ABullet_Pooled* Bullet);
+	// bullet의 수명
+	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
+	float PooledBulletLifeSpan = 5.0f;
 
 protected:
+	// Bullet의 pool array
 	TArray<ABullet_Pooled*> BulletPool;
+
+	// Spawn된 Bullet index array
 	TArray<int> SpawnedPoolIndexes;
+
+	// Bullet이 비활성화일 때 호출되는 함수
+	void OnPooledBulletDespawn(ABullet_Pooled* Bullet);
 };
