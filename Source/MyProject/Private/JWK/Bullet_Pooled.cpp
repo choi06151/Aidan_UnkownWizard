@@ -25,6 +25,8 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->InitialSpeed = 800.0f;
 	movementComp->MaxSpeed = 8000.0f;
 	movementComp->bShouldBounce = false;
+	
+	
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -37,6 +39,13 @@ void ABullet_Pooled::BeginPlay()
 void ABullet_Pooled::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	FVector NewLoc = GetActorLocation();
+	float DeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+	float DeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+	NewLoc += GetActorRightVector() * DeltaX + GetActorUpVector() * DeltaY;
+
+	// 총알을 새로운 위치로 이동
+	SetActorLocation(NewLoc);
 }
 
 // 총알 비활성화
