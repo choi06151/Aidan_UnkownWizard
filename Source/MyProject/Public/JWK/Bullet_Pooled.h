@@ -40,6 +40,9 @@ public:
 	
 	// bullet의 수명을 set하는 함수
 	void SetLifeSpan(float LifeTime);
+
+	// Bullet의 Speed를 set하는 함수
+	void SetBulletSpeed(float Speed);
 	
 	// pool에서의 index 설정하는 함수
 	void SetPoolIndex(int index);
@@ -70,6 +73,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float OscillationFrequency = 1.0f;
 	UPROPERTY(EditAnywhere)
-	float OscillationRadius = 5.0f;
+	float OscillationRadius = 1.0f;
 
 };

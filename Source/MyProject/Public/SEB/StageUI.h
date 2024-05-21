@@ -41,6 +41,8 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;
 
+	int32 DifficultyNum;
+
 	UFUNCTION()
 	void OnSelectStageClicked();
 
