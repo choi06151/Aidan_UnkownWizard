@@ -62,6 +62,10 @@ private:
 	void FireWavePattern(const FBulletHellPattern& Pattern);
 	// 부채꼴
 	void FireFanPattern(const FBulletHellPattern& Pattern);
+	// 스프레드
+	void FireSpreadPattern(const FBulletHellPattern& Pattern);
+	// 랜덤 스프레드
+	void FireRandomSpreadPattern(const FBulletHellPattern& Pattern);
 	// 원
 	void FireCirclePattern(const FBulletHellPattern& Pattern);
 	void DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius);

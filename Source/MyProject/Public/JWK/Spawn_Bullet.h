@@ -21,7 +21,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Pool에서 Bullet Spawn
-	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation);
+	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed);
 
 	// 풀에 사용할 bullet subClass
 	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
