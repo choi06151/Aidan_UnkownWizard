@@ -42,6 +42,7 @@ void UStageUI::SetDifficultyImage(int32 n)
 {
 	if(DifficultyGridPanel)
 	{
+		DifficultyNum = n;
 		for(int i=0; i<DifficultyGridPanel->GetChildrenCount(); i++)
 		{
 			if(i>=n) break; // n개 이상의 이미지는 변경하지 않음
@@ -66,7 +67,7 @@ void UStageUI::OnSelectStageClicked()
 {
 	if (ParentSelectStageUI)
 	{
-		ParentSelectStageUI->ChangeStageName(StageName->GetText(), InfoText->GetText());
+		ParentSelectStageUI->ChangeStageName(StageName->GetText(), InfoText->GetText(), DifficultyNum);
 	}
 	else
 	{
