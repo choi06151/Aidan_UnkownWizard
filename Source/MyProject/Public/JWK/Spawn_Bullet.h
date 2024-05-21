@@ -33,7 +33,7 @@ public:
 
 	// bullet의 수명
 	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
-	float PooledBulletLifeSpan = 5.0f;
+	float PooledBulletLifeSpan = 15.0f;
 
 	class ABoss* boss;
 protected:

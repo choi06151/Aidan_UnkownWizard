@@ -96,4 +96,6 @@ private:
 	FBulletHellPattern DefaultWavePattern;
 	FBulletHellPattern DefaultFanPattern;
 	FBulletHellPattern DefaultCirlPattern;
+	FBulletHellPattern DefaultSpreadPattern;
+	FBulletHellPattern DefaultRandomSpreadPattern;
 };
