@@ -55,7 +55,7 @@ void ABoss::Tick(float DeltaTime)
 	static float TimeElapsed = 0.0f;
 	TimeElapsed += DeltaTime;
 
-	if (TimeElapsed > 12.0f)
+	if (TimeElapsed > 10.0f)
 	{
 		ChangePattern();
 		TimeElapsed = 0.0f;
@@ -89,6 +89,10 @@ void ABoss::FireBullet()
 			FireFanPattern(CurrentPattern);
 			break;
 
+		case EPatternType::Circle:
+			FireCirclePattern(CurrentPattern);
+			break;
+
 		default:
 			break;
 		}
@@ -112,9 +116,9 @@ void ABoss::FireWavePattern(const FBulletHellPattern& Pattern)
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FRotator BossRotation = GetActorRotation();
 
-	for (int32 i = 0; i < 5; ++i)
+	for (int32 i = 0; i < 10; ++i)
 	{
-		float Offset = FMath::Sin(GetWorld()->GetTimeSeconds() + i * 10.0f) * 2.5f;
+		float Offset = FMath::Sin(GetWorld()->GetTimeSeconds() + i * 10.0f) * 10.0f;
 		FVector SpawnLocation = BossLocation + BossRotation.RotateVector(FVector(0.0f, Offset, 0.0f));
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, BossRotation);
 	}
@@ -130,7 +134,7 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 	FRotator BossRotation = GetActorRotation();
 
 	const float FanAngle = Pattern.PatternSize; // 부채꼴 패턴의 각도 설정
-	NumberOfBullets = 5; // 부채꼴 패턴의 총알 수
+	NumberOfBullets = 6; // 부채꼴 패턴의 총알 수
 	AngleStep = FanAngle / (NumberOfBullets - 1);
 	const float StartAngle = -FanAngle / 2.0f;
 
@@ -145,6 +149,47 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 
 	UE_LOG(LogTemp, Warning, TEXT("Fan"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
+}
+
+void ABoss::FireCirclePattern(const FBulletHellPattern& Pattern)
+{
+	// 원형 패턴을 위해 총알의 위치를 계산합니다.
+	FVector BossLocation = GetActorLocation();
+	FRotator BossRotation = GetActorRotation();
+	NumberOfBullets = Pattern.NumberOfBullets;
+	float Radius = Pattern.PatternSize; // 원의 반지름
+
+	for (int32 i = 0; i < NumberOfBullets; ++i)
+	{
+		float Angle = i * (360.0f / NumberOfBullets);
+		float Rad = FMath::DegreesToRadians(Angle);
+
+		// 정면에서 원 모양으로 배치되도록 위치 계산
+		FVector Offset = FVector(0.0f, FMath::Cos(Rad) * Radius, FMath::Sin(Rad) * Radius);
+		FVector SpawnLocation = BossLocation + Offset;
+
+		// 원의 중심에서 바깥쪽으로 향하게 회전 설정
+		FRotator SpawnRotation = (Offset).Rotation();
+        
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Circle"));
+	UE_LOG(LogTemp, Warning, TEXT("---"));
+}
+
+void ABoss::DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius)
+{
+	AngleStep = 360.0f / NumberOfPoints;
+
+	for (int32 i = 0; i < NumberOfPoints; ++i)
+	{
+		float Angle = i * AngleStep;
+		float Radian = FMath::DegreesToRadians(Angle);
+		float X = FMath::Cos(Radian) * Radius;
+		float Y = FMath::Sin(Radian) * Radius;
+		OutShape.Add(FVector(X, Y, 0.0f));
+	}
 }
 
 void ABoss::StartFiring()
@@ -181,5 +226,14 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.PatternType = EPatternType::Fan;
 	FanPattern.Interval = 1.0f;
 	FanPattern.FanAngle = 90.0f; // 부채꼴 패턴의 각도 설정
+    FanPattern.NumberOfBullets = 10; // 부채꼴 패턴에서 발사할 총알 수
 	BulletPatterns.Add(FanPattern);
+
+	// 원형 패턴
+	FBulletHellPattern CirclePattern;
+	CirclePattern.PatternType = EPatternType::Circle;
+	CirclePattern.Interval = 1.0f;
+    CirclePattern.PatternSize = 300.0f; // 원형 패턴의 크기 설정
+	CirclePattern.NumberOfBullets = 12; // 총알의 수
+	BulletPatterns.Add(CirclePattern);
 }

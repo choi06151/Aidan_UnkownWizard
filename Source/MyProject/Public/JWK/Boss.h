@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Spawn_Bullet.h"
 #include "GameFramework/Character.h"
-#include "BulletHellPatern.h"
+#include "BulletHellPattern.h"
 #include "Boss.generated.h"
 
 UCLASS()
@@ -49,19 +49,24 @@ public:
 
 	
 private:
-	// 총알 발사 관련 함수들
+	// 총알 발사 관련 함수
 	void FireBullet();
 	void StartFiring();
 	void StopFiring();
 	void ChangePattern();
 	void InitializeDefaultPatterns();
 
-	
+	// 직선
 	void FireStraightPattern(const FBulletHellPattern& Pattern);
+	// 웨이브
 	void FireWavePattern(const FBulletHellPattern& Pattern);
+	// 부채꼴
 	void FireFanPattern(const FBulletHellPattern& Pattern);
-	void FireSpiralPattern(const FBulletHellPattern& Pattern);
+	// 원
+	void FireCirclePattern(const FBulletHellPattern& Pattern);
+	void DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius);
 
+	
 	UPROPERTY(EditAnywhere, Category = "Combat")	// 총알 생성
 	USpawn_Bullet* BulletSpawner;
 
@@ -86,4 +91,5 @@ private:
 	FBulletHellPattern DefaultStraightPattern;
 	FBulletHellPattern DefaultWavePattern;
 	FBulletHellPattern DefaultFanPattern;
+	FBulletHellPattern DefaultCirlPattern;
 };

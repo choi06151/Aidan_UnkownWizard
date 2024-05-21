@@ -70,6 +70,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float OscillationFrequency = 1.0f;
 	UPROPERTY(EditAnywhere)
-	float OscillationRadius = 5.0f;
+	float OscillationRadius = 1.0f;
 
 };

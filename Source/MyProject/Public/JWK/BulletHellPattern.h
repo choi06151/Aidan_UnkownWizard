@@ -1,17 +1,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BulletHellPatern.generated.h"
+#include "BulletHellPattern.generated.h"
 
 UENUM(BlueprintType)
 enum class EPatternType : uint8
 {
 	// 직선
 	Straight	UMETA(DisplayName = "Straight"),
-	// 웨이브
+	// 파형
 	Wave		UMETA(DisplayName = "Wave"),
 	// 부채꼴
-	Fan			UMETA(DisplayName = "Fan")
+	Fan			UMETA(DisplayName = "Fan"),
+	// 원
+	Circle		UMETA(DisplayName = "Circle")
 };
 
 USTRUCT(BlueprintType)
@@ -53,18 +55,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet Pattern")	// 부채꼴 패턴의 각도
 	float FanAngle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet Pattern") // 총알 수
+	float NumberOfBullets;
+	
 
 	FBulletHellPattern()
 		: PatternType(EPatternType::Straight),
 		  Interval(1.0f),
 		  PatternSize(500.0f),
-		  PatternSpeed(200.0f),
+		  PatternSpeed(100.0f),
 		  PatternDuration(5.0f),
 		  PatternRotation(FRotator::ZeroRotator),
-		  PatternSpacing(50.0f),
+		  PatternSpacing(100.0f),
 		  PatternDirection(FVector::ForwardVector),
 		  PatternRotationSpeed(90.0f),
-		  PatternCurve(0.0f)
+		  PatternCurve(0.0f),
+	      NumberOfBullets(10)
 	{
 	}
 };
