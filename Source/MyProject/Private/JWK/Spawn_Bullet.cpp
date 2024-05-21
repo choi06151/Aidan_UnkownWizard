@@ -43,7 +43,7 @@ void USpawn_Bullet::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 }
 
 // pool에서 Bullet을 Spawn하는 함수
-ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation)
+ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed)
 {
 	for (ABullet_Pooled* PoolableBullet : BulletPool)
 	{
@@ -52,6 +52,7 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 			// 비활성화된 Bullet을 찾아 활성화
 			PoolableBullet->TeleportTo(SpawnLocation, SpawnRotation);
 			PoolableBullet->SetLifeSpan(PooledBulletLifeSpan);
+			PoolableBullet->SetBulletSpeed(BulletSpeed); // 이동 속도 설정
 			PoolableBullet->SetActive(true);
 			SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
 
@@ -71,6 +72,7 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 			PoolableBullet->SetActive(false);
 			PoolableBullet->TeleportTo(SpawnLocation, SpawnRotation);
 			PoolableBullet->SetLifeSpan(PooledBulletLifeSpan);
+			PoolableBullet->SetBulletSpeed(BulletSpeed); // 이동 속도 설정
 			PoolableBullet->SetActive(true);
 			SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
 
