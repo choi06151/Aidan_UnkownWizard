@@ -27,6 +27,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TArray<int32> DifficultyArr;
+
+	
 	
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UScrollBox* MainScroll;
@@ -47,21 +49,23 @@ private:
 	
 	
 	UFUNCTION()
-	void OnLeftArrowClicked();
+	void OnUPArrowClicked();
 	UFUNCTION()
-	void OnRightArrowClicked();
+	void OnDownArrowClicked();
 	UFUNCTION()
 	void OnBackClicked();
 	UFUNCTION()
 	void OnPlayClicked();
 
-
+	UPROPERTY(meta = (BindWidget))
+	class UUniformGridPanel* DifficultyGridPanel;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UStageUI> StageUIClass;
 
+	void SetStarFill(class UImage* ImageWidget, FText* Path);
 public:
 	UFUNCTION(BlueprintCallable)
-	void ChangeStageName(const FText& NewText,  const FText& NewInfoText);
+	void ChangeStageName(const FText& NewText,  const FText& NewInfoText, int32 num);
 
 };
