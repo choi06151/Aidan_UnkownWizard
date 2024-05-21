@@ -21,7 +21,7 @@ UAudioAnalysis::UAudioAnalysis()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ¿Àµğ¿À Ä¸Ã³ ÄÄÆ÷³ÍÆ® »ı¼º
+	// ì˜¤ë””ì˜¤ ìº¡ì²˜ ì»´í¬ë„ŒíŠ¸ ìƒì„±
 	AudioCaptureComponent = CreateDefaultSubobject<UAudioCaptureComponent>(TEXT("AudioCaptureComponent"));
 }
 
@@ -39,7 +39,7 @@ void UAudioAnalysis::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ¸Å ÇÁ·¹ÀÓ¸¶´Ù ¿Àµğ¿À µ¥ÀÌÅÍ¸¦ Ã³¸®
+	// ë§¤ í”„ë ˆì„ë§ˆë‹¤ ì˜¤ë””ì˜¤ ë°ì´í„°ë¥¼ ì²˜ë¦¬
 	//ProcessAudioData();
 }
 
@@ -47,7 +47,7 @@ void UAudioAnalysis::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 //{
 //    if (AudioCaptureComponent)
 //    {
-//        // ¿Àµğ¿À ºĞ¼® ÄÄÆ÷³ÍÆ®µé ÃÊ±âÈ­
+//        // ì˜¤ë””ì˜¤ ë¶„ì„ ì»´í¬ë„ŒíŠ¸ë“¤ ì´ˆê¸°í™”
 //        OnsetNRT = NewObject<UOnsetNRT>(this);
 //        OnsetNRT->Settings = NewObject<UOnsetNRTSettings>(OnsetNRT);
 //        OnsetNRT->Settings->AnalysisDuration = 10.0f;
@@ -70,7 +70,7 @@ void UAudioAnalysis::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 //{
 //    if (AudioCaptureComponent)
 //    {
-//        // ¿Àµğ¿À Ä¸Ã³ ½ÃÀÛ
+//        // ì˜¤ë””ì˜¤ ìº¡ì²˜ ì‹œì‘
 //        AudioCaptureComponent->OnBeginGenerate();
 //    }
 //}
@@ -79,7 +79,7 @@ void UAudioAnalysis::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 //{
 //    if (AudioCaptureComponent)
 //    {
-//        // ¿Àµğ¿À Ä¸Ã³ Á¾·á
+//        // ì˜¤ë””ì˜¤ ìº¡ì²˜ ì¢…ë£Œ
 //        AudioCaptureComponent->OnEndGenerate();
 //    }
 //}
@@ -88,26 +88,26 @@ void UAudioAnalysis::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 //{
 //    if (AudioCaptureComponent && AudioCaptureComponent->IsCapturing())
 //    {
-//        // Ä¸Ã³µÈ ¿Àµğ¿À µ¥ÀÌÅÍ¸¦ °¡Á®¿È
+//        // ìº¡ì²˜ëœ ì˜¤ë””ì˜¤ ë°ì´í„°ë¥¼ ê°€ì ¸ì˜´
 //        TArray<uint8> AudioData;
 //        AudioCaptureComponent->GetCaptureAudioData(AudioData);
 //        if (AudioData.Num() > 0)
 //        {
-//            // ¿Àµğ¿À µ¥ÀÌÅÍ¸¦ ºĞ¼®
+//            // ì˜¤ë””ì˜¤ ë°ì´í„°ë¥¼ ë¶„ì„
 //            OnsetNRT->AnalyzeAudio(AudioData, 44100, 1024);
 //            LoudnessNRT->AnalyzeAudio(AudioData, 44100, 1024);
 //            ConstantQNRT->AnalyzeAudio(AudioData, 44100, 1024);
 //
-//            // ¿Â¼Â(À½ÀÇ ½ÃÀÛ) µ¥ÀÌÅÍ Ã³¸®
+//            // ì˜¨ì…‹(ìŒì˜ ì‹œì‘) ë°ì´í„° ì²˜ë¦¬
 //            TArray<float> OnsetTimes;
 //            OnsetNRT->GetNormalizedChannelOnsets(0, OnsetTimes);
 //
-//            // º¼·ı µ¥ÀÌÅÍ Ã³¸®
+//            // ë³¼ë¥¨ ë°ì´í„° ì²˜ë¦¬
 //            TArray<float> LoudnessValues;
 //            LoudnessNRT->GetNormalizedChannelLoudness(0, LoudnessValues);
 //            CurrentVolume = LoudnessValues.Last();
 //
-//            // ÁÖÆÄ¼ö µ¥ÀÌÅÍ Ã³¸®
+//            // ì£¼íŒŒìˆ˜ ë°ì´í„° ì²˜ë¦¬
 //            TArray<float> Magnitudes;
 //            ConstantQNRT->GetNormalizedChannelConstantQ(0, 0.0f, Magnitudes);
 //            FrequencyBands = Magnitudes;
