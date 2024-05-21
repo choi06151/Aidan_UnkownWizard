@@ -22,13 +22,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//Component
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Componenets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	class UBoxComponent* boxComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Componenets")
+	UPROPERTY(EditAnywhere, Category = "Components")
 	class UStaticMeshComponent* meshComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Componenets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	class UProjectileMovementComponent* movementComp;
 
 	// 총알이 비활성화될 때 호출되는 Event
@@ -65,4 +65,11 @@ protected:
 
 	// 총알 수명 타이머 핸들
 	FTimerHandle LifespanTimer;
+
+	// 움직임 패턴 관련 변수 초기화
+	UPROPERTY(EditAnywhere)
+	float OscillationFrequency = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float OscillationRadius = 5.0f;
+
 };

@@ -69,8 +69,7 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 		if (PoolableBullet != nullptr)
 		{
 			PoolableBullet->SetActive(false);
-
-			PoolableBullet->TeleportTo(FVector(0, 0, 0), FRotator(0, 0, 0));
+			PoolableBullet->TeleportTo(SpawnLocation, SpawnRotation);
 			PoolableBullet->SetLifeSpan(PooledBulletLifeSpan);
 			PoolableBullet->SetActive(true);
 			SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
