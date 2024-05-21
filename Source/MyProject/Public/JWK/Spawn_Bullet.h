@@ -35,6 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
 	float PooledBulletLifeSpan = 5.0f;
 
+	class ABoss* boss;
 protected:
 	// Bullet의 pool array
 	TArray<ABullet_Pooled*> BulletPool;
