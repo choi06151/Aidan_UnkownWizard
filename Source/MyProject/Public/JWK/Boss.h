@@ -98,4 +98,8 @@ private:
 	FBulletHellPattern DefaultCirlPattern;
 	FBulletHellPattern DefaultSpreadPattern;
 	FBulletHellPattern DefaultRandomSpreadPattern;
+
+
+	// 추가해야 할 부분: 음악 데이터를 로드하고 패턴을 설정하는 함수
+	void LoadMusicDataAndSetPatterns();
 };

@@ -2,6 +2,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/Bullet_Pooled.h"
+#include "KJH/BulletPatternManager.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -44,6 +45,8 @@ void ABoss::BeginPlay()
 
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
+
+	LoadMusicDataAndSetPatterns();  // 추가해야 할 부분: 음악 데이터를 로드하고 패턴 설정
 
 	StartFiring();
 }
@@ -253,6 +256,20 @@ void ABoss::DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, f
 		float X = FMath::Cos(Radian) * Radius;
 		float Y = FMath::Sin(Radian) * Radius;
 		OutShape.Add(FVector(X, Y, 0.0f));
+	}
+}
+
+void ABoss::LoadMusicDataAndSetPatterns()
+{
+	FMusicData MusicData;
+	FString FilePath = FPaths::ProjectContentDir() / TEXT("MusicData.json");
+
+	if (UMusicDataLoader::LoadMusicDataFromFile(FilePath, MusicData))
+	{
+		TArray<FPatternConditions> PatternConditions;
+		UBulletPatternManager::AnalyzeMusicData(MusicData, PatternConditions, 0.5f, 0.2f, 0.4f, 0.6f, 0.8f);
+
+		UBulletPatternManager::CreatePatternsFromConditions(PatternConditions, BulletPatterns);
 	}
 }
 
