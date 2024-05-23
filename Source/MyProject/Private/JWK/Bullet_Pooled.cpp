@@ -22,7 +22,7 @@ ABullet_Pooled::ABullet_Pooled()
 
 	// movementComponent
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("movementComp"));
-	movementComp->InitialSpeed = 800.0f;
+	movementComp->InitialSpeed = 200.0f;
 	movementComp->MaxSpeed = 8000.0f;
 	movementComp->bShouldBounce = false;
 	
@@ -68,6 +68,11 @@ void ABullet_Pooled::SetActive(bool IsActive)
 void ABullet_Pooled::SetLifeSpan(float LifeTime)
 {
 	LifeSpan = LifeTime;
+}
+
+void ABullet_Pooled::SetBulletSpeed(float Speed)
+{
+	movementComp->MaxSpeed = Speed;
 }
 
 // pool에서의 index 설정
