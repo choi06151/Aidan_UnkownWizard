@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "AidanGameMode.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "TestUI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYPROJECT_API AAidanGameMode : public AGameModeBase
+class MYPROJECT_API UTestUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
