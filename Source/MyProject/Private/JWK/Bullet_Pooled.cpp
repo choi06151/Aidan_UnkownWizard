@@ -40,7 +40,7 @@ void ABullet_Pooled::Tick(float DeltaTime)
 	FVector NewLoc = GetActorLocation();
 	float DeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
 	float DeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-	NewLoc += GetActorForwardVector()* DeltaX + GetActorUpVector() * DeltaY;
+	NewLoc += GetActorForwardVector()* DeltaX; // + GetActorUpVector() * DeltaY;
 
 	// 총알을 새로운 위치로 이동
 	SetActorLocation(NewLoc);

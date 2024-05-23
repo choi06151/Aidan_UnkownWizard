@@ -97,9 +97,9 @@ void ABoss::FireBullet()
 		case EPatternType::Straight:
 			FireStraightPattern(CurrentPattern);
 			break;
-
-		case EPatternType::Wave:
-			FireWavePattern(CurrentPattern);
+			
+		case EPatternType::RandomStraight:
+			FireRandomStraightPatter(CurrentPattern);
 			break;
 
 		case EPatternType::Fan:
@@ -131,43 +131,55 @@ void ABoss::FireStraightPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("--------"));
 }
 
-void ABoss::FireWavePattern(const FBulletHellPattern& Pattern)
+void ABoss::FireRandomStraightPatter(const FBulletHellPattern& Pattern)
 {
-	// 파형 패턴 발사
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	FRotator BossRotation = GetActorRotation();
 
-	for (int32 i = 0; i < 10; ++i)
+	// 총알 수 설정
+	NumberOfBullets = 3;
+
+	// Y축 범위 설정
+	float YMin = -150.0f;
+	float YMax = 150.0f;
+	float Z = BossLocation.Z; // Z축 고정
+
+	for (int32 i = 0; i < NumberOfBullets; ++i)
 	{
-		float Offset = FMath::Sin(GetWorld()->GetTimeSeconds() + i * 10.0f) * 10.0f;
-		FVector SpawnLocation = BossLocation + BossRotation.RotateVector(FVector(0.0f, Offset, 0.0f));
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, BossRotation, 800.0f);
+		// Y축에서 랜덤 위치 설정
+		float RandomY = FMath::FRandRange(YMin, YMax);
+
+		// 발사 위치 설정
+		FVector SpawnLocation = FVector(BossLocation.X, RandomY, Z);
+
+		// 발사 각도 설정 (직선 발사)
+		FRotator SpawnRotation = GetActorRotation();
+
+		// 총알 발사
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, 800.0f);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Wave"));
-	UE_LOG(LogTemp, Warning, TEXT("----"));
+	UE_LOG(LogTemp, Warning, TEXT("RandomStraight"));
+	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
 void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 {
-	// 부채꼴 패턴 발사
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FRotator BossRotation = GetActorRotation();
 
-	const float FanAngle = Pattern.PatternSize; // 부채꼴 패턴의 각도 설정
-	NumberOfBullets = 6; // 부채꼴 패턴의 총알 수
+	// 부채꼴 패턴 각도와 총알 수 설정
+	float FanAngle = 120.0f;
+	NumberOfBullets = 3;
 	AngleStep = FanAngle / (NumberOfBullets - 1);
-	const float StartAngle = -FanAngle / 2.0f;
 
 	for (int32 i = 0; i < NumberOfBullets; ++i)
 	{
-		float Angle = StartAngle + i * AngleStep;
-		FRotator SpawnRotation = BossRotation + FRotator(0, Angle, 0);
-		FVector Direction = FRotationMatrix(SpawnRotation).GetUnitAxis(EAxis::X);
-		FVector SpawnLocation = BossLocation + Direction * 100.0f;
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, 800.0f);
-	}
+		float AngleOffset = -FanAngle / 2 + AngleStep * i;
+		FRotator SpawnRotation = BossRotation;
+		SpawnRotation.Yaw += AngleOffset;
 
+		BulletSpawner->SpawnPooledBullet(BossLocation, SpawnRotation, 800.0f);
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Fan"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
@@ -178,22 +190,22 @@ void ABoss::FireRandomSpreadPattern(const FBulletHellPattern& Pattern)
 
 	// 스프레드 각도와 총알 수 설정
 	float SpreadAngle = 30.0f; // 각도 설정
-	NumberOfBullets = 10;
+	NumberOfBullets = 5;
 
 	// 랜덤 위치에서 발사
 	for (int32 i = 0; i < NumberOfBullets; ++i)
 	{
 		// 랜덤한 각도와 거리 설정
 		float RandomAngle = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-		float RandomY = FMath::FRandRange(-350.0f, 350.0f); // Y축 범위 설정
-		float RandomZ = FMath::FRandRange(0.0f, 350.0f); // Z축 범위 설정
+		float RandomY = FMath::FRandRange(-250.0f, 250.0f); // Y축 범위 설정
+		float RandomZ = FMath::FRandRange(0.0f, 150.0f); // Z축 범위 설정
 
 		// 발사 위치 설정
 		FVector SpawnLocation = BossLocation + FVector(0.0f, RandomY, RandomZ);
 
 		// 발사 각도 설정
 		FRotator SpawnRotation = (SpawnLocation - BossLocation).Rotation();
-		SpawnRotation.Yaw += RandomAngle;
+		// SpawnRotation.Yaw += RandomAngle;
 
 		// 총알 발사
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, 800.0f);
@@ -272,13 +284,11 @@ void ABoss::InitializeDefaultPatterns()
 	StraightPattern.Interval = 1.0f;
 	BulletPatterns.Add(StraightPattern);
 
-	// 웨이브
-	FBulletHellPattern WavePattern;
-	WavePattern.PatternType = EPatternType::Wave;
-	WavePattern.Interval = 0.5f;
-	WavePattern.Amplitude = 150.0f; // 웨이브 진폭 설정
-	WavePattern.Frequency = 1.0f; // 웨이브 주파수 설정
-	BulletPatterns.Add(WavePattern);
+	// 직선
+	FBulletHellPattern RandomStraightPattern;
+	RandomStraightPattern.PatternType = EPatternType::RandomStraight;
+	RandomStraightPattern.Interval = 1.0f;
+	BulletPatterns.Add(RandomStraightPattern);
 
 	// 부채꼴
 	FBulletHellPattern FanPattern;

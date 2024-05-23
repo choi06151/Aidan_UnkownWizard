@@ -58,8 +58,8 @@ private:
 
 	// 직선
 	void FireStraightPattern(const FBulletHellPattern& Pattern);
-	// 웨이브
-	void FireWavePattern(const FBulletHellPattern& Pattern);
+	// 랜덤 직선
+	void FireRandomStraightPatter(const FBulletHellPattern& Pattern);
 	// 부채꼴
 	void FireFanPattern(const FBulletHellPattern& Pattern);
 	// 랜덤 스프레드
@@ -67,7 +67,6 @@ private:
 	// 원
 	void FireCirclePattern(const FBulletHellPattern& Pattern);
 	void DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius);
-
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")	// 총알 생성
 	USpawn_Bullet* BulletSpawner;
@@ -91,7 +90,6 @@ private:
 
 	// 기본 패턴 설정
 	FBulletHellPattern DefaultStraightPattern;
-	FBulletHellPattern DefaultWavePattern;
 	FBulletHellPattern DefaultFanPattern;
 	FBulletHellPattern DefaultCirlPattern;
 	FBulletHellPattern DefaultSpreadPattern;

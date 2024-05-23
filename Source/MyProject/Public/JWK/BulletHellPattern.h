@@ -7,19 +7,19 @@ UENUM(BlueprintType)
 enum class EPatternType : uint8
 {
 	// 직선
-	Straight UMETA(DisplayName = "Straight"),
-	// 파형
-	Wave UMETA(DisplayName = "Wave"),
+	Straight			UMETA(DisplayName = "Straight"),
+	// 랜덤 직선
+	RandomStraight		UMETA(DisplayName = "RandomStraight"),
 	// 부채꼴
-	Fan UMETA(DisplayName = "Fan"),
+	Fan					UMETA(DisplayName = "Fan"),
 	// 원
-	Circle UMETA(DisplayName = "Circle"),
+	Circle				UMETA(DisplayName = "Circle"),
 	// 렌덤 스프레드
-	RandomSpread UMETA(DisplayName = "Spread"),
+	RandomSpread		UMETA(DisplayName = "Spread"),
 	// 팔각형
-	Octagon UMETA(DisplayName = "Octagon"),
-	// 별
-	Star UMETA(DisplayName = "Star")
+	Octagon				UMETA(DisplayName = "Octagon"),
+	// 나선형
+	Spiral				UMETA(DisplayName = "Spiral")
 };
 
 USTRUCT(BlueprintType)
