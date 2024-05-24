@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ScrollBox.h"
+#include "MusicInfoDT.h"
+#include "SpawnWidget.h"
 #include "SelectStageUI.generated.h"
 
 /**
@@ -34,14 +36,19 @@ private:
 	class UScrollBox* MainScroll;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UTextBlock* StageName;
+	class UTextBlock* ArtistName;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UTextBlock* InfoText;
+	class UTextBlock* MusicName;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* BestScore;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* Thumbnail;
+
 	
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LeftArrowBtn;  
+	class UButton* UpArrowBtn;  
 	UPROPERTY(meta = (BindWidget))
-	class UButton* RightArrowBtn;
+	class UButton* DownArrowBtn;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* PlayBtn;
 	UPROPERTY(meta = (BindWidget))
@@ -66,6 +73,16 @@ private:
 	void SetStarFill(class UImage* ImageWidget, FText* Path);
 public:
 	UFUNCTION(BlueprintCallable)
-	void ChangeStageName(const FText& NewText,  const FText& NewInfoText, int32 num);
+	void ChangeStageName(const FText& NewText,  const FText& NewInfoText);
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* MusicDataTable;
+
+	FMusicInfoDT* FindRowByColumnValue(const FString& ColumnName, const FString& ColumnValue);
+
+	FText* ThumbnailPath;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> NewWidgetClass;
 };

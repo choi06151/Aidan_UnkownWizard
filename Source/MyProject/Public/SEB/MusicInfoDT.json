@@ -1,0 +1,26 @@
+[
+	{
+		"Name": "1",
+		"ArtistName": "Artist1",
+		"MusicName": "Music1",
+		"Difficulty": 1,
+		"Thumbnail": "zz",
+		"BestScore": 123445
+	},
+	{
+		"Name": "2",
+		"ArtistName": "Artist2",
+		"MusicName": "Music2",
+		"Difficulty": 3,
+		"Thumbnail": "aa",
+		"BestScore": 123123
+	},
+	{
+		"Name": "3",
+		"ArtistName": "Artist3",
+		"MusicName": "Music3",
+		"Difficulty": 4,
+		"Thumbnail": "asdf",
+		"BestScore": 292929
+	}
+]

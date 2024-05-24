@@ -43,6 +43,10 @@
 		{
 			"Name": "SkeletalMeshModelingTools",
 			"Enabled": true
+		},
+		{
+			"Name": "SQLiteSupport",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

@@ -6,90 +6,59 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/UniformGridPanel.h"
+#include "Kismet/GameplayStatics.h"
 #include "SEB/GameStartUI.h"
+#include "SEB/MusicInfoDT.h"
 #include "SEB/StageUI.h"
-
+#include "Components/WidgetComponent.h"
 
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	//음악 기본 정보 저장 -> 추후 데이터베이스로 관리 예정
-	ScrollTextArr = { 
-		FText::FromString(TEXT("Stage1")), 
-		FText::FromString(TEXT("Stage2")), 
-		FText::FromString(TEXT("Stage3")),
-		FText::FromString(TEXT("Stage4")),
-		FText::FromString(TEXT("BEETHOVEN")),
-		FText::FromString(TEXT("Stage6")),
-		FText::FromString(TEXT("Stage7")),
-		FText::FromString(TEXT("Stage8")),
-		FText::FromString(TEXT("Stage9"))
-	};
-	InfoTextArr = { 
-		FText::FromString(TEXT("aaaaaaaaaaaaaaaaaaaaaaaaa")), 
-		FText::FromString(TEXT("bbbbbbbbbbbbbbbbbbbbbbbbb")), 
-		FText::FromString(TEXT("ccccccccccccccccccccccccc")),
-		FText::FromString(TEXT("ddddddddddddddddddddddddd")),
-		FText::FromString(TEXT("Piano Sonata No. 17 (Op. 31-2) d minor, Tempest")),
-		FText::FromString(TEXT("fffffffffffffffffffffffff")),
-		FText::FromString(TEXT("ggggggggggggggggggggggggg")),
-		FText::FromString(TEXT("hhhhhhhhhhhhhhhhhhhhhhhhh")),
-		FText::FromString(TEXT("iiiiiiiiiiiiiiiiiiiiiiiii"))
-	};
-	DifficultyArr = {1,2,3,4,5,1,2,3,4};
-	
+	// DataTable 초기화
+	static const FString ContextString(TEXT("Music Info Context"));
+	static const FSoftObjectPath DataTablePath(TEXT("/Game/SEB/Blueprints/DT_MusicInfo.DT_MusicInfo"));
+	UDataTable* MusicInfoDataObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath.ToString()));
+
+	if(MusicInfoDataObject)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DataTable Succeed!!!"));
+		MusicDataTable = MusicInfoDataObject;
+	}
 	if (!StageUIClass || !MainScroll) return;
 
 	MainScroll->ClearChildren();
 
-	//MainScroll에 버튼 추가 -> 배열 안에 들어있는 값으로 저장
-	for (int i = 0; i < ScrollTextArr.Num(); i++)
+	TArray<FName> RowNames = MusicDataTable->GetRowNames();
+	int32 RowCount = RowNames.Num();
+
+	for(int i=0; i<RowCount; i++)
 	{
 		UStageUI* StageUI = CreateWidget<UStageUI>(this, StageUIClass);
+		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowNames[i], TEXT(""));
+		
 		if (StageUI)
 		{
-			StageUI->SetScrollText(ScrollTextArr[i]);
-			StageUI->SetInfoText(InfoTextArr[i]);
-			StageUI->SetDifficultyImage(DifficultyArr[i]);
+			StageUI->SetArtistText(FText::FromString(Row->ArtistName));
+			StageUI->SetMusicText(FText::FromString(Row->MusicName));
+			StageUI->SetDifficultyImage(Row->Difficulty);
 			StageUI->ParentSelectStageUI = this;  
 			MainScroll->AddChild(StageUI);
 		}
 	}
-
 	//배열의 첫번째 값들로 정보 초기화
-	if (StageName)
-	{
-		StageName->SetText(ScrollTextArr[0]);
-	}
-	if(InfoText)
-	{
-		InfoText->SetText(InfoTextArr[0]);
-	}
+	ChangeStageName(FText::FromString(MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""))->ArtistName),FText::FromString(MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""))->MusicName) );
 }
 
 void USelectStageUI::NativeConstruct()
 {
 	Super::NativeConstruct();
-	if (LeftArrowBtn)
-	{
-		LeftArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
-	}
-
-	if (RightArrowBtn)
-	{
-		RightArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
-	}
+	UpArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
+	DownArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
+	BackBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnBackClicked);
+	PlayBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnPlayClicked);
 	
-	if (BackBtn)
-	{
-		BackBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnBackClicked);
-	}
-
-	if (PlayBtn)
-	{
-		BackBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnPlayClicked);
-	}
 }
 
 
@@ -113,28 +82,49 @@ void USelectStageUI::OnDownArrowClicked()
 
 void USelectStageUI::OnBackClicked()
 {
-	// SpawnUI의 Widget Class를 변경
+	//SpawnWidget의 WidgetClass를 GameStartUI로 바꾸고싶어
+	// WidgetClass를 변경할 클래스
+	//TSubclassOf<UUserWidget> NewWidgetClass = UGameStartUI::StaticClass();
+
+	// SpawnWidget의 WidgetClass를 변경
+	ASpawnWidget* SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	
+	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
+	WidgetComponent->SetWidgetClass(NewWidgetClass);
 }
 
 void USelectStageUI::OnPlayClicked()
 {
-	// 게임 시작
+	// UI 숨김
+	SetVisibility(ESlateVisibility::Hidden);
+	// 게임 시작 -> 레벨이동?
 }
 
 
 //버튼 클릭 시 좌측 정보 업데이트
-void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoText, int32 num)
+void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoText)
 {
-	if (StageName)
+	//NewText라는 ArtistName열을 가진 행 탐색
+	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString());
+
+	ArtistName->SetText(NewText);
+	MusicName->SetText(NewInfoText);
+	
+	//BestScore 변경
+	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
+
+	// 썸네일 변경
+	ThumbnailPath = new FText(FText::FromString(SpecificRow->Thumbnail));
+	UTexture2D* ThumbnailTexture = LoadObject<UTexture2D>(nullptr, *ThumbnailPath->ToString());
+	if (ThumbnailTexture)
 	{
-		StageName->SetText(NewText);
-	}
-	if(InfoText)
-	{
-		InfoText->SetText(NewInfoText);
+		FSlateBrush NewBrush;
+		NewBrush.SetResourceObject(ThumbnailTexture);
+		Thumbnail->SetBrush(NewBrush);
 	}
 
 	//난이도 별 이미지 변경
+	int32 num = SpecificRow->Difficulty;
 	if(DifficultyGridPanel)
 	{
 		for(int i=0; i<DifficultyGridPanel->GetChildrenCount(); i++)
@@ -145,23 +135,25 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 			if(i>=num) {
 				if(ImageWidget)
 				{
-					FText* Path = new FText(FText::FromString(TEXT("/Script/Engine.Texture2D'/Game/SEB/UI/Resources/Star.Star'")));
-					SetStarFill(ImageWidget, Path);
+					FText* StarPath = new FText(FText::FromString(TEXT("/Script/Engine.Texture2D'/Game/SEB/UI/Resources/Star.Star'")));
+					SetStarFill(ImageWidget, StarPath);
 				}
 			}
 			else
 			{
 				if(ImageWidget)
 				{
-					FText* Path = new FText(FText::FromString(TEXT("/Script/Engine.Texture2D'/Game/SEB/UI/Resources/Star_fill.Star_fill'")));
-					SetStarFill(ImageWidget, Path);
+					FText* StarFillPath = new FText(FText::FromString(TEXT("/Script/Engine.Texture2D'/Game/SEB/UI/Resources/Star_fill.Star_fill'")));
+					SetStarFill(ImageWidget, StarFillPath);
 				}
 			}
 
 			
 		}
 	}
+	
 }
+
 
 void USelectStageUI::SetStarFill(UImage* ImageWidget, FText* Path)
 {
@@ -173,4 +165,26 @@ void USelectStageUI::SetStarFill(UImage* ImageWidget, FText* Path)
 		NewBrush.SetResourceObject(NewTexture);
 		ImageWidget->SetBrush(NewBrush);
 	}
+}
+
+FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName, const FString& ColumnValue)
+{
+	if (!MusicDataTable) return nullptr;
+
+	static const FString ContextString(TEXT("FindRowByColumnValue"));
+	TArray<FName> RowNames = MusicDataTable->GetRowNames();
+
+	for (const FName& RowName : RowNames)
+	{
+		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowName, ContextString);
+		if (Row)
+		{
+			if (ColumnName == "ArtistName" && Row->ArtistName == ColumnValue)
+			{
+				return Row;
+			}
+		}
+	}
+
+	return nullptr;
 }
