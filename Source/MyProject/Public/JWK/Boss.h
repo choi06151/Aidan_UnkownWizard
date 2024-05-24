@@ -4,6 +4,7 @@
 #include "Spawn_Bullet.h"
 #include "GameFramework/Character.h"
 #include "BulletHellPattern.h"
+#include "KJH/BulletPatternManager.h"
 #include "Boss.generated.h"
 
 UCLASS()
@@ -47,7 +48,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool IsDie = false;
 
-	
+	// 추가해야 할 부분
+	// JSON 파일 경로를 인자로 받아 음악 데이터를 로드하고 패턴 설정
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void LoadMusicDataAndSetPatterns(const FString& FilePath);
+
 private:
 	// 총알 발사 관련 함수
 	void FireBullet();
@@ -99,7 +104,15 @@ private:
 	FBulletHellPattern DefaultSpreadPattern;
 	FBulletHellPattern DefaultRandomSpreadPattern;
 
+	// 추가해야 할 부분
+	// 현재 시간에 해당하는 패턴 조건을 저장할 변수
+	FPatternConditions CurrentConditions;
+	// 조건들을 저장한 배열
+	TArray<FPatternConditions> PatternConditions;
+	// 현재 시간
+	int32 CurrentTimeIndex;
 
-	// 추가해야 할 부분: 음악 데이터를 로드하고 패턴을 설정하는 함수
-	void LoadMusicDataAndSetPatterns();
+	int32 GetHighIntensityPatternIndex() const;
+	int32 GetLowFrequencyPatternIndex() const;
+	// 추가 조건에 따른 패턴 인덱스를 반환하는 함수...
 };

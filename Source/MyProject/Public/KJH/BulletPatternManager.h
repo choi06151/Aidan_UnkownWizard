@@ -74,8 +74,4 @@ public:
     // 음악 데이터를 기반으로 패턴 조건을 생성하는 함수
     UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
     static void AnalyzeMusicData(const FMusicData& MusicData, TArray<FPatternConditions>& OutPatternConditions, float IntensityThreshold, float LowFreqThreshold, float LowMidFreqThreshold, float HighMidFreqThreshold, float HighFreqThreshold);
-
-    // 패턴 조건에 따라 탄막 패턴을 생성하는 함수
-    UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-    static void CreatePatternsFromConditions(const TArray<FPatternConditions>& PatternConditions, TArray<FBulletHellPattern>& OutBulletPatterns);
 };

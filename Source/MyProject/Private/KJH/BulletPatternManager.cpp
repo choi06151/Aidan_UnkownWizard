@@ -48,7 +48,7 @@ void UBulletPatternManager::AnalyzeMusicData(const FMusicData& MusicData,
             }
         }
 
-        // 템포 조건 평가
+        // 템포 조건 평가 
         // 음악 데이터의 템포 값과 비교하여 조건을 설정함.
         // 조건은 상위 조건부터 평가하여 상위 조건이 충족되면 하위 조건은 평가하지 않음.
         Conditions.bIsTempoAbove110 = MusicData.Tempo > 110.0f;
@@ -72,66 +72,3 @@ void UBulletPatternManager::AnalyzeMusicData(const FMusicData& MusicData,
     }
 }
 
-void UBulletPatternManager::CreatePatternsFromConditions(const TArray<FPatternConditions>& PatternConditions,
-	TArray<FBulletHellPattern>& OutBulletPatterns)
-{
-    for (const FPatternConditions& Condition : PatternConditions)
-    {
-        FBulletHellPattern Pattern;
-
-        if (Condition.bIsHighIntensity)
-        {
-            Pattern.PatternType = EPatternType::Circle;
-            Pattern.NumberOfBullets = 20;
-            Pattern.PatternSize = 500.0f;
-        }
-        else if (Condition.bIsLowFrequency)
-        {
-            Pattern.PatternType = EPatternType::Straight;
-            Pattern.NumberOfBullets = 5;
-            Pattern.Interval = 1.0f;
-        }
-        else if (Condition.bIsLowMidFrequency)
-        {
-            Pattern.PatternType = EPatternType::Fan;
-            Pattern.FanAngle = 90.0f;
-            Pattern.NumberOfBullets = 15;
-        }
-        else if (Condition.bIsHighMidFrequency)
-        {
-            Pattern.PatternType = EPatternType::Wave;
-            Pattern.Amplitude = 150.0f;
-            Pattern.Frequency = 1.0f;
-        }
-        else if (Condition.bIsHighFrequency)
-        {
-            Pattern.PatternType = EPatternType::Spread;
-            Pattern.NumberOfBullets = 10;
-        }
-        else if (Condition.bIsOnBeat)
-        {
-            Pattern.PatternType = EPatternType::RandomSpread;
-            Pattern.NumberOfBullets = 20;
-        }
-        else if (Condition.bIsTempoAbove110)
-        {
-            Pattern.PatternType = EPatternType::Circle;
-            Pattern.NumberOfBullets = 30;
-            Pattern.PatternSize = 600.0f;
-        }
-        else if (Condition.bIsTempoAbove100)
-        {
-            Pattern.PatternType = EPatternType::Fan;
-            Pattern.FanAngle = 120.0f;
-            Pattern.NumberOfBullets = 25;
-        }
-        else if (Condition.bIsTempoAbove90)
-        {
-            Pattern.PatternType = EPatternType::Wave;
-            Pattern.Amplitude = 200.0f;
-            Pattern.Frequency = 1.5f;
-        }
-
-        OutBulletPatterns.Add(Pattern);
-    }
-}

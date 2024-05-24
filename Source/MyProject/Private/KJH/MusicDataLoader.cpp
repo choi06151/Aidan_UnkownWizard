@@ -11,10 +11,12 @@
 bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData& OutMusicData)
 {
     FString JsonString;
-    // JSON 파일의 내용을 문자열로 읽어옵니다.
-    if (!FFileHelper::LoadFileToString(JsonString, *FilePath))
+    FString FullPath = FPaths::ProjectContentDir() / FilePath;
+
+    if (!FFileHelper::LoadFileToString(JsonString, *FullPath))
     {
-        return false; // 파일을 읽지 못하면 false를 반환
+        UE_LOG(LogTemp, Error, TEXT(" UMusicDataLoader::LoadMusicDataFromFile: 파일을 문자열로 로드하는 데 실패: %s"), *FullPath);
+        return false;
     }
 
     TSharedPtr<FJsonObject> JsonObject; // JSON 객체를 담을 포인터 선언
@@ -53,12 +55,17 @@ bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData
             OutMusicData.FrequencyBands.Add(Elem.Key, BandValues); // 주파수 대역 데이터를 맵에 추가
         }
 
-        NormalizeIntensity(OutMusicData); // 강도 값 정규화
-        NormalizeFrequencyBands(OutMusicData); // 주파수 대역 값 정규화
-        return true; // 데이터 로드 및 파싱 성공 시 true를 반환합니다.
+        NormalizeIntensity(OutMusicData);
+        NormalizeFrequencyBands(OutMusicData);
+        UE_LOG(LogTemp, Warning, TEXT("UMusicDataLoader::LoadMusicDataFromFile: JSON 데이터 역직렬화 성공"));
+        return true;
     }
 
-    return false; // JSON 파싱 실패 시 false를 반환합니다.
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: JSON 데이터 역직렬화 실패: %s"), *FullPath);
+        return false;
+    }
 }
 
 void UMusicDataLoader::NormalizeIntensity(FMusicData& MusicData)

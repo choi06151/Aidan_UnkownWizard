@@ -43,10 +43,8 @@ void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (BulletPatterns.Num() == 0)
-		InitializeDefaultPatterns();
-
-	LoadMusicDataAndSetPatterns();  // 추가해야 할 부분: 음악 데이터를 로드하고 패턴 설정
+	//if (BulletPatterns.Num() == 0)
+	//	InitializeDefaultPatterns(); 음악 데이터 기반으로 패턴을 설정하기 때문에 기본 패턴을 초기화할 필요 없다
 
 	StartFiring();
 }
@@ -58,10 +56,27 @@ void ABoss::Tick(float DeltaTime)
 	static float TimeElapsed = 0.0f;
 	TimeElapsed += DeltaTime;
 
-	if (TimeElapsed > 2.0f)
+	if (TimeElapsed > 1.0f) // 매 1초마다 업데이트
 	{
-		ChangePattern();
 		TimeElapsed = 0.0f;
+
+		// 현재 시간에 해당하는 패턴 조건을 업데이트
+		if (PatternConditions.IsValidIndex(CurrentTimeIndex))
+		{
+			CurrentConditions = PatternConditions[CurrentTimeIndex];
+			CurrentTimeIndex++;
+		}
+
+		// 현재 조건에 따라 패턴 변경
+		if (CurrentConditions.bIsHighIntensity)
+		{
+			CurrentPatternIndex = GetHighIntensityPatternIndex();
+		}
+		else if (CurrentConditions.bIsLowFrequency)
+		{
+			CurrentPatternIndex = GetLowFrequencyPatternIndex();
+		}
+		// 추가 조건에 따라 패턴 변경...
 	}
 }
 
@@ -259,18 +274,46 @@ void ABoss::DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, f
 	}
 }
 
-void ABoss::LoadMusicDataAndSetPatterns()
+void ABoss::LoadMusicDataAndSetPatterns(const FString& FilePath)
 {
 	FMusicData MusicData;
-	FString FilePath = FPaths::ProjectContentDir() / TEXT("MusicData.json");
+
+	UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터 로드 중: %s"), *FilePath);
 
 	if (UMusicDataLoader::LoadMusicDataFromFile(FilePath, MusicData))
 	{
-		TArray<FPatternConditions> PatternConditions;
 		UBulletPatternManager::AnalyzeMusicData(MusicData, PatternConditions, 0.5f, 0.2f, 0.4f, 0.6f, 0.8f);
-
-		UBulletPatternManager::CreatePatternsFromConditions(PatternConditions, BulletPatterns);
+		CurrentTimeIndex = 0; // 현재 시간을 초기화
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터를 성공적으로 로드하고 패턴을 설정했습니다."));
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터를 로드하는 데 실패!!!!: %s"), *FilePath);
+	}
+}
+
+int32 ABoss::GetHighIntensityPatternIndex() const
+{
+	for (int32 i = 0; i < BulletPatterns.Num(); ++i)
+	{
+		if (BulletPatterns[i].PatternType == EPatternType::Circle) // 예시: 고강도 패턴은 Circle로 설정
+		{
+			return i;
+		}
+	}
+	return 0; // 기본값
+}
+
+int32 ABoss::GetLowFrequencyPatternIndex() const
+{
+	for (int32 i = 0; i < BulletPatterns.Num(); ++i)
+	{
+		if (BulletPatterns[i].PatternType == EPatternType::Straight) // 예시: 저주파수 패턴은 Straight로 설정
+		{
+			return i;
+		}
+	}
+	return 0; // 기본값
 }
 
 void ABoss::StartFiring()
