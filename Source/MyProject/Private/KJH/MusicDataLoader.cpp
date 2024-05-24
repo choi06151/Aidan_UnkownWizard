@@ -63,7 +63,7 @@ bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData
 
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to deserialize JSON data JSON 데이터 역직렬화 실패: %s"), *FullPath);
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to deserialize JSON data JSON 데이터 역직렬화 실패: %s"), *FilePath);
         return false;
     }
 }
