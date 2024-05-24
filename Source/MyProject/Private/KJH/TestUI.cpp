@@ -33,19 +33,19 @@ void UTestUI::NativeConstruct()
 
 void UTestUI::OnMusic1Clicked()
 {
-	PlayMusicAndLoadData(TEXT("Content/Music/butterfly.mp3"), TEXT("Content/Data/butterfly.json"));
+	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/butterfly.butterfly'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/butterfly.json"));
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1111Clicked"));
 }
 
 void UTestUI::OnMusic2Clicked()
 {
-	PlayMusicAndLoadData(TEXT("Content/Music/Lacrimosa.mp3"), TEXT("Content/Data/Lacrimosa.json"));
+	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/Elise.Elise'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/Elise.json"));
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic22222Clicked"));
 }
 
 void UTestUI::OnMusic3Clicked()
 {
-	PlayMusicAndLoadData(TEXT("Content/Music/Symphony_25.mp3"), TEXT("Content/Data/Symphony25.json"));
+	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/Lacrimosa.Lacrimosa'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/Lacrimosa.json"));
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
 }
 

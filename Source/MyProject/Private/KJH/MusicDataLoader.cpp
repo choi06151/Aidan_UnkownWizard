@@ -11,13 +11,13 @@
 bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData& OutMusicData)
 {
     FString JsonString;
-    FString FullPath = FPaths::ProjectContentDir() / FilePath;
-
-    if (!FFileHelper::LoadFileToString(JsonString, *FullPath))
+    // 절대 경로 사용
+    if (!FFileHelper::LoadFileToString(JsonString, *FilePath))
     {
-        UE_LOG(LogTemp, Error, TEXT(" UMusicDataLoader::LoadMusicDataFromFile: 파일을 문자열로 로드하는 데 실패: %s"), *FullPath);
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to load file to string파일을 문자열로 로드하는 데 실패했습니다: %s"), *FilePath);
         return false;
     }
+
 
     TSharedPtr<FJsonObject> JsonObject; // JSON 객체를 담을 포인터 선언
     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString); // JSON 문자열을 읽기 위한 리더 생성
@@ -63,7 +63,7 @@ bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData
 
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: JSON 데이터 역직렬화 실패: %s"), *FullPath);
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to deserialize JSON data JSON 데이터 역직렬화 실패: %s"), *FullPath);
         return false;
     }
 }
