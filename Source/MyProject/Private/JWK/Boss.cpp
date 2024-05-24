@@ -11,7 +11,7 @@ ABoss::ABoss()
 	movementComp = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movementComp"));
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/ToonSkeleton/Characters/Meshes/SKM_ToonSkeleton.SKM_ToonSkeleton'"));
+		"/Script/Engine.SkeletalMesh'/Game/JWK/Skeleton_Boss/ToonSkeleton/Characters/Meshes/SKM_ToonSkeleton.SKM_ToonSkeleton'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
