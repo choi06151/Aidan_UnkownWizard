@@ -11,13 +11,16 @@
 #include "SEB/MusicInfoDT.h"
 #include "SEB/StageUI.h"
 #include "Components/WidgetComponent.h"
+#include "SEB/GameOverUI.h"
 
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
+	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	
 	// DataTable 초기화
-	static const FString ContextString(TEXT("Music Info Context"));
+	//tatic const FString ContextString(TEXT("Music Info Context"));
 	static const FSoftObjectPath DataTablePath(TEXT("/Game/SEB/Blueprints/DT_MusicInfo.DT_MusicInfo"));
 	UDataTable* MusicInfoDataObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath.ToString()));
 
@@ -82,22 +85,20 @@ void USelectStageUI::OnDownArrowClicked()
 
 void USelectStageUI::OnBackClicked()
 {
-	//SpawnWidget의 WidgetClass를 GameStartUI로 바꾸고싶어
-	// WidgetClass를 변경할 클래스
-	//TSubclassOf<UUserWidget> NewWidgetClass = UGameStartUI::StaticClass();
-
 	// SpawnWidget의 WidgetClass를 변경
-	ASpawnWidget* SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
-	
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
-	WidgetComponent->SetWidgetClass(NewWidgetClass);
+	WidgetComponent->SetWidgetClass(GameStartUIClass);
 }
 
 void USelectStageUI::OnPlayClicked()
 {
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
-	// 게임 시작 -> 레벨이동?
+	// 게임 시작 -> 레벨이동? -> 선택된 음악 정보가 넘어가야함.
+	
+	//우선은 GameOverUI로 넘어가도록 함. 
+	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
+	WidgetComponent->SetWidgetClass(GameOverUIClass);
 }
 
 
@@ -105,11 +106,12 @@ void USelectStageUI::OnPlayClicked()
 void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoText)
 {
 	//NewText라는 ArtistName열을 가진 행 탐색
-	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString());
+	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString(), "MusicName", NewInfoText.ToString());
 
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
-	
+	SpawnWidget->ArtistName = NewText;
+	SpawnWidget->SpecificRow = SpecificRow;
 	//BestScore 변경
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 
@@ -167,10 +169,13 @@ void USelectStageUI::SetStarFill(UImage* ImageWidget, FText* Path)
 	}
 }
 
-FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName, const FString& ColumnValue)
+FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName1, const FString& ColumnValue1, const FString& ColumnName2, const FString& ColumnValue2)
 {
-	if (!MusicDataTable) return nullptr;
-
+	if (!MusicDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("MusicDataTable읎다"));
+		return nullptr;
+	}
 	static const FString ContextString(TEXT("FindRowByColumnValue"));
 	TArray<FName> RowNames = MusicDataTable->GetRowNames();
 
@@ -179,9 +184,12 @@ FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName, co
 		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowName, ContextString);
 		if (Row)
 		{
-			if (ColumnName == "ArtistName" && Row->ArtistName == ColumnValue)
+			if (ColumnName1 == "ArtistName" && Row->ArtistName == ColumnValue1)
 			{
-				return Row;
+				if(ColumnName2 == "MusicName" && Row->MusicName == ColumnValue2)
+				{
+					return Row;
+				}
 			}
 		}
 	}

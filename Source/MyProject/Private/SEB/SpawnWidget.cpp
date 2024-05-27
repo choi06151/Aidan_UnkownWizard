@@ -4,6 +4,9 @@
 #include "SEB/SpawnWidget.h"
 
 #include "Components/WidgetComponent.h"
+#include "SEB/GameOverUI.h"
+#include "SEB/SelectStageUI.h"
+
 
 // Sets default values
 ASpawnWidget::ASpawnWidget()
@@ -30,6 +33,7 @@ void ASpawnWidget::BeginPlay()
 		WidgetComponent->SetWidgetClass(WidgetClass);
 		WidgetComponent->InitWidget();
 	}
+
 }
 
 // Called every frame

@@ -43,7 +43,8 @@ private:
 	class UTextBlock* BestScore;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* Thumbnail;
-
+	UPROPERTY(meta = (BindWidget))
+	class UUniformGridPanel* DifficultyGridPanel;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* UpArrowBtn;  
@@ -64,25 +65,33 @@ private:
 	UFUNCTION()
 	void OnPlayClicked();
 
-	UPROPERTY(meta = (BindWidget))
-	class UUniformGridPanel* DifficultyGridPanel;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UStageUI> StageUIClass;
 
 	void SetStarFill(class UImage* ImageWidget, FText* Path);
+
+	class ASpawnWidget* SpawnWidget;
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> GameStartUIClass;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> GameOverUIClass;
+	
+	
+	FText* ThumbnailPath;
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeStageName(const FText& NewText,  const FText& NewInfoText);
 
-
+	FMusicInfoDT* FindRowByColumnValue(const FString& ColumnName1, const FString& ColumnValue1, const FString& ColumnName2, const FString& ColumnValue2);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* MusicDataTable;
 
-	FMusicInfoDT* FindRowByColumnValue(const FString& ColumnName, const FString& ColumnValue);
+	FText MusicInfo;
+	
 
-	FText* ThumbnailPath;
-
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> NewWidgetClass;
+	
 };
