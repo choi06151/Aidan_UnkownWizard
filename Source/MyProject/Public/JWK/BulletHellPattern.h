@@ -19,7 +19,9 @@ enum class EPatternType : uint8
 	// 팔각형
 	Octagon				UMETA(DisplayName = "Octagon"),
 	// 나선형
-	Spiral				UMETA(DisplayName = "Spiral")
+	Spiral				UMETA(DisplayName = "Spiral"),
+	// 꽃
+	Flower				UMETA(DisplayName = "Flower")
 };
 
 USTRUCT(BlueprintType)
@@ -56,21 +58,20 @@ public:
 		meta = (EditCondition = "PatternType == EPatternType::Fan"))
 	float FanAngle;
 
-	// 별 탄막 특성
+	// 전체 탄막 특성
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet Pattern",
-		meta = (EditCondition = "PatternType == EPatternType::Star"))
+		meta = (EditCondition = "PatternType == All"))
 	float BulletSpeed;
 
 
 	FBulletHellPattern()
-		: PatternType(EPatternType::Straight),
-		  Interval(1.0f),
-		  PatternSize(500.0f),
-		  NumberOfBullets(10),
-		  Amplitude(30.0f),
-		  Frequency(3.0f),
-		  FanAngle(90.0f),
-		  BulletSpeed(800.0f)
+		: Interval(1.0f),		// 간격
+		  PatternSize(500.0f),	// 패턴의 크기
+		  Amplitude(0.0f),		// 진폭
+		  Frequency(3.0f),		// 빈도
+		  FanAngle(0.0f),		// 부채꼴 각도
+		  NumberOfBullets(10),	// 총알 수
+		  BulletSpeed(800.0f)	// 총알 속도
 	{
 	}
 };

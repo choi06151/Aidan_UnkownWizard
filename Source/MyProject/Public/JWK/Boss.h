@@ -66,7 +66,15 @@ private:
 	void FireRandomSpreadPattern(const FBulletHellPattern& Pattern);
 	// 원
 	void FireCirclePattern(const FBulletHellPattern& Pattern);
-	void DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius);
+	//꽃
+	void FireFlowerPattern(const FBulletHellPattern& Pattern);
+
+
+
+
+
+	
+	
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")	// 총알 생성
 	USpawn_Bullet* BulletSpawner;
@@ -90,8 +98,4 @@ private:
 
 	// 기본 패턴 설정
 	FBulletHellPattern DefaultStraightPattern;
-	FBulletHellPattern DefaultFanPattern;
-	FBulletHellPattern DefaultCirlPattern;
-	FBulletHellPattern DefaultSpreadPattern;
-	FBulletHellPattern DefaultRandomSpreadPattern;
 };
