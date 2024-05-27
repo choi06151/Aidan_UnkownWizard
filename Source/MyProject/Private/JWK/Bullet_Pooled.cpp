@@ -22,8 +22,8 @@ ABullet_Pooled::ABullet_Pooled()
 
 	// movementComponent
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("movementComp"));
-	movementComp->InitialSpeed = 200.0f;
-	movementComp->MaxSpeed = 8000.0f;
+	movementComp->InitialSpeed = 0.0f;
+	movementComp->MaxSpeed = 3000.0f;
 	movementComp->bShouldBounce = false;
 }
 
@@ -37,13 +37,22 @@ void ABullet_Pooled::BeginPlay()
 void ABullet_Pooled::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector NewLoc = GetActorLocation();
-	float DeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-	float DeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-	NewLoc += GetActorForwardVector()* DeltaX + GetActorUpVector() * DeltaY;
+	
+	// 현재 총알의 속도를 계산
+	FVector BulletVelocity = GetActorForwardVector() * movementComp->InitialSpeed;
 
-	// 총알을 새로운 위치로 이동
-	SetActorLocation(NewLoc);
+	// 현재 시간을 기반으로한 진동 운동 계산
+	float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+	float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+
+	// 진동 운동을 적용한 이동 벡터 계산
+	FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
+
+	// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
+	FVector NewLocation = GetActorLocation() + MoveDelta;
+
+	// 새로운 위치로 총알 이동
+	SetActorLocation(NewLocation);
 }
 
 // 총알 비활성화
@@ -68,6 +77,7 @@ void ABullet_Pooled::SetLifeSpan(float LifeTime)
 	LifeSpan = LifeTime;
 }
 
+// bullet의 Speed Set
 void ABullet_Pooled::SetBulletSpeed(float Speed)
 {
 	movementComp->InitialSpeed = Speed;

@@ -266,19 +266,19 @@ void ABoss::InitializeDefaultPatterns()
 	// 직선
 	FBulletHellPattern StraightPattern;
 	StraightPattern.PatternType = EPatternType::Straight;
-	StraightPattern.Interval = 5.0f;
+	StraightPattern.Interval = 1.0f;
 	StraightPattern.FanAngle = 0.0f;
-	StraightPattern.NumberOfBullets = 1;
-	StraightPattern.BulletSpeed = 100.0f;
+	StraightPattern.NumberOfBullets = 5;
+	StraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(StraightPattern);
 
 	// 랜덤 직선
 	FBulletHellPattern RandomStraightPattern;
 	RandomStraightPattern.PatternType = EPatternType::RandomStraight;
-	RandomStraightPattern.Interval = 5.0f;
+	RandomStraightPattern.Interval = 1.0f;
 	RandomStraightPattern.FanAngle = 0.0f;
-	RandomStraightPattern.NumberOfBullets = 1;
-	RandomStraightPattern.BulletSpeed = 1000.0f;
+	RandomStraightPattern.NumberOfBullets = 8;
+	RandomStraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(RandomStraightPattern);
 
 	// 부채꼴
@@ -286,26 +286,25 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.PatternType = EPatternType::Fan;
 	FanPattern.Interval = 1.0f;
 	FanPattern.PatternSize = 600.0f;
-	FanPattern.FanAngle = 90.0f; // 부채꼴 패턴의 각도 설정
-    FanPattern.NumberOfBullets = 1; // 부채꼴 패턴에서 발사할 총알 수
-	FanPattern.BulletSpeed = 3000.0f;
+	FanPattern.FanAngle = 60.0f; // 부채꼴 패턴의 각도 설정
+    FanPattern.NumberOfBullets = 3; // 부채꼴 패턴에서 발사할 총알 수
+	FanPattern.BulletSpeed = 200.0f;
 	BulletPatterns.Add(FanPattern);
 
 	// 원형 패턴
 	FBulletHellPattern CirclePattern;
 	CirclePattern.PatternType = EPatternType::Circle;
-	CirclePattern.Interval = 10.0f;
+	CirclePattern.Interval = 1.0f;
     CirclePattern.PatternSize = 300.0f; // 원형 패턴의 크기 설정
-	CirclePattern.FanAngle = 0;
-	CirclePattern.NumberOfBullets = 1; // 총알의 수
-	CirclePattern.BulletSpeed = 10000.0f;
+	CirclePattern.NumberOfBullets = 12; // 총알의 수
+	CirclePattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(CirclePattern);
 
 	// 랜덤 스프레드 패턴
 	FBulletHellPattern RandomSpreadPattern;
 	RandomSpreadPattern.PatternType = EPatternType::RandomSpread;
-	RandomSpreadPattern.Interval = 100.0f;
-	RandomSpreadPattern.NumberOfBullets = 11;
+	RandomSpreadPattern.Interval = 4.0f;
+	RandomSpreadPattern.NumberOfBullets = 10;
 	RandomStraightPattern.BulletSpeed = 500.0f;
 	BulletPatterns.Add(RandomSpreadPattern);
 
@@ -313,10 +312,10 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern RandomFlowerPattern;
 	RandomFlowerPattern.PatternType = EPatternType::Flower;
 	RandomFlowerPattern.Interval = 1.0f;
-	RandomStraightPattern.PatternSize = 600.0f;
+	RandomStraightPattern.PatternSize = 300.0f;
 	RandomStraightPattern.Amplitude = 50.0f;
 	RandomFlowerPattern.FanAngle = 0;
-	RandomStraightPattern.NumberOfBullets = 1;
-	RandomFlowerPattern.BulletSpeed = 500.0f;
+	RandomStraightPattern.NumberOfBullets = 12;
+	RandomFlowerPattern.BulletSpeed = 800.0f;
 	BulletPatterns.Add(RandomFlowerPattern);
 }
