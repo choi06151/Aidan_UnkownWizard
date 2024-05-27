@@ -14,7 +14,7 @@ bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData
     // 절대 경로 사용
     if (!FFileHelper::LoadFileToString(JsonString, *FilePath))
     {
-        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to load file to string파일을 문자열로 로드하는 데 실패했습니다: %s"), *FilePath);
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to load file to string: %s"), *FilePath);
         return false;
     }
 
@@ -57,13 +57,13 @@ bool UMusicDataLoader::LoadMusicDataFromFile(const FString& FilePath, FMusicData
 
         NormalizeIntensity(OutMusicData);
         NormalizeFrequencyBands(OutMusicData);
-        UE_LOG(LogTemp, Warning, TEXT("UMusicDataLoader::LoadMusicDataFromFile: JSON 데이터 역직렬화 성공"));
+        UE_LOG(LogTemp, Warning, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Successfully deserialized JSON data."));
         return true;
     }
 
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to deserialize JSON data JSON 데이터 역직렬화 실패: %s"), *FilePath);
+        UE_LOG(LogTemp, Error, TEXT("UMusicDataLoader::LoadMusicDataFromFile: Failed to deserialize JSON data: %s"), *FilePath);
         return false;
     }
 }

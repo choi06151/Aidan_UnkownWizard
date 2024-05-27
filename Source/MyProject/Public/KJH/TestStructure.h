@@ -10,7 +10,7 @@
  */
 USTRUCT(BlueprintType)
 
-struct MYPROJECT_API FTestStructure
+struct MYPROJECT_API FTestStructure : public FTableRowBase
 {
 	GENERATED_BODY()
 

@@ -4,6 +4,7 @@
 #include "KJH/TestUI.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "JWK/Boss.h"
 #include "Components/Button.h"
 
@@ -33,32 +34,41 @@ void UTestUI::NativeConstruct()
 
 void UTestUI::OnMusic1Clicked()
 {
-	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/butterfly.butterfly'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/butterfly.json"));
+	FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/butterfly.butterfly'");
+	// JsonFilePath를 절대 경로로 변환
+	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/butterfly.json");
+	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1111Clicked"));
 }
 
 void UTestUI::OnMusic2Clicked()
 {
-	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/Elise.Elise'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/Elise.json"));
+	FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/Elise.Elise'");
+	// JsonFilePath를 절대 경로로 변환
+	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/Elise.json");
+	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic22222Clicked"));
 }
 
 void UTestUI::OnMusic3Clicked()
 {
-	PlayMusicAndLoadData(TEXT("/Script/Engine.SoundWave'/Game/Music/Lacrimosa.Lacrimosa'"), TEXT("D:/Projects/Aidan_UnkownWizard/Source/MyProject/Private/KJH/Lacrimosa.json"));
+	FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/Lacrimosa.Lacrimosa'");
+	// JsonFilePath를 절대 경로로 변환
+	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/Lacrimosa.json");
+	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
 }
 
 void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)
 {
-	UE_LOG(LogTemp, Warning, TEXT(" UTestUI::PlayMusicAndLoadData: JSON 로드 중: %s"), *JsonFilePath);
+	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
 	if (Boss)
 	{
 		Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
 	}
 
 	// 음악 재생
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: 음악 재생 중: %s"), *MusicFilePath);
+	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Playing music from: %s"), *MusicFilePath);
 	USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath));
 	if (Music)
 	{
@@ -66,6 +76,6 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: 음악 로드 실패: %s"), *MusicFilePath);
+		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Failed to load music: %s"), *MusicFilePath);
 	}
 }

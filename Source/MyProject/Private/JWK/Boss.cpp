@@ -65,16 +65,23 @@ void ABoss::Tick(float DeltaTime)
 		{
 			CurrentConditions = PatternConditions[CurrentTimeIndex];
 			CurrentTimeIndex++;
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Tick: Updated CurrentConditions. TimeIndex: %d"), CurrentTimeIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Tick: No more conditions available."));
 		}
 
 		// 현재 조건에 따라 패턴 변경
 		if (CurrentConditions.bIsHighIntensity)
 		{
 			CurrentPatternIndex = GetHighIntensityPatternIndex();
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Tick: High Intensity detected. Pattern Index: %d"), CurrentPatternIndex);
 		}
 		else if (CurrentConditions.bIsLowFrequency)
 		{
 			CurrentPatternIndex = GetLowFrequencyPatternIndex();
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Tick: Low Frequency detected. Pattern Index: %d"), CurrentPatternIndex);
 		}
 		// 추가 조건에 따라 패턴 변경...
 	}
@@ -92,6 +99,8 @@ void ABoss::FireBullet()
 		FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 		FRotator BossRotation = GetActorRotation();
 		FBulletHellPattern CurrentPattern = BulletPatterns[CurrentPatternIndex];
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::FireBullet: Firing pattern %d of type %d"), CurrentPatternIndex, (int32)CurrentPattern.PatternType);
 
 		switch (CurrentPattern.PatternType)
 		{
@@ -120,8 +129,13 @@ void ABoss::FireBullet()
 			break;
 
 		default:
+			UE_LOG(LogTemp, Error, TEXT("ABoss::FireBullet: Unknown pattern type %d"), (int32)CurrentPattern.PatternType);
 			break;
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::FireBullet: No BulletSpawner or BulletPatterns available."));
 	}
 }
 
@@ -278,17 +292,17 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& FilePath)
 {
 	FMusicData MusicData;
 
-	UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터 로드 중: %s"), *FilePath);
+	UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loading music data from: %s"), *FilePath);
 
 	if (UMusicDataLoader::LoadMusicDataFromFile(FilePath, MusicData))
 	{
-		UBulletPatternManager::AnalyzeMusicData(MusicData, PatternConditions, 0.5f, 0.2f, 0.4f, 0.6f, 0.8f);
+		UBulletPatternManager::AnalyzeMusicData(MusicData, PatternConditions, 0.3f, 0.2f, 0.4f, 0.6f, 0.8f);
 		CurrentTimeIndex = 0; // 현재 시간을 초기화
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터를 성공적으로 로드하고 패턴을 설정했습니다."));
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Successfully loaded music data and set patterns."));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns: 음악 데이터를 로드하는 데 실패!!!!: %s"), *FilePath);
+		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns:Failed to load music data from: %s"), *FilePath);
 	}
 }
 
