@@ -52,6 +52,8 @@ public:
 	// JSON 파일 경로를 인자로 받아 음악 데이터를 로드하고 패턴 설정
 	UFUNCTION(BlueprintCallable, Category = "Music")
 	void LoadMusicDataAndSetPatterns(const FString& FilePath);
+	void UpdatePatternConditions(); // 추가
+	FTimerHandle PatternUpdateTimerHandle; // 추가
 
 private:
 	// 총알 발사 관련 함수
@@ -62,17 +64,17 @@ private:
 	void InitializeDefaultPatterns();
 
 	// 직선
-	void FireStraightPattern(const FBulletHellPattern& Pattern);
+	void FireStraightPattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	// 웨이브
-	void FireWavePattern(const FBulletHellPattern& Pattern);
+	void FireWavePattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	// 부채꼴
-	void FireFanPattern(const FBulletHellPattern& Pattern);
+	void FireFanPattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	// 스프레드
-	void FireSpreadPattern(const FBulletHellPattern& Pattern);
+	void FireSpreadPattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	// 랜덤 스프레드
-	void FireRandomSpreadPattern(const FBulletHellPattern& Pattern);
+	void FireRandomSpreadPattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	// 원
-	void FireCirclePattern(const FBulletHellPattern& Pattern);
+	void FireCirclePattern(const FBulletHellPattern& Pattern, float BulletSpeed);
 	void DefineCircleShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius);
 
 	
@@ -105,6 +107,7 @@ private:
 	FBulletHellPattern DefaultRandomSpreadPattern;
 
 	// 추가해야 할 부분
+
 	// 현재 시간에 해당하는 패턴 조건을 저장할 변수
 	FPatternConditions CurrentConditions;
 	// 조건들을 저장한 배열
@@ -112,7 +115,14 @@ private:
 	// 현재 시간
 	int32 CurrentTimeIndex;
 
+
+
+	// 시간 추적용 변수
+	float TimeElapsed;
 	int32 GetHighIntensityPatternIndex() const;
 	int32 GetLowFrequencyPatternIndex() const;
+	int32 GetLowMidFrequencyPatternIndex() const;
+	int32 GetHighMidFrequencyPatternIndex() const;
+	int32 GetHighFrequencyPatternIndex() const;
 	// 추가 조건에 따른 패턴 인덱스를 반환하는 함수...
 };

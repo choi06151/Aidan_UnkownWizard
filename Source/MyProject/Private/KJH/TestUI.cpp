@@ -73,6 +73,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	if (Music)
 	{
 		UGameplayStatics::PlaySound2D(this, Music);
+		GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
 	}
 	else
 	{
