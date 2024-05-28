@@ -32,6 +32,13 @@ void UGameOverUI::NativeConstruct()
 	//Button
 	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
 	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);
+
+	//Set Count
+	CurrentCount = 0;
+	//플레이 결과를 여기에 넣어주면 됨. 
+	MyScoreCount = SpecificRow->BestScore;
+
+	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.0001f, true);
 }
 
 void UGameOverUI::OnSelectStageClicked()
@@ -42,4 +49,19 @@ void UGameOverUI::OnSelectStageClicked()
 
 void UGameOverUI::OnRestartClicked()
 {
+}
+
+void UGameOverUI::UpdateCountText()
+{
+	if(CurrentCount >= MyScoreCount)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CountTimerHandle);
+		return;
+	}
+
+	CurrentCount++;
+	if(MyScore)
+	{
+		MyScore->SetText(FText::AsNumber(CurrentCount));
+	}
 }
