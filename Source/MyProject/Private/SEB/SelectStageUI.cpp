@@ -29,6 +29,11 @@ void USelectStageUI::NativePreConstruct()
 		UE_LOG(LogTemp, Error, TEXT("DataTable Succeed!!!"));
 		MusicDataTable = MusicInfoDataObject;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("DataTable Load Failed"));
+		return;
+	}
 	if (!StageUIClass || !MainScroll) return;
 
 	MainScroll->ClearChildren();
@@ -41,7 +46,7 @@ void USelectStageUI::NativePreConstruct()
 		UStageUI* StageUI = CreateWidget<UStageUI>(this, StageUIClass);
 		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowNames[i], TEXT(""));
 		
-		if (StageUI)
+		if (StageUI && Row)
 		{
 			StageUI->SetArtistText(FText::FromString(Row->ArtistName));
 			StageUI->SetMusicText(FText::FromString(Row->MusicName));
@@ -51,7 +56,11 @@ void USelectStageUI::NativePreConstruct()
 		}
 	}
 	//배열의 첫번째 값들로 정보 초기화
-	ChangeStageName(FText::FromString(MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""))->ArtistName),FText::FromString(MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""))->MusicName) );
+	FMusicInfoDT* FirstRow = MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""));
+        
+	ChangeStageName(FText::FromString(FirstRow->ArtistName), FText::FromString(FirstRow->MusicName));
+	if(SpawnWidget)
+		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
 }
 
 void USelectStageUI::NativeConstruct()
@@ -107,11 +116,17 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 {
 	//NewText라는 ArtistName열을 가진 행 탐색
 	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString(), "MusicName", NewInfoText.ToString());
-
+	if (!SpecificRow)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpecificRow not found"));
+		return;
+	}
+	if(SpawnWidget)
+		SpawnWidget->SpecificRow = SpecificRow;
+	
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
-	SpawnWidget->ArtistName = NewText;
-	SpawnWidget->SpecificRow = SpecificRow;
+	
 	//BestScore 변경
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 
@@ -184,12 +199,10 @@ FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName1, c
 		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowName, ContextString);
 		if (Row)
 		{
-			if (ColumnName1 == "ArtistName" && Row->ArtistName == ColumnValue1)
+			if ((ColumnName1 == "ArtistName" && Row->ArtistName == ColumnValue1) &&
+				(ColumnName2 == "MusicName" && Row->MusicName == ColumnValue2))
 			{
-				if(ColumnName2 == "MusicName" && Row->MusicName == ColumnValue2)
-				{
-					return Row;
-				}
+				return Row;
 			}
 		}
 	}

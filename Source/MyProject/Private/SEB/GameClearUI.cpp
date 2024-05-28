@@ -1,22 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SEB/GameOverUI.h"
+#include "SEB/GameClearUI.h"
 
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "SEB/MusicInfoDT.h"
 #include "SEB/SpawnWidget.h"
-#include "SEB/SelectStageUI.h"
-void UGameOverUI::NativeConstruct()
+
+void UGameClearUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	FMusicInfoDT* SpecificRow = SpawnWidget->SpecificRow;
-
 	ArtistName->SetText(FText::FromString(SpecificRow->ArtistName));
 	MusicName->SetText(FText::FromString(SpecificRow->MusicName));
 	ThumbnailPath = new FText(FText::FromString(SpecificRow->Thumbnail));
@@ -30,16 +30,16 @@ void UGameOverUI::NativeConstruct()
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 	
 	//Button
-	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);
+	SelectStageBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnSelectStageClicked);
+	RestartBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnRestartClicked);
 }
 
-void UGameOverUI::OnSelectStageClicked()
+void UGameClearUI::OnSelectStageClicked()
 {
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
 }
 
-void UGameOverUI::OnRestartClicked()
+void UGameClearUI::OnRestartClicked()
 {
 }
