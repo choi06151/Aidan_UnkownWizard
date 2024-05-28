@@ -62,13 +62,17 @@ private:
 	void FireRandomStraightPatter(const FBulletHellPattern& Pattern);
 	// 부채꼴
 	void FireFanPattern(const FBulletHellPattern& Pattern);
-	// 랜덤 스프레드
-	void FireRandomSpreadPattern(const FBulletHellPattern& Pattern);
 	// 원
 	void FireCirclePattern(const FBulletHellPattern& Pattern);
-	//꽃
-	void FireFlowerPattern(const FBulletHellPattern& Pattern);
-
+	// 나비
+	void FireButterflyPattern(const FBulletHellPattern& Pattern);
+	// 나팔꽃
+	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern);
+	// 초승달
+	void FireCrescentPattern(const FBulletHellPattern& Pattern);
+	// 천사
+	void FireAngelPattern(const FBulletHellPattern& Pattern);
+	
 
 
 
