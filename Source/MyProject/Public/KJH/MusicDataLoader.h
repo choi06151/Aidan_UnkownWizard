@@ -25,6 +25,10 @@ struct FMusicData
 	UPROPERTY(BlueprintReadWrite, Category = "Music Data")
 	TArray<float> Intensity;
 
+	// 정규화된 강도 값
+	UPROPERTY(BlueprintReadWrite, Category = "Music Data")
+	TArray<float> NormalizedIntensity;
+
 	// 주파수 대역의 값
 	UPROPERTY(BlueprintReadWrite, Category = "Music Data")
 	TMap<FString, FFrequencyBand> FrequencyBands;
@@ -48,4 +52,11 @@ public:
 	//@return - 파일 로드 및 파싱 성공 여부를 반환합니다.
 	UFUNCTION(BlueprintCallable, Category = "Music Data")
 	static bool LoadMusicDataFromFile(const FString& FilePath, FMusicData& OutMusicData);
+
+private:
+	// 강도 값을 정규화하는 함수
+	static void NormalizeIntensity(FMusicData& MusicData);
+
+	// 주파수 대역 값을 정규화하는 함수
+	static void NormalizeFrequencyBands(FMusicData& MusicData);
 };
