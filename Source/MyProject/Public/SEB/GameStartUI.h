@@ -13,10 +13,25 @@ UCLASS()
 class MYPROJECT_API UGameStartUI : public UUserWidget
 {
 	GENERATED_BODY()
+protected:
+	virtual void NativeConstruct() override;
+private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* StartBtn;  
 	UPROPERTY(meta = (BindWidget))
 	class UButton* QuitBtn;
 	UPROPERTY(meta = (BindWidget))
-	class UButton* HowToPlayBtn;
+	class UButton* TutorialBtn;
+	
+	UFUNCTION()
+	void OnStartBtnClicked();
+	UFUNCTION()
+	void OnQuitBtnClicked();
+	UFUNCTION()
+	void OnTutorialBtnClicked();
+
+	class ASpawnWidget* SpawnWidget;
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> SelectStageUIClass;
 };
