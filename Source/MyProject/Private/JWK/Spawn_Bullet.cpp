@@ -1,5 +1,5 @@
 #include "JWK/Spawn_Bullet.h"
-
+	
 USpawn_Bullet::USpawn_Bullet()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -79,7 +79,7 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 			return PoolableBullet;
 		}
 	}
-	return  nullptr; // 사용 가능한 Bullet이 없는 경우 nullptr 반환
+	return  nullptr; // 사용 가능한 Bullet이 없는 경우 null 반환
 }
 
 // Bullet이 비활성화될 때 호출되는 함수

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MusicInfoDT.h"
 #include "GameFramework/Actor.h"
 #include "SpawnWidget.generated.h"
 
@@ -26,6 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> WidgetClass;
 
+	class USelectStageUI* SelectedMusicInfo;
+	FText ArtistName;
+
+	FMusicInfoDT* SpecificRow;
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;

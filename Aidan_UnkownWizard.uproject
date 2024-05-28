@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"CoreUObject"
+				"CoreUObject",
+				"UMG"
 			]
 		}
 	],
@@ -33,15 +34,11 @@
 			"Enabled": true
 		},
 		{
-			"Name": "OculusPlatform",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Android"
-			]
+			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
 		},
 		{
-			"Name": "SkeletalMeshModelingTools",
+			"Name": "SQLiteSupport",
 			"Enabled": true
 		}
 	],

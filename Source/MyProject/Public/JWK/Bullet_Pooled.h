@@ -71,8 +71,8 @@ protected:
 
 	// 움직임 패턴 관련 변수 초기화
 	UPROPERTY(EditAnywhere)
-	float OscillationFrequency = 1.0f;
+	float OscillationFrequency = 3.0f;	// 진동주파수
 	UPROPERTY(EditAnywhere)
-	float OscillationRadius = 1.0f;
+	float OscillationRadius = 1.0f;		// 진동반경
 
 };

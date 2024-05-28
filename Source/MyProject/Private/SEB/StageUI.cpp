@@ -22,19 +22,19 @@ void UStageUI::NativeConstruct()
 	}
 }
 
-void UStageUI::SetScrollText(const FText& NewText)
+void UStageUI::SetArtistText(const FText& NewText)
 {
-	if (StageName)
+	if (ArtistName)
 	{
-		StageName->SetText(NewText);
+		ArtistName->SetText(NewText);
 	}
 }
 
-void UStageUI::SetInfoText(const FText& NewInfoText)
+void UStageUI::SetMusicText(const FText& NewInfoText)
 {
-	if (InfoText)
+	if (MusicName)
 	{
-		InfoText->SetText(NewInfoText);
+		MusicName->SetText(NewInfoText);
 	}
 }
 
@@ -63,11 +63,15 @@ void UStageUI::SetDifficultyImage(int32 n)
 	}
 }
 
+void UStageUI::SetBestScore(int32 score)
+{
+}
+
 void UStageUI::OnSelectStageClicked()
 {
 	if (ParentSelectStageUI)
 	{
-		ParentSelectStageUI->ChangeStageName(StageName->GetText(), InfoText->GetText(), DifficultyNum);
+		ParentSelectStageUI->ChangeStageName(ArtistName->GetText(), MusicName->GetText());
 	}
 	else
 	{

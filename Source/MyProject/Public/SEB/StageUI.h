@@ -23,9 +23,10 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class USelectStageUI* ParentSelectStageUI;
 	
-	void SetScrollText(const FText& NewText);
-	void SetInfoText(const FText& NewInfoText);
+	void SetArtistText(const FText& NewText);
+	void SetMusicText(const FText& NewInfoText);
 	void SetDifficultyImage(int32 n);
+	void SetBestScore(int32 score);
 private:
 	
 	
@@ -33,10 +34,10 @@ private:
 	class UUniformGridPanel* DifficultyGridPanel;
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UTextBlock* StageName;
+	class UTextBlock* ArtistName;
 	
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UTextBlock* InfoText;
+	class UTextBlock* MusicName;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;
