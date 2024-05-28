@@ -34,14 +34,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "OculusPlatform",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Android"
-			]
-		},
-		{
 			"Name": "SkeletalMeshModelingTools",
 			"Enabled": true
 		},
