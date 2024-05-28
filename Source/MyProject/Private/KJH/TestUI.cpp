@@ -64,7 +64,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
 	if (Boss)
 	{
-		Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
+		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
 	}
 
 	// 음악 재생
@@ -73,7 +73,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	if (Music)
 	{
 		UGameplayStatics::PlaySound2D(this, Music);
-		GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
+		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
 	}
 	else
 	{
