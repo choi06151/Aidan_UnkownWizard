@@ -28,18 +28,8 @@ void UGameOverUI::NativeConstruct()
 		NewBrush.SetResourceObject(ThumbnailTexture);
 		Thumbnail->SetBrush(NewBrush);
 	}
-
-	//Add DataTable
-	static const FSoftObjectPath DataTablePath(TEXT("/Script/Engine.DataTable'/Game/SEB/Blueprints/DT_PlayInfo.DT_PlayInfo'"));
-	UDataTable* PlayInfoDataObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath.ToString()));
-
-	if(PlayInfoDataObject)
-	{
-		UE_LOG(LogTemp, Error, TEXT("DataTable Succeed!!!"));
-		PlayDataTable = PlayInfoDataObject;
-		//여기서 PlayDataTable에 값을 넣고싶어
-	}
-
+	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
+	
 	//Button
 	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
 	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);

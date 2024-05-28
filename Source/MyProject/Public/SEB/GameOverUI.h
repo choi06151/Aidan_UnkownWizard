@@ -22,6 +22,8 @@ private:
 	class UTextBlock* ArtistName;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MusicName;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* BestScore;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;  
