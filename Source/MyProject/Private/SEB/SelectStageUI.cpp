@@ -20,7 +20,6 @@ void USelectStageUI::NativePreConstruct()
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	
 	// DataTable 초기화
-	//tatic const FString ContextString(TEXT("Music Info Context"));
 	static const FSoftObjectPath DataTablePath(TEXT("/Game/SEB/Blueprints/DT_MusicInfo.DT_MusicInfo"));
 	UDataTable* MusicInfoDataObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath.ToString()));
 
@@ -34,6 +33,7 @@ void USelectStageUI::NativePreConstruct()
 		UE_LOG(LogTemp, Error, TEXT("DataTable Load Failed"));
 		return;
 	}
+	
 	if (!StageUIClass || !MainScroll || !SpawnWidget) return;
 
 	MainScroll->ClearChildren();
@@ -111,6 +111,7 @@ void USelectStageUI::OnPlayClicked()
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 -> 레벨이동? -> 선택된 음악 정보가 넘어가야함.
+	// BossFSM클래스의 bIsGameStart가 true가 되도록 변경
 	
 	//우선은 GameOverUI로 넘어가도록 함. 
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
@@ -210,6 +211,7 @@ FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName1, c
 		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowName, ContextString);
 		if (Row)
 		{
+			// ArtistName과 MusicName 모두 일치할 경우
 			if ((ColumnName1 == "ArtistName" && Row->ArtistName == ColumnValue1) &&
 				(ColumnName2 == "MusicName" && Row->MusicName == ColumnValue2))
 			{
