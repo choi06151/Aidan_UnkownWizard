@@ -38,8 +38,8 @@ void UGameClearUI::NativeConstruct()
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 	
 	//Button
-	SelectStageBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnSelectStageClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnRestartClicked);
+	SelectStageBtn->OnPressed.AddDynamic(this, &UGameClearUI::OnSelectStageClicked);
+	RestartBtn->OnPressed.AddDynamic(this, &UGameClearUI::OnRestartClicked);
 
 	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
 	SpawnWidget->MusicPlay();

@@ -73,10 +73,10 @@ void USelectStageUI::NativePreConstruct()
 void USelectStageUI::NativeConstruct()
 {
 	Super::NativeConstruct();
-	UpArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
-	DownArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
-	BackBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnBackClicked);
-	PlayBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnPlayClicked);
+	UpArrowBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
+	DownArrowBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
+	BackBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnBackClicked);
+	PlayBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnPlayClicked);
 	
 }
 

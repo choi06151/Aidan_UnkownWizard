@@ -35,8 +35,8 @@ void UGameOverUI::NativeConstruct()
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 	
 	//Button
-	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);
+	SelectStageBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
+	RestartBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnRestartClicked);
 
 
 	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
