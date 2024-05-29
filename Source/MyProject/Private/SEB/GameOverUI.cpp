@@ -15,6 +15,11 @@ void UGameOverUI::NativeConstruct()
 	Super::NativeConstruct();
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	if(nullptr==SpawnWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SpawnWidget is Null"));
+		return;
+	}
 	FMusicInfoDT* SpecificRow = SpawnWidget->SpecificRow;
 
 	ArtistName->SetText(FText::FromString(SpecificRow->ArtistName));
@@ -30,8 +35,8 @@ void UGameOverUI::NativeConstruct()
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 	
 	//Button
-	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);
+	SelectStageBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
+	RestartBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnRestartClicked);
 
 
 	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
