@@ -25,6 +25,8 @@ private:
 	class UButton* Btn_Music2;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Music3;
+	UPROPERTY(meta = (BindWidget))
+	UButton* Btn_Show5SecInfo;
 
 	UPROPERTY()
 	class ABoss* Boss;
@@ -35,6 +37,9 @@ private:
 	void OnMusic2Clicked();
 	UFUNCTION()
 	void OnMusic3Clicked();
+	UFUNCTION()
+	void OnShow5SecInfoClicked();
+
 
 	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
 };

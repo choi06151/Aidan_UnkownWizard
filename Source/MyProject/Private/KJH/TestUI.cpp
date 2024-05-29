@@ -28,6 +28,10 @@ void UTestUI::NativeConstruct()
 	{
 		Btn_Music3->OnPressed.AddDynamic(this, &UTestUI::OnMusic3Clicked);
 	}
+	if (Btn_Show5SecInfo)
+	{
+		Btn_Show5SecInfo->OnPressed.AddDynamic(this, &UTestUI::OnShow5SecInfoClicked);
+	}
 
 	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 }
@@ -57,6 +61,60 @@ void UTestUI::OnMusic3Clicked()
 	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/Lacrimosa.json");
 	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
+}
+
+void UTestUI::OnShow5SecInfoClicked()
+{
+	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/butterfly.json");
+	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnShow5SecInfoClicked: Loading JSON from: %s"), *JsonFilePath);
+
+	FString JsonString;
+	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
+	{
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			// 5초 시점의 정보를 로그에 출력
+			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
+			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
+			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
+			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
+			const TArray<TSharedPtr<FJsonValue>> LowMidArray = JsonObject->GetArrayField(TEXT("low_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
+
+			float Intensity = IntensityArray[3]->AsNumber();
+			float LowFrequency = LowArray[3]->AsNumber();
+			float LowMidFrequency = LowMidArray[3]->AsNumber();
+			float HighMidFrequency = HighMidArray[3]->AsNumber();
+			float HighFrequency = HighArray[3]->AsNumber();
+
+			UE_LOG(LogTemp, Warning, TEXT("Tempo: %f"), Tempo);
+			for (const auto& BeatValue : BeatsArray)
+			{
+				float BeatTime = BeatValue->AsNumber();
+				if (BeatTime <= 3.0f)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Beat at: %f"), BeatTime);
+				}
+				else
+				{
+					break;
+				}
+			}
+			UE_LOG(LogTemp, Warning, TEXT("Intensity at 5 seconds: %f"), Intensity);
+			UE_LOG(LogTemp, Warning, TEXT("Low frequency band at 5 seconds: %f"), LowFrequency);
+			UE_LOG(LogTemp, Warning, TEXT("Low-mid frequency band at 5 seconds: %f"), LowMidFrequency);
+			UE_LOG(LogTemp, Warning, TEXT("High-mid frequency band at 5 seconds: %f"), HighMidFrequency);
+			UE_LOG(LogTemp, Warning, TEXT("High frequency band at 5 seconds: %f"), HighFrequency);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *JsonFilePath);
+	}
 }
 
 void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)

@@ -68,10 +68,12 @@ struct FPatternConditions
 UCLASS(Blueprintable)
 class MYPROJECT_API UBulletPatternManager : public UObject
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
     // 음악 데이터를 기반으로 패턴 조건을 생성하는 함수
     UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
     static void AnalyzeMusicData(const FMusicData& MusicData, TArray<FPatternConditions>& OutPatternConditions, float IntensityThreshold, float LowFreqThreshold, float LowMidFreqThreshold, float HighMidFreqThreshold, float HighFreqThreshold);
+
+    void ExtractDataAtSecond(const FMusicData& MusicData, int32 Second, float& OutIntensity, float& OutLowFrequency, float& OutLowMidFrequency, float& OutHighMidFrequency, float& OutHighFrequency, TArray<float>& OutBeats);
 };
