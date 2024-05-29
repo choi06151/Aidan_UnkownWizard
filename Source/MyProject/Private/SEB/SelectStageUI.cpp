@@ -16,7 +16,7 @@
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-
+	
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	
 	// DataTable 초기화
@@ -34,7 +34,7 @@ void USelectStageUI::NativePreConstruct()
 		UE_LOG(LogTemp, Error, TEXT("DataTable Load Failed"));
 		return;
 	}
-	if (!StageUIClass || !MainScroll) return;
+	if (!StageUIClass || !MainScroll || !SpawnWidget) return;
 
 	MainScroll->ClearChildren();
 
@@ -57,8 +57,15 @@ void USelectStageUI::NativePreConstruct()
 	}
 	//배열의 첫번째 값들로 정보 초기화
 	FMusicInfoDT* FirstRow = MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""));
-        
-	ChangeStageName(FText::FromString(FirstRow->ArtistName), FText::FromString(FirstRow->MusicName));
+
+	if(nullptr == SpawnWidget->SpecificRow)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpawnWidget->SpecificRow is Null"));
+		SpawnWidget->SpecificRow = FirstRow;
+		
+	}
+	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+	
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
 }
@@ -111,28 +118,6 @@ void USelectStageUI::OnPlayClicked()
 }
 
 
-void USelectStageUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)
-{
-	/*UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
-	/*if (Boss)
-	{
-		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
-	}#1#
-
-	// 음악 재생
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Playing music from: %s"), *MusicFilePath);
-	USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath));
-	if (Music)
-	{
-		UGameplayStatics::PlaySound2D(this, Music);
-		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Failed to load music: %s"), *MusicFilePath);
-	}*/
-}
-
 //버튼 클릭 시 좌측 정보 업데이트
 void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoText)
 {
@@ -146,9 +131,7 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
 
-	/*FString MusicFilePath = SpecificRow->MusicFilePath;
-	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
-	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);*/
+	//SpawnWidget->MusicPlay();
 	
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);

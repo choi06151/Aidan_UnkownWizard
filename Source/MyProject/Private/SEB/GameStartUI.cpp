@@ -12,9 +12,9 @@ void UGameStartUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
-	StartBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
-	QuitBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
-	TutorialBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnTutorialBtnClicked);
+	StartBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
+	QuitBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
+	TutorialBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnTutorialBtnClicked);
 }
 
 void UGameStartUI::OnStartBtnClicked()

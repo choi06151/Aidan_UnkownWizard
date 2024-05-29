@@ -15,6 +15,11 @@ void UGameOverUI::NativeConstruct()
 	Super::NativeConstruct();
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	if(nullptr==SpawnWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SpawnWidget is Null"));
+		return;
+	}
 	FMusicInfoDT* SpecificRow = SpawnWidget->SpecificRow;
 
 	ArtistName->SetText(FText::FromString(SpecificRow->ArtistName));
