@@ -4,7 +4,7 @@
 #include "KJH/BulletPatternManager.h"
 
 void UBulletPatternManager::AnalyzeMusicData(const FMusicData& MusicData,
-    TArray<FPatternConditions>& OutPatternConditions, float IntensityThreshold, float LowFreqThreshold,
+    TArray<FPatternConditions22>& OutPatternConditions, float IntensityThreshold, float LowFreqThreshold,
     float LowMidFreqThreshold, float HighMidFreqThreshold, float HighFreqThreshold)
 {
     // 음악 데이터의 강도 배열 길이를 가져옴.
@@ -15,7 +15,7 @@ void UBulletPatternManager::AnalyzeMusicData(const FMusicData& MusicData,
     for (int32 i = 0; i < NumSeconds; ++i)
     {
         // 매 초마다 새로운 패턴 조건을 초기화함.
-        FPatternConditions Conditions;
+        FPatternConditions22 Conditions;
 
         // 주파수 대역 조건 평가
         // 각 주파수 대역(low, low_mid, high_mid, high)에 대해 현재 초에 해당하는 값을 가져와 임계값과 비교하여 조건을 설정함.
@@ -67,31 +67,30 @@ void UBulletPatternManager::ExtractDataAtSecond(const FMusicData& MusicData, int
     if (MusicData.Intensity.IsValidIndex(Second))
     {
         OutIntensity = MusicData.Intensity[Second];
-        //UE_LOG(LogTemp, Log, TEXT("Second: %d, Intensity: %f"), Second, OutIntensity);
     }
+
     // 주어진 초(Second)가 저주파수 대역 배열 범위 내에 있는지 확인하고, 해당 초의 저주파수 대역 값을 반환
     if (MusicData.LowFrequencyBand.IsValidIndex(Second))
     {
         OutLowFrequency = MusicData.LowFrequencyBand[Second];
-        //UE_LOG(LogTemp, Log, TEXT("Second: %d, Low Frequency: %f"), Second, OutLowFrequency);
     }
+
     // 주어진 초(Second)가 저중주파수 대역 배열 범위 내에 있는지 확인하고, 해당 초의 저중주파수 대역 값을 반환
     if (MusicData.LowMidFrequencyBand.IsValidIndex(Second))
     {
         OutLowMidFrequency = MusicData.LowMidFrequencyBand[Second];
-        //UE_LOG(LogTemp, Log, TEXT("Second: %d, Low Mid Frequency: %f"), Second, OutLowMidFrequency);
     }
+
     // 주어진 초(Second)가 중고주파수 대역 배열 범위 내에 있는지 확인하고, 해당 초의 중고주파수 대역 값을 반환
     if (MusicData.HighMidFrequencyBand.IsValidIndex(Second))
     {
         OutHighMidFrequency = MusicData.HighMidFrequencyBand[Second];
-        //UE_LOG(LogTemp, Log, TEXT("Second: %d, High Mid Frequency: %f"), Second, OutHighMidFrequency);
     }
+
     // 주어진 초(Second)가 고주파수 대역 배열 범위 내에 있는지 확인하고, 해당 초의 고주파수 대역 값을 반환
     if (MusicData.HighFrequencyBand.IsValidIndex(Second))
     {
         OutHighFrequency = MusicData.HighFrequencyBand[Second];
-        //UE_LOG(LogTemp, Log, TEXT("Second: %d, High Frequency: %f"), Second, OutHighFrequency);
     }
 
     // 비트 발생 시기를 확인하고, 주어진 초(Second) ±0.1초 이내에 발생한 비트를 반환
@@ -100,7 +99,6 @@ void UBulletPatternManager::ExtractDataAtSecond(const FMusicData& MusicData, int
         if (FMath::Abs(Second - BeatTime) < 0.1f) // 비트 발생 시점을 ±0.1초 이내로 확인
         {
             OutBeats.Add(BeatTime);
-            //UE_LOG(LogTemp, Log, TEXT("Second: %d, Beat Time: %f"), Second, BeatTime);
         }
     }
 }

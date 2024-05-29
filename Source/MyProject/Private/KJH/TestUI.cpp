@@ -85,17 +85,17 @@ void UTestUI::OnShow5SecInfoClicked()
 			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
 			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
 
-			float Intensity = IntensityArray[3]->AsNumber();
-			float LowFrequency = LowArray[3]->AsNumber();
-			float LowMidFrequency = LowMidArray[3]->AsNumber();
-			float HighMidFrequency = HighMidArray[3]->AsNumber();
-			float HighFrequency = HighArray[3]->AsNumber();
+			float Intensity = IntensityArray[15]->AsNumber();
+			float LowFrequency = LowArray[15]->AsNumber();
+			float LowMidFrequency = LowMidArray[15]->AsNumber();
+			float HighMidFrequency = HighMidArray[15]->AsNumber();
+			float HighFrequency = HighArray[15]->AsNumber();
 
 			UE_LOG(LogTemp, Warning, TEXT("Tempo: %f"), Tempo);
 			for (const auto& BeatValue : BeatsArray)
 			{
 				float BeatTime = BeatValue->AsNumber();
-				if (BeatTime <= 3.0f)
+				if (BeatTime <= 15.0f)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Beat at: %f"), BeatTime);
 				}
@@ -122,19 +122,11 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
 	if (Boss)
 	{
-		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
+		Boss->LoadMusicDataAndSetPatterns(JsonFilePath, MusicFilePath); // JSON 파일, Music 경로 전달
 	}
 
-	// 음악 재생
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Playing music from: %s"), *MusicFilePath);
-	USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath));
-	if (Music)
-	{
-		UGameplayStatics::PlaySound2D(this, Music);
-		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
-	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Failed to load music: %s"), *MusicFilePath);
+		UE_LOG(LogTemp, Error, TEXT("Boss is not valid!"));
 	}
 }

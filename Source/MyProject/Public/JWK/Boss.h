@@ -6,6 +6,54 @@
 #include "BulletHellPattern.h"
 #include "Boss.generated.h"
 
+// 패턴 조건을 정의하는 구조체
+USTRUCT(BlueprintType)
+struct FPatternConditions
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighIntensity;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsLowFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsLowMidFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighMidFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsOnBeat;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove90;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove100;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove110;
+
+	FPatternConditions()
+		: bIsHighIntensity(false)
+		, bIsLowFrequency(false)
+		, bIsLowMidFrequency(false)
+		, bIsHighMidFrequency(false)
+		, bIsHighFrequency(false)
+		, bIsOnBeat(false)
+		, bIsTempoAbove90(false)
+		, bIsTempoAbove100(false)
+		, bIsTempoAbove110(false)
+	{
+	}
+};
+
+
 UCLASS()
 class MYPROJECT_API ABoss : public ACharacter
 {
@@ -47,6 +95,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool IsDie = false;
 
+	//----------------------------------------------------------------
+	// 추가해야하는 
+	// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
+	void LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FString& MusicFilePath);
+
+	// 패턴 조건을 업데이트하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
+	void UpdatePatternConditions();
 	
 private:
 	// 총알 발사 관련 함수
@@ -102,4 +159,13 @@ private:
 
 	// 기본 패턴 설정
 	FBulletHellPattern DefaultStraightPattern;
+
+
+	//-------------------------------------------
+	// 추가
+	FTimerHandle PatternUpdateTimerHandle; // 새로운 타이머 핸들 추가
+	// 음악 데이터를 저장할 변수
+	TArray<FPatternConditions> PatternConditions;
+	// 패턴 업데이트를 위한 인덱스
+	int32 CurrentTimeIndex;
 };

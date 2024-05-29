@@ -1,6 +1,7 @@
 #include "JWK/Boss.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -36,6 +37,7 @@ ABoss::ABoss()
 	FireRate = 1.0f;
 
 	CurrentPatternIndex = 0;
+	CurrentTimeIndex = 0; // 추가: CurrentTimeIndex 초기화
 }
 
 void ABoss::BeginPlay()
@@ -45,43 +47,202 @@ void ABoss::BeginPlay()
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
 
-	StartFiring();
+	/*StartFiring();*/
 }
 
 void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	static float TimeElapsed = 0.0f;
-	TimeElapsed += DeltaTime;
-	
-	// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
-	if (TimeElapsed > 1.5f && TimeElapsed <= 3.0f && !IsDie)
-	{
-		StopFiring();
-		ChangePattern();
-		StartFiring();
-	}
-	// 3.0초 5.5초 발사 중지
-	if (TimeElapsed > 3.0f && TimeElapsed <= 5.5f && !IsDie)
-	{
-		StopFiring();
-	}
+	//static float TimeElapsed = 0.0f;
+	//TimeElapsed += DeltaTime;
+	//
+	//// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
+	//if (TimeElapsed > 1.5f && TimeElapsed <= 3.0f && !IsDie)
+	//{
+	//	StopFiring();
+	//	ChangePattern();
+	//	StartFiring();
+	//}
+	//// 3.0초 5.5초 발사 중지
+	//if (TimeElapsed > 3.0f && TimeElapsed <= 5.5f && !IsDie)
+	//{
+	//	StopFiring();
+	//}
 
-	// 5.5초 초과시 다음 탄막 패턴 발사
-	if (TimeElapsed > 5.5f && !IsDie)
-	{
-		ChangePattern();
-		StartFiring();
+	//// 5.5초 초과시 다음 탄막 패턴 발사
+	//if (TimeElapsed > 5.5f && !IsDie)
+	//{
+	//	ChangePattern();
+	//	StartFiring();
 
-		// 타이머 리셋
-		TimeElapsed = 0.0f;
-	}
+	//	// 타이머 리셋
+	//	TimeElapsed = 0.0f;
+	//}
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+void ABoss::LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FString& MusicFilePath)
+{
+	FString JsonString;
+	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
+	{
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			// 패턴 조건들을 초기화
+			PatternConditions.Empty();
+			CurrentTimeIndex = 0;
+
+			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
+			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
+			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
+			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
+			const TArray<TSharedPtr<FJsonValue>> LowMidArray = JsonObject->GetArrayField(TEXT("low_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
+
+			for (int32 i = 0; i < IntensityArray.Num(); ++i)
+			{
+				FPatternConditions Conditions;
+
+				Conditions.bIsHighIntensity = IntensityArray[i]->AsNumber() > 0.3f;
+				Conditions.bIsLowFrequency = LowArray[i]->AsNumber() > 0.2f;
+				Conditions.bIsLowMidFrequency = LowMidArray[i]->AsNumber() > 0.2f;
+				Conditions.bIsHighMidFrequency = HighMidArray[i]->AsNumber() > 0.2f;
+				Conditions.bIsHighFrequency = HighArray[i]->AsNumber() > 0.2f;
+
+				for (const auto& BeatValue : BeatsArray)
+				{
+					float BeatTime = BeatValue->AsNumber();
+					if (FMath::Abs(i - BeatTime) < 0.1f)
+					{
+						Conditions.bIsOnBeat = true;
+						break;
+					}
+				}
+
+				Conditions.bIsTempoAbove90 = Tempo > 90.0f;
+				Conditions.bIsTempoAbove100 = Tempo > 100.0f;
+				Conditions.bIsTempoAbove110 = Tempo > 110.0f;
+
+				PatternConditions.Add(Conditions);
+			}
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Loaded JSON with %d conditions."), PatternConditions.Num());
+
+			// 패턴 조건 업데이트 타이머 설정 (1초 간격으로 패턴 업데이트)
+			GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, 1.0f, true);
+
+			// 음악 재생 시작
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::Playing music synchronized with pattern conditions."));
+			if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+			{
+				UGameplayStatics::PlaySound2D(this, Music);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ABoss::Failed to load music: %s"), *MusicFilePath);
+			}
+
+			// 탄막 발사 시작
+			StartFiring();
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::Failed to load JSON file: %s"), *JsonFilePath);
+	}
+}
+
+// 패턴 조건을 업데이트하는 함수
+void ABoss::UpdatePatternConditions()
+{
+	if (PatternConditions.IsValidIndex(CurrentTimeIndex))
+	{
+		FPatternConditions CurrentCondition = PatternConditions[CurrentTimeIndex];
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
+
+		// 패턴 조건을 기반으로 패턴 변경 로직을 추가합니다.
+		if (CurrentCondition.bIsHighIntensity)
+		{
+			// 높은 강도 조건이 만족되면 패턴 속도를 높입니다.
+			for (auto& Pattern : BulletPatterns)
+			{
+				Pattern.BulletSpeed += 50.0f; // 속도를 50만큼 증가
+			}
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High intensity condition met. Increasing bullet speed."));
+		}
+
+		if (CurrentCondition.bIsLowFrequency)
+		{
+			// 저주파수 대역이 활성화될 때 패턴을 부채꼴로 변경
+			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+				{
+					return Pattern.PatternType == EPatternType::Fan;
+				});
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Low frequency condition met. Changing pattern to Fan."));
+		}
+
+		if (CurrentCondition.bIsLowMidFrequency)
+		{
+			// 저중주파수 대역이 활성화될 때 패턴을 원형으로 변경
+			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+				{
+					return Pattern.PatternType == EPatternType::Circle;
+				});
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Low-mid frequency condition met. Changing pattern to Circle."));
+		}
+
+		if (CurrentCondition.bIsHighMidFrequency)
+		{
+			// 중고주파수 대역이 활성화될 때 패턴을 나비로 변경
+			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+				{
+					return Pattern.PatternType == EPatternType::Butterfly;
+				});
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High-mid frequency condition met. Changing pattern to Butterfly."));
+		}
+
+		if (CurrentCondition.bIsHighFrequency)
+		{
+			// 고주파수 대역이 활성화될 때 패턴을 나팔꽃으로 변경
+			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+				{
+					return Pattern.PatternType == EPatternType::TrumpetFlower;
+				});
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High frequency condition met. Changing pattern to TrumpetFlower."));
+		}
+
+		if (CurrentCondition.bIsOnBeat)
+		{
+			// 비트가 발생할 때 발사 주기를 줄입니다.
+			FireRate = FMath::Max(0.1f, FireRate - 0.1f); // 최소 0.1초
+		}
+
+		CurrentTimeIndex++;
+		//if (CurrentCondition.bIsTempoAbove110)
+		//{
+		//	// 템포가 110 이상일 때 패턴을 직선으로 변경
+		//	CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+		//		{
+		//			return Pattern.PatternType == EPatternType::Straight;
+		//		});
+		//	UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Tempo above 110. Changing pattern to Straight."));
+		//}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // Stop the timer if no more conditions
+	}
 }
 
 void ABoss::FireBullet()
