@@ -81,7 +81,7 @@ private:
 	
 	
 	FText* ThumbnailPath;
-	
+	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
 public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeStageName(const FText& NewText,  const FText& NewInfoText);

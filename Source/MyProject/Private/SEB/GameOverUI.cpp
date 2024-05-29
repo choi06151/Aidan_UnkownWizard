@@ -33,6 +33,10 @@ void UGameOverUI::NativeConstruct()
 	SelectStageBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
 	RestartBtn->OnClicked.AddDynamic(this, &UGameOverUI::OnRestartClicked);
 
+
+	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
+	SpawnWidget->MusicPlay();
+	
 	//Set Count
 	CurrentCount = 0;
 	//플레이 결과를 여기에 넣어주면 됨. 
@@ -65,3 +69,5 @@ void UGameOverUI::UpdateCountText()
 		MyScore->SetText(FText::AsNumber(CurrentCount));
 	}
 }
+
+

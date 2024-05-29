@@ -31,6 +31,8 @@ public:
 	FText ArtistName;
 
 	FMusicInfoDT* SpecificRow;
+	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
+	void MusicPlay();
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;

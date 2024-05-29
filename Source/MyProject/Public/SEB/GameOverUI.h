@@ -53,10 +53,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateCountText();
-
+	
 private:
 	int32 CurrentCount;
 	int32 MyScoreCount;
 	FTimerHandle CountTimerHandle;
 	
+
 };
