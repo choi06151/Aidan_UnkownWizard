@@ -87,7 +87,67 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 // JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
-void ABoss::LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FString& MusicFilePath)
+void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
+{
+	if (AnalyzedDataMap.Contains(MusicTitle))
+	{
+		FinalPatternData = AnalyzedDataMap[MusicTitle];
+		CurrentTimeIndex = 0;
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s."), *MusicTitle);
+
+		// 패턴 조건 업데이트 타이머 설정 (1초 간격으로 패턴 업데이트)
+		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, 1.0f, true);
+
+		// 음악 재생 시작
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
+		if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+		{
+			UGameplayStatics::PlaySound2D(this, Music);
+
+			// 탄막 발사 시작
+			StartFiring();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load music: %s"), *MusicFilePath);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load pre-analyzed data for: %s"), *MusicTitle);
+	}
+}
+
+// 패턴 조건을 업데이트하는 함수
+void ABoss::UpdatePatternConditions()
+{
+	if (FinalPatternData.IsValidIndex(CurrentTimeIndex))
+	{
+		FFinalPatternData CurrentData = FinalPatternData[CurrentTimeIndex];
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
+
+		// 패턴과 속도를 설정
+		CurrentPatternIndex = CurrentData.PatternIndex;
+		for (auto& Pattern : BulletPatterns)
+		{
+			Pattern.BulletSpeed = CurrentData.BulletSpeed;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Applying pattern index %d with bullet speed %f at time index %d"), CurrentData.PatternIndex, CurrentData.BulletSpeed, CurrentTimeIndex);
+
+		CurrentTimeIndex++;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // Stop the timer if no more conditions
+		StopFiring(); // 탄막 발사 중지
+	}
+}
+
+void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath)
 {
 	FString JsonString;
 	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
@@ -97,9 +157,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FStri
 
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			// 패턴 조건들을 초기화
-			PatternConditions.Empty();
-			CurrentTimeIndex = 0;
+			TArray<FFinalPatternData> FinalPatternDataArray;
 
 			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
 			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
@@ -111,48 +169,57 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FStri
 
 			for (int32 i = 0; i < IntensityArray.Num(); ++i)
 			{
-				FPatternConditions Conditions;
+				FFinalPatternData FinalData;
 
-				Conditions.bIsHighIntensity = IntensityArray[i]->AsNumber() > 0.3f;
-				Conditions.bIsLowFrequency = LowArray[i]->AsNumber() > 0.2f;
-				Conditions.bIsLowMidFrequency = LowMidArray[i]->AsNumber() > 0.2f;
-				Conditions.bIsHighMidFrequency = HighMidArray[i]->AsNumber() > 0.2f;
-				Conditions.bIsHighFrequency = HighArray[i]->AsNumber() > 0.2f;
+				if (IntensityArray[i]->AsNumber() > 0.3f)
+				{
+					FinalData.BulletSpeed += 50.0f;
+				}
+
+				if (LowArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Fan;
+						});
+				}
+				else if (LowMidArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Circle;
+						});
+				}
+				else if (HighMidArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Butterfly;
+						});
+				}
+				else if (HighArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::TrumpetFlower;
+						});
+				}
 
 				for (const auto& BeatValue : BeatsArray)
 				{
 					float BeatTime = BeatValue->AsNumber();
 					if (FMath::Abs(i - BeatTime) < 0.1f)
 					{
-						Conditions.bIsOnBeat = true;
+						FinalData.BulletSpeed = FMath::Max(0.1f, FinalData.BulletSpeed - 0.1f);
 						break;
 					}
 				}
 
-				Conditions.bIsTempoAbove90 = Tempo > 90.0f;
-				Conditions.bIsTempoAbove100 = Tempo > 100.0f;
-				Conditions.bIsTempoAbove110 = Tempo > 110.0f;
-
-				PatternConditions.Add(Conditions);
-			}
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::Loaded JSON with %d conditions."), PatternConditions.Num());
-
-			// 패턴 조건 업데이트 타이머 설정 (1초 간격으로 패턴 업데이트)
-			GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, 1.0f, true);
-
-			// 음악 재생 시작
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::Playing music synchronized with pattern conditions."));
-			if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
-			{
-				UGameplayStatics::PlaySound2D(this, Music);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ABoss::Failed to load music: %s"), *MusicFilePath);
+				FinalPatternDataArray.Add(FinalData);
 			}
 
-			// 탄막 발사 시작
-			StartFiring();
+			AnalyzedDataMap.Add(MusicTitle, FinalPatternDataArray);
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::PreAnalyzeMusicData: Pre-analyzed %d conditions for %s."), FinalPatternDataArray.Num(), *MusicTitle);
 		}
 	}
 	else
@@ -161,88 +228,18 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FStri
 	}
 }
 
-// 패턴 조건을 업데이트하는 함수
-void ABoss::UpdatePatternConditions()
+void ABoss::PreAnalyzeAllMusicData()
 {
-	if (PatternConditions.IsValidIndex(CurrentTimeIndex))
-	{
-		FPatternConditions CurrentCondition = PatternConditions[CurrentTimeIndex];
+	// 각 음악에 대한 JSON 파일 경로 설정
+	FString ProjectDir = UKismetSystemLibrary::GetProjectDirectory();
+	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
+	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
+	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
-
-		// 패턴 조건을 기반으로 패턴 변경 로직을 추가합니다.
-		if (CurrentCondition.bIsHighIntensity)
-		{
-			// 높은 강도 조건이 만족되면 패턴 속도를 높입니다.
-			for (auto& Pattern : BulletPatterns)
-			{
-				Pattern.BulletSpeed += 50.0f; // 속도를 50만큼 증가
-			}
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High intensity condition met. Increasing bullet speed."));
-		}
-
-		if (CurrentCondition.bIsLowFrequency)
-		{
-			// 저주파수 대역이 활성화될 때 패턴을 부채꼴로 변경
-			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
-				{
-					return Pattern.PatternType == EPatternType::Fan;
-				});
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Low frequency condition met. Changing pattern to Fan."));
-		}
-
-		if (CurrentCondition.bIsLowMidFrequency)
-		{
-			// 저중주파수 대역이 활성화될 때 패턴을 원형으로 변경
-			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
-				{
-					return Pattern.PatternType == EPatternType::Circle;
-				});
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Low-mid frequency condition met. Changing pattern to Circle."));
-		}
-
-		if (CurrentCondition.bIsHighMidFrequency)
-		{
-			// 중고주파수 대역이 활성화될 때 패턴을 나비로 변경
-			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
-				{
-					return Pattern.PatternType == EPatternType::Butterfly;
-				});
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High-mid frequency condition met. Changing pattern to Butterfly."));
-		}
-
-		if (CurrentCondition.bIsHighFrequency)
-		{
-			// 고주파수 대역이 활성화될 때 패턴을 나팔꽃으로 변경
-			CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
-				{
-					return Pattern.PatternType == EPatternType::TrumpetFlower;
-				});
-			UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: High frequency condition met. Changing pattern to TrumpetFlower."));
-		}
-
-		if (CurrentCondition.bIsOnBeat)
-		{
-			// 비트가 발생할 때 발사 주기를 줄입니다.
-			FireRate = FMath::Max(0.1f, FireRate - 0.1f); // 최소 0.1초
-		}
-
-		CurrentTimeIndex++;
-		//if (CurrentCondition.bIsTempoAbove110)
-		//{
-		//	// 템포가 110 이상일 때 패턴을 직선으로 변경
-		//	CurrentPatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
-		//		{
-		//			return Pattern.PatternType == EPatternType::Straight;
-		//		});
-		//	UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Tempo above 110. Changing pattern to Straight."));
-		//}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
-		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // Stop the timer if no more conditions
-	}
+	// 각 음악에 대해 미리 분석 수행
+	PreAnalyzeMusicData(TEXT("butterfly"), ButterflyJsonPath);
+	PreAnalyzeMusicData(TEXT("Elise"), EliseJsonPath);
+	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
 }
 
 void ABoss::FireBullet()

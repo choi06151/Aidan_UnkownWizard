@@ -53,6 +53,23 @@ struct FPatternConditions
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FFinalPatternData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	int32 PatternIndex;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float BulletSpeed;
+
+	FFinalPatternData()
+		: PatternIndex(0)
+		, BulletSpeed(300.0f) // 기본 속도 값
+	{
+	}
+};
 
 UCLASS()
 class MYPROJECT_API ABoss : public ACharacter
@@ -99,11 +116,25 @@ public:
 	// 추가해야하는 
 	// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
 	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
-	void LoadMusicDataAndSetPatterns(const FString& JsonFilePath, const FString& MusicFilePath);
+	void LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath);
 
 	// 패턴 조건을 업데이트하는 함수
 	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
 	void UpdatePatternConditions();
+
+	// 미리 분석된 결과를 저장하는 TMap
+	//TMap<FString, TArray<FPatternConditions>> AnalyzedDataMap;
+	TMap<FString, TArray<FFinalPatternData>> AnalyzedDataMap;
+
+	// PreAnalyzeMusicData 함수에서 저장된 최종 패턴 데이터를 저장할 변수
+	TArray<FFinalPatternData> FinalPatternData;
+
+	// 미리 분석하는 함수
+	void PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath);
+
+	// 모든 곡을 미리 분석하는 함수
+	void PreAnalyzeAllMusicData();
+
 	
 private:
 	// 총알 발사 관련 함수
