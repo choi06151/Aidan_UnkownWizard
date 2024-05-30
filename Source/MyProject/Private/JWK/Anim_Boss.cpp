@@ -18,3 +18,7 @@ void UAnim_Boss::NativeUpdateAnimation(float DeltaSeconds)
 	if (nullptr != me)
 		speed = UKismetMathLibrary::VSize(me->GetVelocity());
 }
+
+void UAnim_Boss::AnimNotify_Boss_Throw()
+{
+}

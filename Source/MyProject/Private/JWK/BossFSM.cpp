@@ -74,11 +74,9 @@ void UBossFSM::TickWalk()
 {
 	curTime += GetWorld()->GetDeltaSeconds();
 
-	bossAnim->speed = 800;
-	
 	if(curTime >= 5)
 	{
-		bossAnim->speed = 0;
+		bossAnim->speed = 800;
 		me->bIsGameStart = false;
 		me->bIsWalk = false;
 		SetState(EBoss_state::IDLE);

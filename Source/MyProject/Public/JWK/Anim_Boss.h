@@ -24,4 +24,7 @@ public:
 
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
 	EBoss_state state;
+
+	//////////////////////////////////////// Notify ////////////////////////////////////////
+	void AnimNotify_Boss_Throw();
 };
