@@ -46,8 +46,8 @@ void UGameClearUI::NativeConstruct()
 	
 	//Set Count
 	CurrentCount = 0;
-	//플레이 결과를 여기에 넣어주면 됨. 
-	MyScoreCount = SpecificRow->BestScore;
+	
+	SetMyScore(SpecificRow->BestScore);
 
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.0001f, true);
 }
@@ -75,4 +75,9 @@ void UGameClearUI::UpdateCountText()
 	{
 		MyScore->SetText(FText::AsNumber(CurrentCount));
 	}
+}
+
+void UGameClearUI::SetMyScore(int32 score)
+{
+	MyScoreCount = score;
 }
