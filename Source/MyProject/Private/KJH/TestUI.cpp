@@ -152,7 +152,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
 	if (Boss)
 	{
-		Boss->LoadMusicDataAndSetPatterns(JsonFilePath, MusicFilePath); // JSON 파일, Music 경로 전달
+		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath, MusicFilePath); // JSON 파일, Music 경로 전달
 	}
 
 	else

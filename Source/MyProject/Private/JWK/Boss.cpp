@@ -34,7 +34,7 @@ ABoss::ABoss()
 
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
 
-	FireRate = 1.0f;
+	FireRate = 1.0f; // rate 수치 변경함
 
 	CurrentPatternIndex = 0;
 	CurrentTimeIndex = 0; // 추가: CurrentTimeIndex 초기화
@@ -94,6 +94,9 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		FinalPatternData = AnalyzedDataMap[MusicTitle];
 		CurrentTimeIndex = 0;
 
+		// FireRate 설정 (여기서 조정 가능)
+		FireRate = 1.0f;
+
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s."), *MusicTitle);
 
 		// 패턴 조건 업데이트 타이머 설정 (1초 간격으로 패턴 업데이트)
@@ -124,12 +127,15 @@ void ABoss::UpdatePatternConditions()
 {
 	if (FinalPatternData.IsValidIndex(CurrentTimeIndex))
 	{
+		// 현재 시간 인덱스에 해당하는 패턴 데이터를 가져옴
 		FFinalPatternData CurrentData = FinalPatternData[CurrentTimeIndex];
 
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
 
-		// 패턴과 속도를 설정
+		// 패턴 인덱스를 설정
 		CurrentPatternIndex = CurrentData.PatternIndex;
+
+		// 모든 탄막 패턴의 속도를 현재 데이터의 속도로 설정
 		for (auto& Pattern : BulletPatterns)
 		{
 			Pattern.BulletSpeed = CurrentData.BulletSpeed;
@@ -137,12 +143,13 @@ void ABoss::UpdatePatternConditions()
 
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Applying pattern index %d with bullet speed %f at time index %d"), CurrentData.PatternIndex, CurrentData.BulletSpeed, CurrentTimeIndex);
 
+		// TimeIndex를 증가시켜 다음 조건을 확인하도록 함
 		CurrentTimeIndex++;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
-		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // Stop the timer if no more conditions
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // 타이머를 중지하여 패턴 업데이트를 멈춤
 		StopFiring(); // 탄막 발사 중지
 	}
 }
@@ -471,7 +478,7 @@ void ABoss::InitializeDefaultPatterns()
 	// 원형 패턴
 	FBulletHellPattern CirclePattern;
 	CirclePattern.PatternType = EPatternType::Circle;
-	CirclePattern.Interval = 2.0f;
+	CirclePattern.Interval = 0.2f;
     CirclePattern.PatternSize = 400.0f; // 원형 패턴의 크기 설정
 	CirclePattern.NumberOfBullets = 12; // 총알의 수
 	CirclePattern.BulletSpeed = 300.0f;
@@ -489,7 +496,7 @@ void ABoss::InitializeDefaultPatterns()
     // 나비 패턴
     FBulletHellPattern ButterflyPattern;
     ButterflyPattern.PatternType = EPatternType::Butterfly;
-    ButterflyPattern.Interval = 1.0f;
+    ButterflyPattern.Interval = 0.1f;
     ButterflyPattern.NumberOfBullets = 20;
     ButterflyPattern.BulletSpeed = 350.0f;
     BulletPatterns.Add(ButterflyPattern);
@@ -511,4 +518,6 @@ void ABoss::InitializeDefaultPatterns()
     // AngelPattern.NumberOfBullets = 14;
     // AngelPattern.BulletSpeed = 250.0f;
     // BulletPatterns.Add(AngelPattern);
+
+	// 속도 10배 시켜봄
 }
