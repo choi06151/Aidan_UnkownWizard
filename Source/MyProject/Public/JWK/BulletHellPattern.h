@@ -10,6 +10,7 @@ enum class EPatternType : uint8
 	RandomStraight,	// 랜덤 직선			O
 	Fan,			// 부채꼴			O
 	Circle,			// 원형				O
+	Swirl,			// 소용돌이			O
 	TrumpetFlower,	// 나팔꽃			O
 	Butterfly,		// 나비				? 이게 왜 나비?
 	Crescent,		// 초승달			X
