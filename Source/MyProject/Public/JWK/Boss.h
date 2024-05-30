@@ -68,7 +68,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int bossHP = bossMaxHP;
-
+	
 
 	//////////////////////////////////////// BulletHell 발사 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 한 번에 발사되는 총알의 수
@@ -94,7 +94,11 @@ private:
 	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
 
 	void FireCirclePattern(const FBulletHellPattern& Pattern); // 원
+	
+	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 유도 원
+	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset);// 유도 원
 
+	
 	void FireButterflyPattern(const FBulletHellPattern& Pattern); // 나비
 
 	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
