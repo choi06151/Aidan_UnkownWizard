@@ -25,29 +25,58 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class USkeletalMesh* bossMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* bossEyeMesh_L;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* bossEyeMesh_R;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCharacterMovementComponent* movementComp;
 
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* batonMesh;
 
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* capMesh;
 
-	// Bullet 발사 관련
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* tuxedoMesh;
+
+
+	//////////////////////////////////////// Boss Play 관련 ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되었는가?
+	bool bIsGameStart = false;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 움직이는가?
+	bool bIsWalk = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")	// 한 번에 발사되는 총알의 수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 목적지에 도달했는가?
+	bool bIsArrive = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격을 시작했는가?
+	bool bIsAttack = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 체력 이하로 떨어졌을 때 다음 페이즈로 진입했는가?
+	bool bIsPhase = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
+	bool bIsDie = false;
+
+	// Boss HP 관련
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int bossMaxHP = 500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int bossHP = bossMaxHP;
+
+
+	//////////////////////////////////////// BulletHell 발사 관련 ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 한 번에 발사되는 총알의 수
 	int32 NumberOfBullets = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")	// 총알의 각도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 총알의 각도
 	float AngleStep = 360.0f / NumberOfBullets;
 
-	
-	
-	// Boss의 상태
-	UPROPERTY(EditAnywhere)
-	bool IsDie = false;
-
-	
 private:
 	// 총알 발사 관련 함수
 	void FireBullet();
@@ -56,48 +85,43 @@ private:
 	void ChangePattern();
 	void InitializeDefaultPatterns();
 
-	// 직선
-	void FireStraightPattern(const FBulletHellPattern& Pattern);
-	// 랜덤 직선
-	void FireRandomStraightPatter(const FBulletHellPattern& Pattern);
-	// 부채꼴
-	void FireFanPattern(const FBulletHellPattern& Pattern);
-	// 원
-	void FireCirclePattern(const FBulletHellPattern& Pattern);
-	// 나비
-	void FireButterflyPattern(const FBulletHellPattern& Pattern);
-	// 나팔꽃
-	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern);
-	// 초승달
-	void FireCrescentPattern(const FBulletHellPattern& Pattern);
-	// 천사
-	void FireAngelPattern(const FBulletHellPattern& Pattern);
-	
+	//////////////////////////////////////// BulletHell 패턴 관련 ////////////////////////////////////////
+
+	void FireStraightPattern(const FBulletHellPattern& Pattern); // 직선
+
+	void FireRandomStraightPatter(const FBulletHellPattern& Pattern); // 랜덤 직선
+
+	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
+
+	void FireCirclePattern(const FBulletHellPattern& Pattern); // 원
+
+	void FireButterflyPattern(const FBulletHellPattern& Pattern); // 나비
+
+	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
+
+	void FireCrescentPattern(const FBulletHellPattern& Pattern); // 초승달
+
+	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
 
-
-
-	
-	
-	
-	UPROPERTY(EditAnywhere, Category = "Combat")	// 총알 생성
+	UPROPERTY(EditAnywhere, Category = "Combat") // 총알 생성
 	USpawn_Bullet* BulletSpawner;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")	// 패턴 종류
+	UPROPERTY(EditAnywhere, Category = "Combat") // 패턴 종류 저장소
 	TArray<FBulletHellPattern> BulletPatterns;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")	// 발사 주기
+	UPROPERTY(EditAnywhere, Category = "Combat") // 발사 주기
 	float FireRate;
-	
-	UPROPERTY(EditAnywhere, Category = "Combat")	// 현재 패턴 인덱스
+
+	UPROPERTY(EditAnywhere, Category = "Combat") // 현재 패턴 인덱스
 	int32 CurrentPatternIndex;
-	
+
 	FTimerHandle FireRateTimerHandle;
 
-	
+
 	// 부채꼴 관련 변수
-	float FanAngleStep;		// 각도 변경
-	float FanStartAngle;	// 초기 각도 변경
+	float FanAngleStep; // 각도 변경
+	float FanStartAngle; // 초기 각도 변경
 
 
 	// 기본 패턴 설정
