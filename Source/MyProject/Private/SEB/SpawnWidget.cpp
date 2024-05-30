@@ -19,7 +19,7 @@ ASpawnWidget::ASpawnWidget()
 	RootComponent = WidgetComponent;
 
 	// Optionally set the WidgetComponent's properties
-	WidgetComponent->SetDrawSize(FVector2D(600, 300));
+	WidgetComponent->SetDrawSize(FVector2D(1800, 1200));
 	WidgetComponent->SetWidgetSpace(EWidgetSpace::World); // Set to Screen Space if needed
 	WidgetComponent->SetPivot(FVector2D(0.5f, 0.5f)); // Center the pivot
 }
