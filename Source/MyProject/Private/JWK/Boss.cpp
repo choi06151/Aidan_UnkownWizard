@@ -64,6 +64,17 @@ ABoss::ABoss()
 	FireRate = 1.0f;
 
 	CurrentPatternIndex = 0;
+
+	// DELEGATE Map 초기화
+	PatternDelegates.Add(EPatternType::Straight, FPatternDelegate::CreateUObject(this, &ABoss::FireStraightPattern));
+	PatternDelegates.Add(EPatternType::RandomStraight, FPatternDelegate::CreateUObject(this, &ABoss::FireRandomStraightPattern));
+	PatternDelegates.Add(EPatternType::Fan, FPatternDelegate::CreateUObject(this, &ABoss::FireFanPattern));
+	PatternDelegates.Add(EPatternType::Circle, FPatternDelegate::CreateUObject(this, &ABoss::FireCirclePattern));
+	PatternDelegates.Add(EPatternType::Swirl, FPatternDelegate::CreateUObject(this, &ABoss::FireSwirlPattern));
+	PatternDelegates.Add(EPatternType::Butterfly, FPatternDelegate::CreateUObject(this, &ABoss::FireButterflyPattern));
+	PatternDelegates.Add(EPatternType::TrumpetFlower, FPatternDelegate::CreateUObject(this, &ABoss::FireTrumpetFlowerPattern));
+	PatternDelegates.Add(EPatternType::Crescent, FPatternDelegate::CreateUObject(this, &ABoss::FireCrescentPattern));
+	PatternDelegates.Add(EPatternType::Angel, FPatternDelegate::CreateUObject(this, &ABoss::FireAngelPattern));
 }
 
 void ABoss::BeginPlay()
@@ -72,8 +83,6 @@ void ABoss::BeginPlay()
 
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
-
-	StartFiring();
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -83,20 +92,20 @@ void ABoss::Tick(float DeltaTime)
 	static float TimeElapsed = 0.0f;
 	TimeElapsed += DeltaTime;
 
-	// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
+	// 1.5초 ~ 5.0초 랜덤 탄막 패턴 발사
 	if (TimeElapsed > 1.5f && TimeElapsed <= 5.0f && !bIsDie)
 	{
 		StopFiring();
 		ChangePattern();
 		StartFiring();
 	}
-	// 3.0초 5.5초 발사 중지
+	// 5.0초 7.5초 발사 중지
 	if (TimeElapsed > 5.0f && TimeElapsed <= 7.5f && !bIsDie)
 	{
 		StopFiring();
 	}
 
-	// 5.5초 초과시 다음 탄막 패턴 발사
+	// 7.5초 초과시 다음 탄막 패턴 발사
 	if (TimeElapsed > 7.5f && !bIsDie)
 	{
 		ChangePattern();
@@ -116,49 +125,10 @@ void ABoss::FireBullet()
 {
 	if (BulletSpawner != nullptr && BulletPatterns.Num() > 0)
 	{
-		FBulletHellPattern CurrentPattern = BulletPatterns[CurrentPatternIndex];
-
-		switch (CurrentPattern.PatternType)
-		{
-		case EPatternType::Straight:
-			FireStraightPattern(CurrentPattern);
-			break;
-
-		case EPatternType::RandomStraight:
-			FireRandomStraightPatter(CurrentPattern);
-			break;
-
-		case EPatternType::Fan:
-			FireFanPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Circle:
-			FireCirclePattern(CurrentPattern);
-			break;
-
-		case EPatternType::Swirl:
-			FireSwirlPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Butterfly:
-			FireButterflyPattern(CurrentPattern);
-			break;
-
-		case EPatternType::TrumpetFlower:
-			FireTrumpetFlowerPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Crescent:
-			FireCrescentPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Angel:
-			FireAngelPattern(CurrentPattern);
-			break;
-
-		default:
-			break;
-		}
+		const FBulletHellPattern& CurrentPattern = BulletPatterns[CurrentPatternIndex];
+		// 현재 패턴 타입에 대한 델리게이트가 존재하는지 확인하고, 존재하면 해당 패턴 타입에 매핑된 메서드를 호출
+		if (PatternDelegates.Contains(CurrentPattern.PatternType))
+			PatternDelegates[CurrentPattern.PatternType].Execute(CurrentPattern);
 	}
 }
 
@@ -174,7 +144,7 @@ void ABoss::FireStraightPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("--------"));
 }
 
-void ABoss::FireRandomStraightPatter(const FBulletHellPattern& Pattern)
+void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	BossLocation.Z = 300.0f;
@@ -346,7 +316,7 @@ void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::StartFiring()
 {
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true);
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true, 0.0f);
 }
 
 void ABoss::StopFiring()

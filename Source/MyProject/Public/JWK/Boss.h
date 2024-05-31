@@ -6,6 +6,8 @@
 #include "BulletHellPattern.h"
 #include "Boss.generated.h"
 
+DECLARE_DELEGATE_OneParam(FPatternDelegate, const FBulletHellPattern&);
+
 UCLASS()
 class MYPROJECT_API ABoss : public ACharacter
 {
@@ -89,14 +91,14 @@ private:
 
 	void FireStraightPattern(const FBulletHellPattern& Pattern); // 직선
 
-	void FireRandomStraightPatter(const FBulletHellPattern& Pattern); // 랜덤 직선
+	void FireRandomStraightPattern(const FBulletHellPattern& Pattern); // 랜덤 직선
 
 	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
 
 	void FireCirclePattern(const FBulletHellPattern& Pattern); // 원
 	
-	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 유도 원
-	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset);// 유도 원
+	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 소용돌이
+	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset);// 소용돌이
 
 	
 	void FireButterflyPattern(const FBulletHellPattern& Pattern); // 나비
@@ -130,4 +132,7 @@ private:
 
 	// 기본 패턴 설정
 	FBulletHellPattern DefaultStraightPattern;
+
+	// 패턴 델리게이트 맵
+	TMap<EPatternType, FPatternDelegate> PatternDelegates;
 };
