@@ -46,8 +46,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	class AAIController* ai;
 	
-	UPROPERTY(EditAnywhere)
-	int moveCurTime = 0;
+	int curTime = 0;
 
 	void SetState(EBossState next);
 	

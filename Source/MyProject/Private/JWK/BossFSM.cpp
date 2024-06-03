@@ -55,9 +55,12 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 //////////////////////////////////////// Idle ////////////////////////////////////////
 void UBossFSM::TickIdle()
 {
-	if (me->bIsGameStart && !me->bIsWalk)
+	if (me->bIsGameStart && me->bIsWalk && !me->bIsArrive)
 		SetState(EBossState::WALK);
 
+	if(me->bIsArrive)
+		SetState(EBossState::ATTACK);
+	
 	UE_LOG(LogTemp, Warning, TEXT("IDLE"));
 }
 
@@ -65,7 +68,7 @@ void UBossFSM::TickIdle()
 void UBossFSM::TickWalk()
 {
 	ai->MoveToLocation(FVector(-500, 0, 0), 5.0f);
-	if(me->bIsWalk)
+	if(me->bIsArrive)
 		SetState(EBossState::IDLE);
 	
 	UE_LOG(LogTemp, Warning, TEXT("Walk"));
@@ -81,7 +84,7 @@ void UBossFSM::TickAttack()
 	UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
-//////////////////////////////////////// Phase ////////////////////////////////////////
+//////////////////////////////////////// Phase_2 ////////////////////////////////////////
 void UBossFSM::TickPhase_2()
 {
 	// 체력이 0이 되었을 때 죽음

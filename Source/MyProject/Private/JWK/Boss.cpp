@@ -99,11 +99,23 @@ void ABoss::Tick(float DeltaTime)
 
 	curTime += DeltaTime;
 
-	if (curTime >= 5)
+	/* 게임 시작 버튼 누를 때 Boss 움직임 */
+	if (curTime >= 3)
+	{
 		bIsGameStart = true;
-	
-	if(curTime >= 8.5)
 		bIsWalk = true;
+	}
+	
+	if(curTime >= 5.5)
+		bIsArrive = true;
+
+	if(curTime >= 10)
+		bIsAttack = true;
+
+	if(curTime >= 15)
+		bIsPhase = true;
+
+	
 	// // 1.5초 ~ 5.0초 랜덤 탄막 패턴 발사
 	// if (curTime > 1.5f && curTime <= 5.0f && !bIsDie)
 	// {
