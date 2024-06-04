@@ -2,6 +2,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/BossFSM.h"
+#include "Kismet/GameplayStatics.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -70,6 +71,8 @@ ABoss::ABoss()
 	FireRate = 1.0f;
 
 	CurrentPatternIndex = 0;
+	//////////////////////////////////////// 음악분석 관련 추가 ////////////////////////////////////////
+	CurrentTimeIndex = 0; // CurrentTimeIndex 초기화
 
 	// DELEGATE Map 초기화
 	PatternDelegates.Add(EPatternType::Straight, FPatternDelegate::CreateUObject(this, &ABoss::FireStraightPattern));
@@ -159,6 +162,193 @@ void ABoss::TakeDamaged(int damage)
 	}
 }
 
+//////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
+void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
+{
+	if (AnalyzedDataMap.Contains(MusicTitle))
+	{
+		auto AnalyzedData = AnalyzedDataMap[MusicTitle];
+		float Tempo = AnalyzedData.Key;
+		FinalPatternData = AnalyzedData.Value;
+		CurrentTimeIndex = 0;
+
+		// FireRate 설정 (템포에 맞춰 조정)
+		float BeatLength = 60.0f / Tempo; // 한 비트의 길이
+		FireRate = BeatLength * 4; // 4/4 박자를 위해 4배로 설정
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s."), *MusicTitle);
+
+		// 패턴 조건 업데이트 타이머 설정 (한 바 단위로 패턴 업데이트)
+		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate, true);
+
+		// 음악 재생 시작
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
+		if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+		{
+			UGameplayStatics::PlaySound2D(this, Music);
+
+			// 탄막 발사 시작
+			StartFiring();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load music: %s"), *MusicFilePath);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load pre-analyzed data for: %s"), *MusicTitle);
+	}
+}
+
+// 패턴 조건을 업데이트하는 함수
+void ABoss::UpdatePatternConditions()
+{
+	if (FinalPatternData.IsValidIndex(CurrentTimeIndex))
+	{
+		// 현재 시간 인덱스에 해당하는 패턴 데이터를 가져옴
+		FFinalPatternData CurrentData = FinalPatternData[CurrentTimeIndex];
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
+
+		// 패턴 인덱스를 설정
+		CurrentPatternIndex = CurrentData.PatternIndex;
+
+		// 모든 탄막 패턴의 속도를 현재 데이터의 속도로 설정
+		for (auto& Pattern : BulletPatterns)
+		{
+			Pattern.BulletSpeed = CurrentData.BulletSpeed;
+		}
+
+		// 패턴 델리게이트가 존재하는지 확인하고, 존재하면 실행
+		if (PatternDelegates.Contains(BulletPatterns[CurrentPatternIndex].PatternType))
+		{
+			PatternDelegates[BulletPatterns[CurrentPatternIndex].PatternType].Execute(BulletPatterns[CurrentPatternIndex]);
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Applying pattern index %d with bullet speed %f at time index %d"), CurrentData.PatternIndex, CurrentData.BulletSpeed, CurrentTimeIndex);
+
+		// 4/4 박자 단위로 인덱스를 증가시켜 다음 조건을 확인하도록 함
+		CurrentTimeIndex++; // 4 비트마다 한 번씩 업데이트
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // 타이머를 중지하여 패턴 업데이트를 멈춤
+		StopFiring(); // 탄막 발사 중지
+	}
+}
+
+// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath)
+{
+	// JSON 파일을 문자열로 로드
+	FString JsonString;
+	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
+	{
+		// JSON 파서를 위한 객체 생성
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
+		// JSON 문자열을 파싱하여 JsonObject로 변환
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			// 최종 패턴 데이터를 저장할 배열
+			TArray<FFinalPatternData> FinalPatternDataArray;
+
+			// JSON 객체에서 템포, 비트, 강도, 주파수 대역별 데이터 값을 가져옴
+			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
+			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
+			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
+			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
+			const TArray<TSharedPtr<FJsonValue>> LowMidArray = JsonObject->GetArrayField(TEXT("low_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
+
+			// 각 강도 값에 대해 반복하여 패턴 데이터를 생성
+			for (int32 i = 0; i < IntensityArray.Num(); ++i)
+			{
+				FFinalPatternData FinalData;
+
+				// 강도 값이 0.3 이상인 경우 탄막 속도를 증가시킴
+				if (IntensityArray[i]->AsNumber() > 0.3f)
+				{
+					FinalData.BulletSpeed += 50.0f;
+				}
+
+				// 주파수 대역별 값에 따라 패턴 인덱스를 설정
+				if (LowArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Fan;
+						});
+				}
+				else if (LowMidArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Circle;
+						});
+				}
+				else if (HighMidArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::Butterfly;
+						});
+				}
+				else if (HighArray[i]->AsNumber() > 0.2f)
+				{
+					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
+						{
+							return Pattern.PatternType == EPatternType::TrumpetFlower;
+						});
+				}
+
+				// 비트 시간과 현재 인덱스가 가까운 경우 탄막 속도를 감소시킴
+				// 탄막 발사 타이밍을 음악의 비트와 동기화하여 더 리드미컬하게 만들기 위함임
+				// 제대로 되는지는 모르겠음
+				for (const auto& BeatValue : BeatsArray)
+				{
+					float BeatTime = BeatValue->AsNumber();
+					if (FMath::Abs(i * 4 * (60.0 / Tempo) - BeatTime) < 0.1f)
+					{
+						// 현재 인덱스가 비트 시간과 매우 가까운 경우 탄막 속도를 감소시킴
+						FinalData.BulletSpeed = FMath::Max(0.1f, FinalData.BulletSpeed - 0.1f);
+						break;
+					}
+				}
+
+				// 생성된 패턴 데이터를 배열에 추가
+				FinalPatternDataArray.Add(FinalData);
+
+			}
+			// Tempo 값을 TMap에 함께 저장합니다.
+			AnalyzedDataMap.Add(MusicTitle, TPair<float, TArray<FFinalPatternData>>(Tempo, FinalPatternDataArray));
+
+			UE_LOG(LogTemp, Warning, TEXT("ABoss::PreAnalyzeMusicData: Pre-analyzed %d conditions for %s."), FinalPatternDataArray.Num(), *MusicTitle);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::Failed to load JSON file: %s"), *JsonFilePath);
+	}
+}
+
+void ABoss::PreAnalyzeAllMusicData()
+{
+	// 각 음악에 대한 JSON 파일 경로 설정
+	FString ProjectDir = UKismetSystemLibrary::GetProjectDirectory();
+	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
+	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
+	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
+
+	// 각 음악에 대해 미리 분석 수행
+	PreAnalyzeMusicData(TEXT("butterfly"), ButterflyJsonPath);
+	PreAnalyzeMusicData(TEXT("Elise"), EliseJsonPath);
+	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
+}
 
 ////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
 void ABoss::FireBullet()
