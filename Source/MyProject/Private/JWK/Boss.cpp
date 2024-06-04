@@ -115,49 +115,46 @@ void ABoss::MusicStart()
 	if (SpawnWidget != nullptr)
 	{
 		SpawnWidget->CurtainOpenAnim();
-		CurrentState = EBossState::Walking;
+		cnt = 0;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 5.0f, false);
 	}
 }
 
 void ABoss::HandleState()
 {
-	switch (CurrentState)
+	switch (cnt)
 	{
-	case EBossState::Walking:
+	case 0:
 		bIsWalk = true;
-		CurrentState = EBossState::Arriving;
+		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
 		break;
-			
-	case EBossState::Arriving:
+	case 1:
 		bIsArrive = true;
-		CurrentState = EBossState::ClosingCurtain;
+		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 10 - 7.5 = 2.5
 		break;
-			
-	case EBossState::ClosingCurtain:
+	case 2:
 		if (SpawnWidget != nullptr)
 		{
 			SpawnWidget->CurtainCloseAnim();
 		}
-		CurrentState = EBossState::ShakingCurtainAndPlayingMusic;
+		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 10.0f, false); // 20 - 10 = 10
 		break;
-
-	case EBossState::ShakingCurtainAndPlayingMusic:
+	case 3:
 		if (SpawnWidget != nullptr)
 		{
 			SpawnWidget->CurtainShakeAnim();
 			SpawnWidget->MusicPlay();
 		}
 		bIsAttack = true;
-		CurrentState = EBossState::None; // Reset state or handle end of sequence
+		cnt++;
 		break;
-
 	default:
 		break;
 	}
+	
 }
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////

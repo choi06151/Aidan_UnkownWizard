@@ -241,17 +241,9 @@ private:
 
 
 	FTimerHandle TimerHandle;
-
-	enum class EBossState
-	{
-		None,
-		Walking,
-		Arriving,
-		ClosingCurtain,
-		ShakingCurtainAndPlayingMusic
-	};
-
-	EBossState CurrentState;
+	
+	int cnt = 0;
+	
 	void HandleState();
 	
 };
