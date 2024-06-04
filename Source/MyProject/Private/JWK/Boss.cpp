@@ -100,8 +100,8 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if(bIsGameStart)		// GameStart 버튼이 눌리고
-		MusicStart();
+	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
+		MusicStart();*/
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -112,27 +112,49 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABoss::MusicStart()
 {
-	SpawnWidget->CurtainOpenAnim();
-	
-	if(nullptr != SpawnWidget)
+	if (SpawnWidget != nullptr)
 	{
-		curTime += GetWorld()->GetDeltaSeconds();
-		
-		if(curTime >=5)		// n초 뒤 걷기 시작
-			bIsWalk = true;
+		SpawnWidget->CurtainOpenAnim();
+		cnt = 0;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.0f, false);
+	}
+}
 
-		if(curTime >= 7.5)
-			bIsArrive = true;
-
-		if(curTime >= 10)
+void ABoss::HandleState()
+{
+	switch (cnt)
+	{
+	case 0:
+		bIsWalk = true;
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
+		break;
+	case 1:
+		bIsArrive = true;
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false); // 10 - 7.5 = 2.5
+		break;
+	case 2:
+		if (SpawnWidget != nullptr)
+		{
 			SpawnWidget->CurtainCloseAnim();
-		
-		if(curTime >= 20)
+		}
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false); // 20 - 10 = 10
+		break;
+	case 3:
+		if (SpawnWidget != nullptr)
 		{
 			SpawnWidget->CurtainShakeAnim();
-			bIsAttack = true;
+			SpawnWidget->MusicPlay();
 		}
+		bIsAttack = true;
+		cnt++;
+		break;
+	default:
+		break;
 	}
+	
 }
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////

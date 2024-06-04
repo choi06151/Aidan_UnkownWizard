@@ -238,4 +238,12 @@ private:
 	TArray<FPatternConditions> PatternConditions;
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
+
+
+	FTimerHandle TimerHandle;
+	
+	int cnt = 0;
+	
+	void HandleState();
+	
 };

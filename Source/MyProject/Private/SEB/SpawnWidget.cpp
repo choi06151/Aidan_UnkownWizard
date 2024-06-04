@@ -51,34 +51,11 @@ void ASpawnWidget::Tick(float DeltaTime)
 
 }
 
-void ASpawnWidget::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)
-{
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
-	/*if (Boss)
-	{
-		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
-	}*/
-
-	// 음악 재생
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Playing music from: %s"), *MusicFilePath);
-	USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath));
-	if (Music)
-	{
-		UGameplayStatics::PlaySound2D(this, Music);
-		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Failed to load music: %s"), *MusicFilePath);
-	}
-}
-
 void ASpawnWidget::MusicPlay()
 {
 	FString MusicFilePath = SpecificRow->MusicFilePath;
 	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
 	FString MusicTitle = SpecificRow->MusicName;
-	//PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 	Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 }
 
