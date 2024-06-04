@@ -59,7 +59,7 @@ void UBossFSM::TickIdle()
 //////////////////////////////////////// Walk ////////////////////////////////////////
 void UBossFSM::TickWalk()
 {
-	ai->MoveToLocation(FVector(-500, 0, 0), 5.0f);
+	ai->MoveToLocation(FVector(1480.000000, 650.000000, 169.999991), 0.1f);
 	if(me->bIsArrive)
 		SetState(EBossState::IDLE);
 	
