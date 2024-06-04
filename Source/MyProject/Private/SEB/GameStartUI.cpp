@@ -12,8 +12,8 @@ void UGameStartUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
-	StartBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
-	QuitBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
+	StartBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
+	QuitBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
 	TutorialBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnTutorialBtnClicked);
 }
 
@@ -32,4 +32,9 @@ void UGameStartUI::OnQuitBtnClicked()
 
 void UGameStartUI::OnTutorialBtnClicked()
 {
+	// 원하는 맵 이름을 문자열로 지정
+	FString LevelName = TEXT("TutorialTestMap");
+
+	// 월드를 가져와서 맵 변경 함수 호출
+	UGameplayStatics::OpenLevel(this, FName(*LevelName));
 }

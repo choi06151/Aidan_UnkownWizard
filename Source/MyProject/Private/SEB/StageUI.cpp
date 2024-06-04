@@ -18,7 +18,7 @@ void UStageUI::NativeConstruct()
 	Super::NativeConstruct();
 	if (SelectStageBtn)
 	{
-		SelectStageBtn->OnClicked.AddDynamic(this, &UStageUI::OnSelectStageClicked);
+		SelectStageBtn->OnPressed.AddDynamic(this, &UStageUI::OnSelectStageClicked);
 	}
 }
 

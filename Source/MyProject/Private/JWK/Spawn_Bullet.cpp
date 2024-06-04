@@ -69,6 +69,7 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 		
 		if (PoolableBullet != nullptr)
 		{
+			PoolableBullet->meshComp->SetVisibility(true);//총알의 Visibility 설정을 리셋
 			PoolableBullet->SetActive(false);
 			PoolableBullet->TeleportTo(SpawnLocation, SpawnRotation);
 			PoolableBullet->SetLifeSpan(PooledBulletLifeSpan);

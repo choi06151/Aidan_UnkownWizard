@@ -10,13 +10,21 @@
 #include "Kismet/GameplayStatics.h"
 #include "SEB/MusicInfoDT.h"
 #include "SEB/SpawnWidget.h"
+#include "SEB/SelectStageUI.h"
 
 void UGameClearUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	if(!SpawnWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SpawnWidget is Null"));
+		return;
+	}
+
 	FMusicInfoDT* SpecificRow = SpawnWidget->SpecificRow;
+	
 	ArtistName->SetText(FText::FromString(SpecificRow->ArtistName));
 	MusicName->SetText(FText::FromString(SpecificRow->MusicName));
 	ThumbnailPath = new FText(FText::FromString(SpecificRow->Thumbnail));
@@ -30,8 +38,18 @@ void UGameClearUI::NativeConstruct()
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
 	
 	//Button
-	SelectStageBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnSelectStageClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &UGameClearUI::OnRestartClicked);
+	SelectStageBtn->OnPressed.AddDynamic(this, &UGameClearUI::OnSelectStageClicked);
+	RestartBtn->OnPressed.AddDynamic(this, &UGameClearUI::OnRestartClicked);
+
+	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
+	SpawnWidget->MusicPlay();
+	
+	//Set Count
+	CurrentCount = 0;
+	
+	SetMyScore(SpecificRow->BestScore);
+
+	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.0001f, true);
 }
 
 void UGameClearUI::OnSelectStageClicked()
@@ -42,4 +60,24 @@ void UGameClearUI::OnSelectStageClicked()
 
 void UGameClearUI::OnRestartClicked()
 {
+}
+
+void UGameClearUI::UpdateCountText()
+{
+	if(CurrentCount >= MyScoreCount)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CountTimerHandle);
+		return;
+	}
+
+	CurrentCount++;
+	if(MyScore)
+	{
+		MyScore->SetText(FText::AsNumber(CurrentCount));
+	}
+}
+
+void UGameClearUI::SetMyScore(int32 score)
+{
+	MyScoreCount = score;
 }

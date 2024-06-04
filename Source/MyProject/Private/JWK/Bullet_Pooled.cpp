@@ -69,6 +69,7 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	Active = IsActive;
 	SetActorHiddenInGame(!IsActive);
 	GetWorldTimerManager().SetTimer(LifespanTimer, this, &ABullet_Pooled::Deactivate, LifeSpan, false);
+
 }
 
 // bullet의 수명을 set

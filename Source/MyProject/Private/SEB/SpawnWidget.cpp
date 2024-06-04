@@ -4,6 +4,7 @@
 #include "SEB/SpawnWidget.h"
 
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "SEB/GameOverUI.h"
 #include "SEB/SelectStageUI.h"
 
@@ -19,7 +20,7 @@ ASpawnWidget::ASpawnWidget()
 
 	// Optionally set the WidgetComponent's properties
 	WidgetComponent->SetDrawSize(FVector2D(1800, 1200));
-	WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen); // Set to Screen Space if needed
+	WidgetComponent->SetWidgetSpace(EWidgetSpace::World); // Set to Screen Space if needed
 	WidgetComponent->SetPivot(FVector2D(0.5f, 0.5f)); // Center the pivot
 }
 
@@ -41,5 +42,34 @@ void ASpawnWidget::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ASpawnWidget::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
+	/*if (Boss)
+	{
+		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
+	}*/
+
+	// 음악 재생
+	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Playing music from: %s"), *MusicFilePath);
+	USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath));
+	if (Music)
+	{
+		UGameplayStatics::PlaySound2D(this, Music);
+		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Failed to load music: %s"), *MusicFilePath);
+	}
+}
+
+void ASpawnWidget::MusicPlay()
+{
+	FString MusicFilePath = SpecificRow->MusicFilePath;
+	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
+	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
 }
 

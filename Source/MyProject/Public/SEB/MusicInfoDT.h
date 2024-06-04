@@ -30,6 +30,10 @@ struct FMusicInfoDT : public FTableRowBase
 	//최고 점수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 BestScore;
-	
-	
+	//음악
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString MusicFilePath;
+	//json
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString JsonFilePath;
 };

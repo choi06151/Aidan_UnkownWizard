@@ -16,11 +16,10 @@
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-
+	
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	
 	// DataTable 초기화
-	//tatic const FString ContextString(TEXT("Music Info Context"));
 	static const FSoftObjectPath DataTablePath(TEXT("/Game/SEB/Blueprints/DT_MusicInfo.DT_MusicInfo"));
 	UDataTable* MusicInfoDataObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath.ToString()));
 
@@ -34,7 +33,8 @@ void USelectStageUI::NativePreConstruct()
 		UE_LOG(LogTemp, Error, TEXT("DataTable Load Failed"));
 		return;
 	}
-	if (!StageUIClass || !MainScroll) return;
+	
+	if (!StageUIClass || !MainScroll || !SpawnWidget) return;
 
 	MainScroll->ClearChildren();
 
@@ -57,8 +57,15 @@ void USelectStageUI::NativePreConstruct()
 	}
 	//배열의 첫번째 값들로 정보 초기화
 	FMusicInfoDT* FirstRow = MusicDataTable->FindRow<FMusicInfoDT>(RowNames[0], TEXT(""));
-        
-	ChangeStageName(FText::FromString(FirstRow->ArtistName), FText::FromString(FirstRow->MusicName));
+
+	if(nullptr == SpawnWidget->SpecificRow)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpawnWidget->SpecificRow is Null"));
+		SpawnWidget->SpecificRow = FirstRow;
+		
+	}
+	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+	
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
 }
@@ -66,10 +73,10 @@ void USelectStageUI::NativePreConstruct()
 void USelectStageUI::NativeConstruct()
 {
 	Super::NativeConstruct();
-	UpArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
-	DownArrowBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
-	BackBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnBackClicked);
-	PlayBtn->OnClicked.AddDynamic(this, &USelectStageUI::OnPlayClicked);
+	UpArrowBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnUPArrowClicked);
+	DownArrowBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnDownArrowClicked);
+	BackBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnBackClicked);
+	PlayBtn->OnPressed.AddDynamic(this, &USelectStageUI::OnPlayClicked);
 	
 }
 
@@ -104,6 +111,7 @@ void USelectStageUI::OnPlayClicked()
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 -> 레벨이동? -> 선택된 음악 정보가 넘어가야함.
+	// BossFSM클래스의 bIsGameStart가 true가 되도록 변경
 	
 	//우선은 GameOverUI로 넘어가도록 함. 
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
@@ -123,6 +131,8 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	}
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
+
+	//SpawnWidget->MusicPlay();
 	
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
@@ -168,6 +178,8 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 			
 		}
 	}
+
+	
 	
 }
 
@@ -199,6 +211,7 @@ FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName1, c
 		FMusicInfoDT* Row = MusicDataTable->FindRow<FMusicInfoDT>(RowName, ContextString);
 		if (Row)
 		{
+			// ArtistName과 MusicName 모두 일치할 경우
 			if ((ColumnName1 == "ArtistName" && Row->ArtistName == ColumnValue1) &&
 				(ColumnName2 == "MusicName" && Row->MusicName == ColumnValue2))
 			{

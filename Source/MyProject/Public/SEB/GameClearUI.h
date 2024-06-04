@@ -24,6 +24,8 @@ private:
 	class UTextBlock* MusicName;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* BestScore;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MyScore;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;  
@@ -48,4 +50,12 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* PlayDataTable;
+	UFUNCTION(BlueprintCallable)
+	void UpdateCountText();
+	// 최종 Score 설정
+	void SetMyScore(int32 score);
+private:
+	int32 CurrentCount;
+	int32 MyScoreCount;
+	FTimerHandle CountTimerHandle;
 };

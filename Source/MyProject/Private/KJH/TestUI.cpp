@@ -18,15 +18,15 @@ void UTestUI::NativeConstruct()
 	Super::NativeConstruct();
 	if (Btn_Music1)
 	{
-		Btn_Music1->OnClicked.AddDynamic(this, &UTestUI::OnMusic1Clicked);
+		Btn_Music1->OnPressed.AddDynamic(this, &UTestUI::OnMusic1Clicked);
 	}
 	if (Btn_Music2)
 	{
-		Btn_Music2->OnClicked.AddDynamic(this, &UTestUI::OnMusic2Clicked);
+		Btn_Music2->OnPressed.AddDynamic(this, &UTestUI::OnMusic2Clicked);
 	}
 	if (Btn_Music3)
 	{
-		Btn_Music3->OnClicked.AddDynamic(this, &UTestUI::OnMusic3Clicked);
+		Btn_Music3->OnPressed.AddDynamic(this, &UTestUI::OnMusic3Clicked);
 	}
 
 	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
@@ -64,7 +64,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
 	if (Boss)
 	{
-		Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
+		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath); // JSON 파일 경로 전달
 	}
 
 	// 음악 재생
@@ -73,7 +73,7 @@ void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& 
 	if (Music)
 	{
 		UGameplayStatics::PlaySound2D(this, Music);
-		GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
+		//GetWorld()->GetTimerManager().SetTimer(Boss->PatternUpdateTimerHandle, Boss, &ABoss::UpdatePatternConditions, 1.0f, true);
 	}
 	else
 	{
