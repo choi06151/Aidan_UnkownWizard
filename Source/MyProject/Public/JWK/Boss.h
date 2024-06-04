@@ -132,9 +132,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
 	bool bIsDie = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float curTime = 0;
 
+	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 음악이 시작되었는가??
+	bool bIsMusicStart;
+
+	UFUNCTION()
+	void MusicStart();	// 음악이 시작되고 커튼 애니메이션 재생 및 보스 행동 시작
+
+	float curTime;
+
+	UPROPERTY(EditAnywhere, Category = "Spawn_Widget")
+	class ASpawnWidget* SpawnWidget;
 	
 	//////////////////////////////////////// BulletHell 발사 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 한 번에 발사되는 총알의 수
@@ -229,4 +238,12 @@ private:
 	TArray<FPatternConditions> PatternConditions;
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
+
+
+	FTimerHandle TimerHandle;
+	
+	int cnt = 0;
+	
+	void HandleState();
+	
 };

@@ -3,6 +3,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/BossFSM.h"
 #include "Kismet/GameplayStatics.h"
+#include "SEB/SpawnWidget.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -99,19 +100,8 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if(bIsGameStart)		// GameStart 버튼이 눌리고
-	{
-		curTime += DeltaTime;
-		
-		if(curTime >=5)		// n초 뒤 걷기 시작
-			bIsWalk = true;
-
-		if(curTime >= 7.5)
-			bIsArrive = true;
-
-		if(curTime >= 20)
-			bIsAttack = true;	
-	}
+	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
+		MusicStart();*/
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -119,6 +109,53 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+
+void ABoss::MusicStart()
+{
+	if (SpawnWidget != nullptr)
+	{
+		SpawnWidget->CurtainOpenAnim();
+		cnt = 0;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 5.0f, false);
+	}
+}
+
+void ABoss::HandleState()
+{
+	switch (cnt)
+	{
+	case 0:
+		bIsWalk = true;
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
+		break;
+	case 1:
+		bIsArrive = true;
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 10 - 7.5 = 2.5
+		break;
+	case 2:
+		if (SpawnWidget != nullptr)
+		{
+			SpawnWidget->CurtainCloseAnim();
+		}
+		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 10.0f, false); // 20 - 10 = 10
+		break;
+	case 3:
+		if (SpawnWidget != nullptr)
+		{
+			SpawnWidget->CurtainShakeAnim();
+			SpawnWidget->MusicPlay();
+		}
+		bIsAttack = true;
+		cnt++;
+		break;
+	default:
+		break;
+	}
+	
+}
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)

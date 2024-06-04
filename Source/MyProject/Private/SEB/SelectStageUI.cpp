@@ -116,7 +116,7 @@ void USelectStageUI::OnPlayClicked()
 	if (Boss)
 	{
 		Boss->bIsGameStart = true;
-
+		Boss->MusicStart();
 		//이건 보스에서 공격 시작할때 하도록 해야함.
 		//커튼이 열리고 -> 보스가 걸어나오고 -> 커튼이 닫히고 -> 커튼 흔들리는 애니메이션으로 변경
 		//SpawnWidget->CurtainOpenAnim();
