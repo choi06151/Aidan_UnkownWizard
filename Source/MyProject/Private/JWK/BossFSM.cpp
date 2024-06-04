@@ -50,10 +50,10 @@ void UBossFSM::TickIdle()
 	if (me->bIsGameStart && me->bIsWalk && !me->bIsArrive)
 		SetState(EBossState::WALK);
 
-	if(me->bIsArrive)
+	if(me->bIsArrive && me->bIsAttack)
 		SetState(EBossState::ATTACK);
 	
-	UE_LOG(LogTemp, Warning, TEXT("IDLE"));
+	// UE_LOG(LogTemp, Warning, TEXT("IDLE"));
 }
 
 //////////////////////////////////////// Walk ////////////////////////////////////////
@@ -63,7 +63,7 @@ void UBossFSM::TickWalk()
 	if(me->bIsArrive)
 		SetState(EBossState::IDLE);
 	
-	UE_LOG(LogTemp, Warning, TEXT("Walk"));
+	// UE_LOG(LogTemp, Warning, TEXT("Walk"));
 }
 
 //////////////////////////////////////// Attack ////////////////////////////////////////
@@ -73,20 +73,20 @@ void UBossFSM::TickAttack()
 	if (me->bIsPhase)
 		SetState(EBossState::PHASE_2);
 
-	UE_LOG(LogTemp, Warning, TEXT("Attack"));
+	// UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
 //////////////////////////////////////// Phase_2 ////////////////////////////////////////
 void UBossFSM::TickPhase_2()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Phase"));
+	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 
 void UBossFSM::TakeDamaged(int damage)
 {
-	me->bossHP -= damage;
+	bossHP -= damage;
 
-	if(me->bossHP <=0)
+	if(bossHP <=0)
 	{
 		me->bIsDie = true;
 		/* 죽음 Montage, Sound 추가 */

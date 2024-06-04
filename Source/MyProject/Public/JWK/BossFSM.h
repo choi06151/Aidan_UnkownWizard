@@ -48,7 +48,12 @@ public:
 	int curTime = 0;
 
 	
-	//////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
+	////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int bossMaxHP = 500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int bossHP = bossMaxHP;
 	UFUNCTION(BlueprintCallable)
 	void TakeDamaged(int damage);
 
