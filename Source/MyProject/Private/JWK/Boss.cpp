@@ -3,6 +3,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/BossFSM.h"
 #include "Kismet/GameplayStatics.h"
+#include "SEB/SpawnWidget.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -100,18 +101,7 @@ void ABoss::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	if(bIsGameStart)		// GameStart 버튼이 눌리고
-	{
-		curTime += DeltaTime;
-		
-		if(curTime >=5)		// n초 뒤 걷기 시작
-			bIsWalk = true;
-
-		if(curTime >= 7.5)
-			bIsArrive = true;
-
-		if(curTime >= 20)
-			bIsAttack = true;	
-	}
+		MusicStart();
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -119,6 +109,31 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+
+void ABoss::MusicStart()
+{
+	SpawnWidget->CurtainOpenAnim();
+	
+	if(nullptr != SpawnWidget)
+	{
+		curTime += GetWorld()->GetDeltaSeconds();
+		
+		if(curTime >=5)		// n초 뒤 걷기 시작
+			bIsWalk = true;
+
+		if(curTime >= 7.5)
+			bIsArrive = true;
+
+		if(curTime >= 10)
+			SpawnWidget->CurtainCloseAnim();
+		
+		if(curTime >= 20)
+		{
+			SpawnWidget->CurtainShakeAnim();
+			bIsAttack = true;
+		}
+	}
+}
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
