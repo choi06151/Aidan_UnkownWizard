@@ -238,4 +238,20 @@ private:
 	TArray<FPatternConditions> PatternConditions;
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
+
+
+	FTimerHandle TimerHandle;
+
+	enum class EBossState
+	{
+		None,
+		Walking,
+		Arriving,
+		ClosingCurtain,
+		ShakingCurtainAndPlayingMusic
+	};
+
+	EBossState CurrentState;
+	void HandleState();
+	
 };
