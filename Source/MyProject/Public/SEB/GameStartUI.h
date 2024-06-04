@@ -34,4 +34,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> SelectStageUIClass;
+
+	UPROPERTY()
+	class ABoss* Boss;
 };
