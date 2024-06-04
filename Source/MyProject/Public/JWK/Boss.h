@@ -124,7 +124,7 @@ public:
 
 	// 미리 분석된 결과를 저장하는 TMap
 	//TMap<FString, TArray<FPatternConditions>> AnalyzedDataMap;
-	TMap<FString, TArray<FFinalPatternData>> AnalyzedDataMap;
+	TMap<FString, TPair<float, TArray<FFinalPatternData>>> AnalyzedDataMap; // 템포값까지 저장
 
 	// PreAnalyzeMusicData 함수에서 저장된 최종 패턴 데이터를 저장할 변수
 	TArray<FFinalPatternData> FinalPatternData;

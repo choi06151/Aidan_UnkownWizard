@@ -34,7 +34,7 @@ ABoss::ABoss()
 
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
 
-	FireRate = 1.0f; // rate 수치 변경함
+	//FireRate = 1.0f; // rate 수치 변경함
 
 	CurrentPatternIndex = 0;
 	CurrentTimeIndex = 0; // 추가: CurrentTimeIndex 초기화
@@ -91,16 +91,19 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 {
 	if (AnalyzedDataMap.Contains(MusicTitle))
 	{
-		FinalPatternData = AnalyzedDataMap[MusicTitle];
+		auto AnalyzedData = AnalyzedDataMap[MusicTitle];
+		float Tempo = AnalyzedData.Key;
+		FinalPatternData = AnalyzedData.Value;
 		CurrentTimeIndex = 0;
 
-		// FireRate 설정 (여기서 조정 가능)
-		FireRate = 1.0f;
+		// FireRate 설정 (템포에 맞춰 조정)
+		float BeatLength = 60.0f / Tempo; // 한 비트의 길이
+		FireRate = BeatLength * 4; // 4/4 박자를 위해 4배로 설정
 
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s."), *MusicTitle);
 
-		// 패턴 조건 업데이트 타이머 설정 (1초 간격으로 패턴 업데이트)
-		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, 1.0f, true);
+		// 패턴 조건 업데이트 타이머 설정 (한 바 단위로 패턴 업데이트)
+		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate, true);
 
 		// 음악 재생 시작
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
@@ -143,8 +146,8 @@ void ABoss::UpdatePatternConditions()
 
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Applying pattern index %d with bullet speed %f at time index %d"), CurrentData.PatternIndex, CurrentData.BulletSpeed, CurrentTimeIndex);
 
-		// TimeIndex를 증가시켜 다음 조건을 확인하도록 함
-		CurrentTimeIndex++;
+		// 4/4 박자 단위로 인덱스를 증가시켜 다음 조건을 확인하도록 함
+		CurrentTimeIndex ++; // 4 비트마다 한 번씩 업데이트
 	}
 	else
 	{
@@ -156,16 +159,21 @@ void ABoss::UpdatePatternConditions()
 
 void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath)
 {
+	// JSON 파일을 문자열로 로드
 	FString JsonString;
 	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
 	{
+		// JSON 파서를 위한 객체 생성
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 
+		// JSON 문자열을 파싱하여 JsonObject로 변환
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
+			// 최종 패턴 데이터를 저장할 배열
 			TArray<FFinalPatternData> FinalPatternDataArray;
 
+			// JSON 객체에서 템포, 비트, 강도, 주파수 대역별 데이터 값을 가져옴
 			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
 			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
 			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
@@ -174,15 +182,18 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
 			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
 
+			// 각 강도 값에 대해 반복하여 패턴 데이터를 생성
 			for (int32 i = 0; i < IntensityArray.Num(); ++i)
 			{
 				FFinalPatternData FinalData;
 
+				// 강도 값이 0.3 이상인 경우 탄막 속도를 증가시킴
 				if (IntensityArray[i]->AsNumber() > 0.3f)
 				{
 					FinalData.BulletSpeed += 50.0f;
 				}
 
+				// 주파수 대역별 값에 따라 패턴 인덱스를 설정
 				if (LowArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
@@ -212,20 +223,27 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 						});
 				}
 
+				// 비트 시간과 현재 인덱스가 가까운 경우 탄막 속도를 감소시킴
+				// 탄막 발사 타이밍을 음악의 비트와 동기화하여 더 리드미컬하게 만들기 위함임
+				// 제대로 되는지는 모르겠음
 				for (const auto& BeatValue : BeatsArray)
 				{
 					float BeatTime = BeatValue->AsNumber();
-					if (FMath::Abs(i - BeatTime) < 0.1f)
+					if (FMath::Abs(i * 4 * (60.0 / Tempo) - BeatTime) < 0.1f)
 					{
+						// 현재 인덱스가 비트 시간과 매우 가까운 경우 탄막 속도를 감소시킴
 						FinalData.BulletSpeed = FMath::Max(0.1f, FinalData.BulletSpeed - 0.1f);
 						break;
 					}
 				}
 
+				// 생성된 패턴 데이터를 배열에 추가
 				FinalPatternDataArray.Add(FinalData);
+				
 			}
+			// Tempo 값을 TMap에 함께 저장합니다.
+			AnalyzedDataMap.Add(MusicTitle, TPair<float, TArray<FFinalPatternData>>(Tempo, FinalPatternDataArray));
 
-			AnalyzedDataMap.Add(MusicTitle, FinalPatternDataArray);
 			UE_LOG(LogTemp, Warning, TEXT("ABoss::PreAnalyzeMusicData: Pre-analyzed %d conditions for %s."), FinalPatternDataArray.Num(), *MusicTitle);
 		}
 	}
