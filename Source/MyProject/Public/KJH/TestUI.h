@@ -38,10 +38,6 @@ private:
 	UFUNCTION()
 	void OnMusic3Clicked();
 	UFUNCTION()
-	void OnShow5SecInfoClicked();
-	UFUNCTION()
 	void OnPreAnalyzeAllClicked();// 미리 분석하는
 
-
-	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
 };
