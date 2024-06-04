@@ -33,7 +33,16 @@ public:
 	FMusicInfoDT* SpecificRow;
 	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
 	void MusicPlay();
+
+	TArray<AActor*> Curtains;
+	void CurtainOpenAnim();
+	void CurtainCloseAnim();
+	void CurtainShakeAnim();
+	
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;
+
+	UAnimSequence* OpenCurtainAnim;
+	UAnimSequence* ShakeCurtainAnim;
 };
