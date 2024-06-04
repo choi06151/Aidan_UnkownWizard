@@ -31,7 +31,6 @@ public:
 	FText ArtistName;
 
 	FMusicInfoDT* SpecificRow;
-	void PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath);
 	void MusicPlay();
 
 	TArray<AActor*> Curtains;
