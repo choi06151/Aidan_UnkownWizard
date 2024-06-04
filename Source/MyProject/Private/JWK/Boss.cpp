@@ -116,7 +116,7 @@ void ABoss::MusicStart()
 	{
 		SpawnWidget->CurtainOpenAnim();
 		cnt = 0;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 5.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.0f, false);
 	}
 }
 
@@ -132,7 +132,7 @@ void ABoss::HandleState()
 	case 1:
 		bIsArrive = true;
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 10 - 7.5 = 2.5
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false); // 10 - 7.5 = 2.5
 		break;
 	case 2:
 		if (SpawnWidget != nullptr)
@@ -140,7 +140,7 @@ void ABoss::HandleState()
 			SpawnWidget->CurtainCloseAnim();
 		}
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 10.0f, false); // 20 - 10 = 10
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false); // 20 - 10 = 10
 		break;
 	case 3:
 		if (SpawnWidget != nullptr)
