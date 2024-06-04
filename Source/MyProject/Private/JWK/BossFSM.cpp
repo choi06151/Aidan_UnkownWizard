@@ -1,7 +1,6 @@
 #include "JWK/BossFSM.h"
 
 #include "AIController.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/Anim_Boss.h"
 #include "JWK/Boss.h"
 
@@ -40,14 +39,7 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	case EBossState::PHASE_2: TickPhase_2();
 		break;
-
-	case EBossState::DEAD: TickDead();
-		break;
 	}
-
-	// 만약 보스가 죽었다면 state를 dead로 set
-	if (state != EBossState::DEAD && me->bIsDie == true)
-		SetState(EBossState::DEAD);
 }
 
 // bIsGameStart, bIsWalk, bIsArrive, bIsAttack, bIsPhase, bIsDie
@@ -87,19 +79,19 @@ void UBossFSM::TickAttack()
 //////////////////////////////////////// Phase_2 ////////////////////////////////////////
 void UBossFSM::TickPhase_2()
 {
-	// 체력이 0이 되었을 때 죽음
-	if (me->bIsDie)
-		SetState(EBossState::DEAD);
-
 	UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 
-//////////////////////////////////////// Dead ////////////////////////////////////////
-void UBossFSM::TickDead()
+void UBossFSM::TakeDamaged(int damage)
 {
-	me->GetCharacterMovement()->SetMovementMode(MOVE_None);
+	me->bossHP -= damage;
 
-	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
+	if(me->bossHP <=0)
+	{
+		me->bIsDie = true;
+		/* 죽음 Montage, Sound 추가 */
+		me->PlayAnimMontage(deadMontage, 1, FName("Dead"));
+	}
 }
 
 void UBossFSM::SetState(EBossState next)

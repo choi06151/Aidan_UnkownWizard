@@ -12,8 +12,7 @@ enum class EBossState : uint8
 	IDLE	UMETA(DisplayName = "IDLE"),
 	WALK	UMETA(DisplayName = "WALK"),
 	ATTACK	UMETA(DisplayName = "ATTACK"),
-	PHASE_2	UMETA(DisplayName = "PHASE_2"),
-	DEAD	UMETA(DisplayName = "DEAD")
+	PHASE_2	UMETA(DisplayName = "PHASE_2")
 	
 };
 
@@ -48,12 +47,19 @@ public:
 	
 	int curTime = 0;
 
+	
+	//////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
+	UFUNCTION(BlueprintCallable)
+	void TakeDamaged(int damage);
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* deadMontage;
+
+	
 	void SetState(EBossState next);
 	
 	void TickIdle();
 	void TickWalk();
 	void TickAttack();
 	void TickPhase_2();
-	void TickDead();
-
 };
