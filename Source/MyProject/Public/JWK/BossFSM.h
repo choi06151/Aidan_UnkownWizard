@@ -6,14 +6,14 @@
 #include "Components/ActorComponent.h"
 #include "BossFSM.generated.h"
 
-UENUM()
-enum class EBoss_state : uint8
+UENUM(BlueprintType)
+enum class EBossState : uint8
 {
-	IDLE	UMETA(DisplaName = "IDLE"),
-	WALK	UMETA(DisplaName = "WALK"),
-	ATTACK	UMETA(DisplaName = "ATTACK"),
-	Phase	UMETA(DisplaName = "Phase"),
-	DEAD	UMETA(DisplaName = "DEAD")
+	IDLE	UMETA(DisplayName = "IDLE"),
+	WALK	UMETA(DisplayName = "WALK"),
+	ATTACK	UMETA(DisplayName = "ATTACK"),
+	PHASE_2	UMETA(DisplayName = "PHASE_2"),
+	DEAD	UMETA(DisplayName = "DEAD")
 	
 };
 
@@ -41,18 +41,19 @@ public:
 
 	// Boss의 State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EBoss_state state;
+	EBossState state;
 
 	UPROPERTY(EditAnywhere)
-	float curTime;
-
+	class AAIController* ai;
 	
-private:
+	int curTime = 0;
+
+	void SetState(EBossState next);
+	
 	void TickIdle();
 	void TickWalk();
 	void TickAttack();
-	void TickPhase();
+	void TickPhase_2();
 	void TickDead();
 
-	void SetState(EBoss_state nextState);
 };

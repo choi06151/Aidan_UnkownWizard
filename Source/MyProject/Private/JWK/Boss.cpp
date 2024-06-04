@@ -1,6 +1,7 @@
 #include "JWK/Boss.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "JWK/BossFSM.h"
 // #include "JWK/BossFSM.h"
 
 ABoss::ABoss()
@@ -24,9 +25,10 @@ ABoss::ABoss()
 	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
 	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
 	bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
-	
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	if(tempEyeMesh.Succeeded())
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
+		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	if (tempEyeMesh.Succeeded())
 	{
 		bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
 		bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
@@ -35,7 +37,7 @@ ABoss::ABoss()
 		bossEyeMesh_L->SetWorldScale3D(FVector(0.075));
 		bossEyeMesh_R->SetWorldScale3D(FVector(0.075));
 	}
-	
+
 	// 지휘봉
 	batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
 	batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
@@ -51,19 +53,36 @@ ABoss::ABoss()
 
 	capMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("capMesh"));
 	capMesh->SetupAttachment(GetMesh(), TEXT("Hat"));
-	
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempCapMesh(TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Hat/CapCartola.CapCartola'"));
-	if(tempCapMesh.Succeeded())
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempCapMesh(
+		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Hat/CapCartola.CapCartola'"));
+	if (tempCapMesh.Succeeded())
 	{
 		capMesh->SetStaticMesh(tempCapMesh.Object);
 		capMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 90));
 		capMesh->SetWorldScale3D(FVector(1, 1, 1));
 	}
+
+	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("bossFSM"));
+	
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
 
 	FireRate = 1.0f;
 
 	CurrentPatternIndex = 0;
+
+	// DELEGATE Map 초기화
+	PatternDelegates.Add(EPatternType::Straight, FPatternDelegate::CreateUObject(this, &ABoss::FireStraightPattern));
+	PatternDelegates.Add(EPatternType::RandomStraight,
+	                     FPatternDelegate::CreateUObject(this, &ABoss::FireRandomStraightPattern));
+	PatternDelegates.Add(EPatternType::Fan, FPatternDelegate::CreateUObject(this, &ABoss::FireFanPattern));
+	PatternDelegates.Add(EPatternType::Circle, FPatternDelegate::CreateUObject(this, &ABoss::FireCirclePattern));
+	PatternDelegates.Add(EPatternType::Swirl, FPatternDelegate::CreateUObject(this, &ABoss::FireSwirlPattern));
+	PatternDelegates.Add(EPatternType::Butterfly, FPatternDelegate::CreateUObject(this, &ABoss::FireButterflyPattern));
+	PatternDelegates.Add(EPatternType::TrumpetFlower,
+	                     FPatternDelegate::CreateUObject(this, &ABoss::FireTrumpetFlowerPattern));
+	PatternDelegates.Add(EPatternType::Crescent, FPatternDelegate::CreateUObject(this, &ABoss::FireCrescentPattern));
+	PatternDelegates.Add(EPatternType::Angel, FPatternDelegate::CreateUObject(this, &ABoss::FireAngelPattern));
 }
 
 void ABoss::BeginPlay()
@@ -72,39 +91,53 @@ void ABoss::BeginPlay()
 
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
-
-	StartFiring();
 }
 
 void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	static float TimeElapsed = 0.0f;
-	TimeElapsed += DeltaTime;
+	curTime += DeltaTime;
 
-	// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
-	if (TimeElapsed > 1.5f && TimeElapsed <= 5.0f && !bIsDie)
+	/* 게임 시작 버튼 누를 때 Boss 움직임 */
+	if (curTime >= 3)
 	{
-		StopFiring();
-		ChangePattern();
-		StartFiring();
+		bIsGameStart = true;
+		bIsWalk = true;
 	}
-	// 3.0초 5.5초 발사 중지
-	if (TimeElapsed > 5.0f && TimeElapsed <= 7.5f && !bIsDie)
-	{
-		StopFiring();
-	}
+	
+	if(curTime >= 5.5)
+		bIsArrive = true;
 
-	// 5.5초 초과시 다음 탄막 패턴 발사
-	if (TimeElapsed > 7.5f && !bIsDie)
-	{
-		ChangePattern();
-		StartFiring();
+	if(curTime >= 10)
+		bIsAttack = true;
 
-		// 타이머 리셋
-		TimeElapsed = 0.0f;
-	}
+	if(curTime >= 15)
+		bIsPhase = true;
+
+	
+	// // 1.5초 ~ 5.0초 랜덤 탄막 패턴 발사
+	// if (curTime > 1.5f && curTime <= 5.0f && !bIsDie)
+	// {
+	// 	StopFiring();
+	// 	ChangePattern();
+	// 	StartFiring();
+	// }
+	// // 5.0초 7.5초 발사 중지
+	// if (curTime > 5.0f && curTime <= 7.5f && !bIsDie)
+	// {
+	// 	StopFiring();
+	// }
+	//
+	// // 7.5초 초과시 다음 탄막 패턴 발사
+	// if (curTime > 7.5f && !bIsDie)
+	// {
+	// 	ChangePattern();
+	// 	StartFiring();
+	//
+	// 	// 타이머 리셋
+	// 	curTime = 0.0f;
+	// }
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -112,56 +145,54 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+
+////////////////////////////////////////////////// boss Hp 관련 //////////////////////////////////////////////////
+void ABoss::TakeDamaged(int damage)
+{
+	bossHP -= damage;
+
+	if(bossHP <=0)
+	{
+		bIsDie = true;
+		/* 죽음 Montage, Sound 추가 */
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+	}
+}
+
+
+////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
 void ABoss::FireBullet()
 {
 	if (BulletSpawner != nullptr && BulletPatterns.Num() > 0)
 	{
-		FBulletHellPattern CurrentPattern = BulletPatterns[CurrentPatternIndex];
-
-		switch (CurrentPattern.PatternType)
-		{
-		case EPatternType::Straight:
-			FireStraightPattern(CurrentPattern);
-			break;
-
-		case EPatternType::RandomStraight:
-			FireRandomStraightPatter(CurrentPattern);
-			break;
-
-		case EPatternType::Fan:
-			FireFanPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Circle:
-			FireCirclePattern(CurrentPattern);
-			break;
-
-		case EPatternType::Swirl:
-			FireSwirlPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Butterfly:
-			FireButterflyPattern(CurrentPattern);
-			break;
-
-		case EPatternType::TrumpetFlower:
-			FireTrumpetFlowerPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Crescent:
-			FireCrescentPattern(CurrentPattern);
-			break;
-
-		case EPatternType::Angel:
-			FireAngelPattern(CurrentPattern);
-			break;
-
-		default:
-			break;
-		}
+		const FBulletHellPattern& CurrentPattern = BulletPatterns[CurrentPatternIndex];
+		// 현재 패턴 타입에 대한 델리게이트가 존재하는지 확인하고, 존재하면 해당 패턴 타입에 매핑된 메서드를 호출
+		if (PatternDelegates.Contains(CurrentPattern.PatternType))
+			PatternDelegates[CurrentPattern.PatternType].Execute(CurrentPattern);
 	}
 }
 
+void ABoss::StartFiring()
+{
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true, 0.0f);
+}
+
+void ABoss::StopFiring()
+{
+	GetWorldTimerManager().ClearTimer(FireRateTimerHandle);
+}
+
+void ABoss::ChangePattern()
+{
+	CurrentPatternIndex = (CurrentPatternIndex + 1) % BulletPatterns.Num();
+	// int32 RandomIndex = FMath::RandRange(0, BulletPatterns.Num() - 1);
+
+	// // 현재 패턴 인덱스를 랜덤한 값으로 설정
+	// CurrentPatternIndex = RandomIndex;
+}
+
+
+////////////////////////////////////////////////// 탄막 패턴들 //////////////////////////////////////////////////
 void ABoss::FireStraightPattern(const FBulletHellPattern& Pattern)
 {
 	// 직선 패턴 발사
@@ -174,11 +205,11 @@ void ABoss::FireStraightPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("--------"));
 }
 
-void ABoss::FireRandomStraightPatter(const FBulletHellPattern& Pattern)
+void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	BossLocation.Z = 300.0f;
-	
+
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
 		float RandomY = FMath::FRandRange(-400.0f, 400.0f);
@@ -344,25 +375,8 @@ void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 {
 }
 
-void ABoss::StartFiring()
-{
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true);
-}
 
-void ABoss::StopFiring()
-{
-	GetWorldTimerManager().ClearTimer(FireRateTimerHandle);
-}
-
-void ABoss::ChangePattern()
-{
-	CurrentPatternIndex = (CurrentPatternIndex + 1) % BulletPatterns.Num();
-	// int32 RandomIndex = FMath::RandRange(0, BulletPatterns.Num() - 1);
-
-	// // 현재 패턴 인덱스를 랜덤한 값으로 설정
-	// CurrentPatternIndex = RandomIndex;
-}
-
+////////////////////////////////////////////////// 패턴들 특성 //////////////////////////////////////////////////
 void ABoss::InitializeDefaultPatterns()
 {
 	// Interval : 발사 주기 ( 높을수록 발사 빈도수 적어짐)	// PatternSize : 패턴의 크기
@@ -375,14 +389,14 @@ void ABoss::InitializeDefaultPatterns()
 	StraightPattern.NumberOfBullets = 5;
 	StraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(StraightPattern);
-	
+
 	// 랜덤 직선
 	FBulletHellPattern RandomStraightPattern;
 	RandomStraightPattern.PatternType = EPatternType::RandomStraight;
 	RandomStraightPattern.NumberOfBullets = 6;
 	RandomStraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(RandomStraightPattern);
-	
+
 	// 부채꼴
 	FBulletHellPattern FanPattern;
 	FanPattern.PatternType = EPatternType::Fan;
@@ -390,7 +404,7 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
 	FanPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(FanPattern);
-	
+
 	// 원형 패턴
 	FBulletHellPattern CirclePattern;
 	CirclePattern.PatternType = EPatternType::Circle;
@@ -402,11 +416,11 @@ void ABoss::InitializeDefaultPatterns()
 	// 유도 원형 패턴
 	FBulletHellPattern TargetSwirlPattern;
 	TargetSwirlPattern.PatternType = EPatternType::Swirl;
-	TargetSwirlPattern.PatternSize = 150.0f;	// 원형 패턴의 크기 설정
-	TargetSwirlPattern.NumberOfBullets = 4;	// 총알의 수
+	TargetSwirlPattern.PatternSize = 150.0f; // 원형 패턴의 크기 설정
+	TargetSwirlPattern.NumberOfBullets = 4; // 총알의 수
 	TargetSwirlPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(TargetSwirlPattern);
-	
+
 	// 나팔꽃 패턴
 	FBulletHellPattern TrumpetFlowerPattern;
 	TrumpetFlowerPattern.PatternType = EPatternType::TrumpetFlower;
@@ -414,15 +428,15 @@ void ABoss::InitializeDefaultPatterns()
 	TrumpetFlowerPattern.BulletSpeed = 300.0f;
 	TrumpetFlowerPattern.FanAngle = 180.0f;
 	BulletPatterns.Add(TrumpetFlowerPattern);
-	
+
 	// 나비 패턴
 	FBulletHellPattern ButterflyPattern;
 	ButterflyPattern.PatternType = EPatternType::Butterfly;
 	ButterflyPattern.NumberOfBullets = 20;
 	ButterflyPattern.BulletSpeed = 350.0f;
 	BulletPatterns.Add(ButterflyPattern);
-	
-	
+
+
 	// 초승달 패턴
 	FBulletHellPattern CrescentPattern;
 	CrescentPattern.PatternType = EPatternType::Crescent;
