@@ -8,6 +8,71 @@
 
 DECLARE_DELEGATE_OneParam(FPatternDelegate, const FBulletHellPattern&);
 
+// 패턴 조건을 정의하는 구조체
+USTRUCT(BlueprintType)
+struct FPatternConditions
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighIntensity;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsLowFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsLowMidFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighMidFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsHighFrequency;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsOnBeat;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove90;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove100;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Conditions")
+	bool bIsTempoAbove110;
+
+	FPatternConditions()
+		: bIsHighIntensity(false)
+		, bIsLowFrequency(false)
+		, bIsLowMidFrequency(false)
+		, bIsHighMidFrequency(false)
+		, bIsHighFrequency(false)
+		, bIsOnBeat(false)
+		, bIsTempoAbove90(false)
+		, bIsTempoAbove100(false)
+		, bIsTempoAbove110(false)
+	{
+	}
+};
+// 각 시간 인덱스에서 사용할 탄막 패턴의 정보를 저장하는 구조체
+USTRUCT(BlueprintType)
+struct FFinalPatternData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	int32 PatternIndex; // 탄막 패턴의 인덱스
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float BulletSpeed; // 탄막의 총알 속도
+
+	FFinalPatternData()
+		: PatternIndex(0)
+		, BulletSpeed(300.0f) // 기본 속도 값
+	{
+	}
+};
+
 UCLASS()
 class MYPROJECT_API ABoss : public ACharacter
 {
@@ -90,6 +155,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 총알의 각도
 	float AngleStep = 360.0f / NumberOfBullets;
 
+	//////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
+	
+    // JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
+	void LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath);
+
+	// 패턴 조건을 업데이트하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
+	void UpdatePatternConditions();
+
+	// 미리 분석된 결과를 저장하는 TMap
+	//TMap<FString, TArray<FPatternConditions>> AnalyzedDataMap;
+	TMap<FString, TPair<float, TArray<FFinalPatternData>>> AnalyzedDataMap; // 템포값까지 저장
+
+	// PreAnalyzeMusicData 함수에서 저장된 최종 패턴 데이터를 저장할 변수
+	TArray<FFinalPatternData> FinalPatternData;
+
+	// 미리 분석하는 함수
+	void PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath);
+
+	// 모든 곡을 미리 분석하는 함수
+	void PreAnalyzeAllMusicData();
+
 private:
 	// 총알 발사 관련 함수
 	void FireBullet();
@@ -146,4 +234,11 @@ private:
 
 	// 패턴 델리게이트 맵
 	TMap<EPatternType, FPatternDelegate> PatternDelegates;
+
+	//////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
+	FTimerHandle PatternUpdateTimerHandle; // 새로운 타이머 핸들 추가
+	// 음악 데이터를 저장할 변수
+	TArray<FPatternConditions> PatternConditions;
+	// 패턴 업데이트를 위한 인덱스
+	int32 CurrentTimeIndex;
 };
