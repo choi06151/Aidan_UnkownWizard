@@ -11,6 +11,7 @@
 #include "SEB/MusicInfoDT.h"
 #include "SEB/StageUI.h"
 #include "Components/WidgetComponent.h"
+#include "JWK/Boss.h"
 #include "SEB/GameOverUI.h"
 
 void USelectStageUI::NativePreConstruct()
@@ -110,12 +111,22 @@ void USelectStageUI::OnPlayClicked()
 {
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
-	// 게임 시작 -> 레벨이동? -> 선택된 음악 정보가 넘어가야함.
-	// BossFSM클래스의 bIsGameStart가 true가 되도록 변경
-	
+	// 게임 시작 
+	ABoss* Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	if (Boss)
+	{
+		Boss->bIsGameStart = true;
+
+		//이건 보스에서 공격 시작할때 하도록 해야함.
+		//커튼이 열리고 -> 보스가 걸어나오고 -> 커튼이 닫히고 -> 커튼 흔들리는 애니메이션으로 변경
+		//SpawnWidget->CurtainOpenAnim();
+		//SpawnWidget->CurtainCloseAnim();
+		//SpawnWidget->CurtainShakeAnim();
+		//SpawnWidget->MusicPlay();
+	}
 	//우선은 GameOverUI로 넘어가도록 함. 
-	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
-	WidgetComponent->SetWidgetClass(GameOverUIClass);
+	/*UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
+	WidgetComponent->SetWidgetClass(GameOverUIClass);*/
 }
 
 

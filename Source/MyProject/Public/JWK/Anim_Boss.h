@@ -16,12 +16,15 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float speed = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class ABoss* me;
-
+	UPROPERTY()
+	class UBossFSM* bossFSM;
+	
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
-	EBoss_state state;
+	EBossState state;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAttacck;
+	
+	//////////////////////////////////////// Notify ////////////////////////////////////////
+	void AnimNotify_Boss_Throw();
 };

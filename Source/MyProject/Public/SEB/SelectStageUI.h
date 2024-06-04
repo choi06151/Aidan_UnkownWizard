@@ -79,8 +79,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> GameOverUIClass;
 	
-	
 	FText* ThumbnailPath;
+
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeStageName(const FText& NewText,  const FText& NewInfoText);

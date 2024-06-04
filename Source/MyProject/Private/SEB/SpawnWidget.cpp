@@ -20,7 +20,7 @@ ASpawnWidget::ASpawnWidget()
 
 	// Optionally set the WidgetComponent's properties
 	WidgetComponent->SetDrawSize(FVector2D(1800, 1200));
-	WidgetComponent->SetWidgetSpace(EWidgetSpace::World); // Set to Screen Space if needed
+	WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen); // Set to Screen Space if needed
 	WidgetComponent->SetPivot(FVector2D(0.5f, 0.5f)); // Center the pivot
 }
 
@@ -34,8 +34,12 @@ void ASpawnWidget::BeginPlay()
 		WidgetComponent->SetWidgetClass(WidgetClass);
 		WidgetComponent->InitWidget();
 	}
-
-}
+	
+	//Curtains Animation 
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("curtain"), Curtains);
+	OpenCurtainAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/SEB/Anim/Curain/Anim_OpeningCurtains.Anim_OpeningCurtains'"));
+	ShakeCurtainAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/SEB/Anim/Curain/Anim_ShakingCurtains.Anim_ShakingCurtains'"));
+}	
 
 // Called every frame
 void ASpawnWidget::Tick(float DeltaTime)
@@ -71,5 +75,48 @@ void ASpawnWidget::MusicPlay()
 	FString MusicFilePath = SpecificRow->MusicFilePath;
 	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
 	PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
+}
+
+void ASpawnWidget::CurtainOpenAnim()
+{
+	
+	for(AActor* Curtain : Curtains)
+	{
+		USkeletalMeshComponent* SkeletalMesh = Curtain->FindComponentByClass<USkeletalMeshComponent>();
+		if(SkeletalMesh && OpenCurtainAnim)
+		{
+			SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			SkeletalMesh->PlayAnimation(OpenCurtainAnim, false);
+		}
+	}
+	
+}
+
+void ASpawnWidget::CurtainCloseAnim()
+{
+	for(AActor* Curtain : Curtains)
+	{
+		USkeletalMeshComponent* SkeletalMesh = Curtain->FindComponentByClass<USkeletalMeshComponent>();
+		if(SkeletalMesh && OpenCurtainAnim)
+		{
+			SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			SkeletalMesh->PlayAnimation(OpenCurtainAnim, false);
+			SkeletalMesh->SetPosition(OpenCurtainAnim->GetPlayLength(), false);
+			SkeletalMesh->SetPlayRate(-1.0f);
+		}
+	}
+}
+
+void ASpawnWidget::CurtainShakeAnim()
+{
+	for(AActor* Curtain : Curtains)
+	{
+		USkeletalMeshComponent* SkeletalMesh = Curtain->FindComponentByClass<USkeletalMeshComponent>();
+		if(SkeletalMesh && ShakeCurtainAnim)
+		{
+			SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			SkeletalMesh->PlayAnimation(ShakeCurtainAnim, true);
+		}
+	}
 }
 

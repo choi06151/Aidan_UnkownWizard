@@ -1,14 +1,12 @@
 #include "JWK/BossFSM.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
 #include "JWK/Anim_Boss.h"
 #include "JWK/Boss.h"
 
 UBossFSM::UBossFSM()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	state = EBoss_state::IDLE;
 }
 
 
@@ -20,6 +18,7 @@ void UBossFSM::BeginPlay()
 
 	bossAnim = Cast<UAnim_Boss>(me->GetMesh()->GetAnimInstance());
 
+	ai = Cast<AAIController>(me->GetController());
 }
 
 
@@ -29,27 +28,18 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	switch (state)
 	{
-	case EBoss_state::IDLE:
-		TickIdle();
+	case EBossState::IDLE: TickIdle();
 		break;
 
-	case EBoss_state::WALK:
-		TickWalk();
+	case EBossState::WALK: TickWalk();
 		break;
-		
-	case EBoss_state::ATTACK:
-		TickAttack();
+
+	case EBossState::ATTACK: TickAttack();
 		break;
-		
-	case EBoss_state::DEAD:
-		TickDead();
+
+	case EBossState::PHASE_2: TickPhase_2();
 		break;
 	}
-
-	// 만약 보스가 죽었다면 state를 dead로 set
-	if(state != EBoss_state::DEAD && me->bIsDie == true)
-		SetState(EBoss_state::DEAD);
-	
 }
 
 // bIsGameStart, bIsWalk, bIsArrive, bIsAttack, bIsPhase, bIsDie
@@ -57,67 +47,54 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 //////////////////////////////////////// Idle ////////////////////////////////////////
 void UBossFSM::TickIdle()
 {
-	if(me->bIsGameStart)
-	{
-		me->bIsWalk = true;
-		SetState(EBoss_state::WALK);
-	}
+	if (me->bIsGameStart && me->bIsWalk && !me->bIsArrive)
+		SetState(EBossState::WALK);
 
-	if(me->bIsAttack == true && me->bIsWalk == false)
-		SetState(EBoss_state::ATTACK);
+	if(me->bIsArrive && me->bIsAttack)
+		SetState(EBossState::ATTACK);
 	
-	UE_LOG(LogTemp, Warning, TEXT("IDLE"));
+	// UE_LOG(LogTemp, Warning, TEXT("IDLE"));
 }
 
 //////////////////////////////////////// Walk ////////////////////////////////////////
 void UBossFSM::TickWalk()
 {
-	curTime += GetWorld()->GetDeltaSeconds();
-
-	bossAnim->speed = 800;
+	ai->MoveToLocation(FVector(-500, 0, 0), 5.0f);
+	if(me->bIsArrive)
+		SetState(EBossState::IDLE);
 	
-	if(curTime >= 5)
-	{
-		bossAnim->speed = 0;
-		me->bIsGameStart = false;
-		me->bIsWalk = false;
-		SetState(EBoss_state::IDLE);
-	}
-	
-	UE_LOG(LogTemp, Warning, TEXT("Walk"));
+	// UE_LOG(LogTemp, Warning, TEXT("Walk"));
 }
 
 //////////////////////////////////////// Attack ////////////////////////////////////////
 void UBossFSM::TickAttack()
 {
 	// 일정 체력 이하일 때 Phase2 진입
-	if(me->bIsPhase)
-		SetState(EBoss_state::Phase);
+	if (me->bIsPhase)
+		SetState(EBossState::PHASE_2);
 
-	UE_LOG(LogTemp, Warning, TEXT("Attack"));
+	// UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
-//////////////////////////////////////// Phase ////////////////////////////////////////
-void UBossFSM::TickPhase()
+//////////////////////////////////////// Phase_2 ////////////////////////////////////////
+void UBossFSM::TickPhase_2()
 {
-	// 체력이 0이 되었을 때 죽음
-	if(me->bIsDie)
-		SetState(EBoss_state::DEAD);
-
-	UE_LOG(LogTemp, Warning, TEXT("Phase"));
+	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 
-//////////////////////////////////////// Dead ////////////////////////////////////////
-void UBossFSM::TickDead()
+void UBossFSM::TakeDamaged(int damage)
 {
-	me->GetCharacterMovement()->SetMovementMode(MOVE_None);
-	
-	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
+	bossHP -= damage;
+
+	if(bossHP <=0)
+	{
+		me->bIsDie = true;
+		/* 죽음 Montage, Sound 추가 */
+		me->PlayAnimMontage(deadMontage, 1, FName("Dead"));
+	}
 }
 
-void UBossFSM::SetState(EBoss_state nextState)
+void UBossFSM::SetState(EBossState next)
 {
-	state = nextState;
-	curTime = 0;
+	state = next;
 }
-

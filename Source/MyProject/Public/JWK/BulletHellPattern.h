@@ -6,7 +6,6 @@
 UENUM(BlueprintType)
 enum class EPatternType : uint8
 {
-	Straight,		// 직선				O
 	RandomStraight,	// 랜덤 직선			O
 	Fan,			// 부채꼴			O
 	Circle,			// 원형				O
