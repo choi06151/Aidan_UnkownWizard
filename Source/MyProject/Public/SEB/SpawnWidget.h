@@ -45,4 +45,7 @@ private:
 
 	UAnimSequence* OpenCurtainAnim;
 	UAnimSequence* ShakeCurtainAnim;
+
+	UPROPERTY()
+	class ABoss* Boss;
 };
