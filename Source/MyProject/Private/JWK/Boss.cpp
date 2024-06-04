@@ -75,7 +75,6 @@ ABoss::ABoss()
 	CurrentTimeIndex = 0; // CurrentTimeIndex 초기화
 
 	// DELEGATE Map 초기화
-	PatternDelegates.Add(EPatternType::Straight, FPatternDelegate::CreateUObject(this, &ABoss::FireStraightPattern));
 	PatternDelegates.Add(EPatternType::RandomStraight,
 	                     FPatternDelegate::CreateUObject(this, &ABoss::FireRandomStraightPattern));
 	PatternDelegates.Add(EPatternType::Fan, FPatternDelegate::CreateUObject(this, &ABoss::FireFanPattern));
@@ -99,48 +98,20 @@ void ABoss::BeginPlay()
 void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	curTime += DeltaTime;
-
-	/* 게임 시작 버튼 누를 때 Boss 움직임 */
-	if (curTime >= 3)
+	
+	if(bIsGameStart)		// GameStart 버튼이 눌리고
 	{
-		bIsGameStart = true;
-		bIsWalk = true;
+		curTime += DeltaTime;
+		
+		if(curTime >=5)		// n초 뒤 걷기 시작
+			bIsWalk = true;
+
+		if(curTime >= 7.5)
+			bIsArrive = true;
+
+		if(curTime >= 20)
+			bIsAttack = true;	
 	}
-	
-	if(curTime >= 5.5)
-		bIsArrive = true;
-
-	if(curTime >= 10)
-		bIsAttack = true;
-
-	if(curTime >= 15)
-		bIsPhase = true;
-
-	
-	// // 1.5초 ~ 5.0초 랜덤 탄막 패턴 발사
-	// if (curTime > 1.5f && curTime <= 5.0f && !bIsDie)
-	// {
-	// 	StopFiring();
-	// 	ChangePattern();
-	// 	StartFiring();
-	// }
-	// // 5.0초 7.5초 발사 중지
-	// if (curTime > 5.0f && curTime <= 7.5f && !bIsDie)
-	// {
-	// 	StopFiring();
-	// }
-	//
-	// // 7.5초 초과시 다음 탄막 패턴 발사
-	// if (curTime > 7.5f && !bIsDie)
-	// {
-	// 	ChangePattern();
-	// 	StartFiring();
-	//
-	// 	// 타이머 리셋
-	// 	curTime = 0.0f;
-	// }
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -148,19 +119,6 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-
-////////////////////////////////////////////////// boss Hp 관련 //////////////////////////////////////////////////
-void ABoss::TakeDamaged(int damage)
-{
-	bossHP -= damage;
-
-	if(bossHP <=0)
-	{
-		bIsDie = true;
-		/* 죽음 Montage, Sound 추가 */
-		GetCharacterMovement()->SetMovementMode(MOVE_None);
-	}
-}
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
@@ -284,6 +242,7 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 							return Pattern.PatternType == EPatternType::Fan;
 						});
 				}
+				
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
@@ -291,6 +250,7 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 							return Pattern.PatternType == EPatternType::Circle;
 						});
 				}
+				
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
@@ -298,6 +258,7 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 							return Pattern.PatternType == EPatternType::Butterfly;
 						});
 				}
+				
 				else if (HighArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
@@ -383,18 +344,6 @@ void ABoss::ChangePattern()
 
 
 ////////////////////////////////////////////////// 탄막 패턴들 //////////////////////////////////////////////////
-void ABoss::FireStraightPattern(const FBulletHellPattern& Pattern)
-{
-	// 직선 패턴 발사
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 300.0f;
-	FRotator BossRotation = GetActorRotation();
-	BulletSpawner->SpawnPooledBullet(BossLocation, BossRotation, Pattern.BulletSpeed);
-
-	UE_LOG(LogTemp, Warning, TEXT("Straight"));
-	UE_LOG(LogTemp, Warning, TEXT("--------"));
-}
-
 void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -571,14 +520,6 @@ void ABoss::InitializeDefaultPatterns()
 {
 	// Interval : 발사 주기 ( 높을수록 발사 빈도수 적어짐)	// PatternSize : 패턴의 크기
 	// NumberOfBullets : 한 번에 발사되는 총알의 수		// BulletSpeed : 총알의 속도
-
-
-	// 직선
-	FBulletHellPattern StraightPattern;
-	StraightPattern.PatternType = EPatternType::Straight;
-	StraightPattern.NumberOfBullets = 5;
-	StraightPattern.BulletSpeed = 300.0f;
-	BulletPatterns.Add(StraightPattern);
 
 	// 랜덤 직선
 	FBulletHellPattern RandomStraightPattern;

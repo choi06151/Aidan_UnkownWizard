@@ -136,18 +136,6 @@ public:
 	float curTime = 0;
 
 	
-
-	
-	//////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int bossMaxHP = 500;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int bossHP = bossMaxHP;
-
-	UFUNCTION(BlueprintCallable)
-	void TakeDamaged(int damage);
-
 	//////////////////////////////////////// BulletHell 발사 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 한 번에 발사되는 총알의 수
 	int32 NumberOfBullets = 5;
@@ -155,6 +143,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 총알의 각도
 	float AngleStep = 360.0f / NumberOfBullets;
 
+	
 	//////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 	
     // JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
@@ -179,16 +168,15 @@ public:
 	void PreAnalyzeAllMusicData();
 
 private:
-	// 총알 발사 관련 함수
+	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
 	void StartFiring();
 	void StopFiring();
 	void ChangePattern();
 	void InitializeDefaultPatterns();
 
+	
 	//////////////////////////////////////// BulletHell 패턴 관련 ////////////////////////////////////////
-
-	void FireStraightPattern(const FBulletHellPattern& Pattern); // 직선
 
 	void FireRandomStraightPattern(const FBulletHellPattern& Pattern); // 랜덤 직선
 
@@ -230,7 +218,7 @@ private:
 
 
 	// 기본 패턴 설정
-	FBulletHellPattern DefaultStraightPattern;
+	FBulletHellPattern DefaultRandomStraightPattern;
 
 	// 패턴 델리게이트 맵
 	TMap<EPatternType, FPatternDelegate> PatternDelegates;

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SEB/SpawnWidget.h"
 #include "Components/WidgetComponent.h"
+#include "JWK/Boss.h"
 
 void UGameStartUI::NativeConstruct()
 {
@@ -15,10 +16,17 @@ void UGameStartUI::NativeConstruct()
 	StartBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
 	QuitBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
 	TutorialBtn->OnClicked.AddDynamic(this, &UGameStartUI::OnTutorialBtnClicked);
+
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 }
 
 void UGameStartUI::OnStartBtnClicked()
 {
+	if (Boss)
+	{
+		Boss->PreAnalyzeAllMusicData();
+		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnPreAnalyzeAllClicked: All music data pre-analyzed."));
+	}
 	// SpawnWidget의 WidgetClass를 변경
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
