@@ -28,6 +28,7 @@ void UTutorialUI::StartTextAnimation(FString FullText, float Interval)
 	}
 }
 
+
 void UTutorialUI::StartTextDeletion(float Interval)
 {
 	if (AnimatedTextBlock && !CurrentText.IsEmpty())
@@ -35,6 +36,7 @@ void UTutorialUI::StartTextDeletion(float Interval)
 		GetWorld()->GetTimerManager().SetTimer(TextDeletionTimer, this, &UTutorialUI::DeleteText, Interval, true);
 	}
 }
+
 
 void UTutorialUI::UpdateText()
 {
@@ -48,6 +50,7 @@ void UTutorialUI::UpdateText()
 	{
 		StartTextDeletion(0.05f);
 		GetWorld()->GetTimerManager().ClearTimer(TextAnimationTimer);
+		OnNextClicked();
 	}
 }
 
@@ -63,7 +66,7 @@ void UTutorialUI::DeleteText()
 	{
 		
 		GetWorld()->GetTimerManager().ClearTimer(TextDeletionTimer);
-		//OnNextClicked();
+		OnNextClicked();
 	}
 }
 
@@ -84,8 +87,7 @@ void UTutorialUI::BasicShootingLearning()
 {
 	StartTextAnimation(TEXT("기본 슈팅 : 검지와 엄지 튕김"), 0.1f);
 	cnt++;
-	// 여기서 UI 껏다켰다를 하고 싶은데 글자가 다 나오기 전에 꺼져버리네
-	TutorialTextCanvas->SetVisibility(ESlateVisibility::Hidden);
+	
 }
 
 void UTutorialUI::OnNextClicked()
@@ -97,6 +99,9 @@ void UTutorialUI::OnNextClicked()
 		break;
 	case 2:
 		BasicShootingLearning();
+		break;
+	case 3:
+		TutorialTextCanvas->SetVisibility(ESlateVisibility::Hidden);
 		break;
 	}
 }
