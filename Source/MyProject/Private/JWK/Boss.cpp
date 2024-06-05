@@ -381,6 +381,9 @@ void ABoss::ChangePattern()
 
 
 ////////////////////////////////////////////////// 탄막 패턴들 //////////////////////////////////////////////////
+
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
+
 void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -400,6 +403,7 @@ void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -420,6 +424,7 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireCirclePattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -444,6 +449,7 @@ void ABoss::FireCirclePattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -475,6 +481,7 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset)
 {
 	AngleStep = 360.0f / NumberOfPoints;
@@ -489,6 +496,7 @@ void ABoss::DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 	}
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireButterflyPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -511,6 +519,7 @@ void ABoss::FireButterflyPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("---------"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -529,6 +538,7 @@ void ABoss::FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("-------------"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireCrescentPattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
@@ -547,6 +557,7 @@ void ABoss::FireCrescentPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("--------"));
 }
 
+/* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 {
 }
