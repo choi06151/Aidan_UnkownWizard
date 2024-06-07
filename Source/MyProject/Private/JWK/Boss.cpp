@@ -94,6 +94,13 @@ void ABoss::BeginPlay()
 
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
+
+	player = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if (!player)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player not found"));
+		return;
+	}
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -427,21 +434,28 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 /* 랜덤 범위 : GetActorRightVector() * FMath::RandRange(-200, 200);*/
 void ABoss::FireCirclePattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 300.0f;
-	float Radius = Pattern.PatternSize / 3.0f;
-	FRotator BossRotation = GetActorRotation();
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f +  GetActorRightVector() * FMath::RandRange(-200, 200) + GetActorUpVector() * FMath::RandRange(0, 150);
+	BossLocation.Z = 300.0f;  // 보스의 높이를 설정
+	float Radius = Pattern.PatternSize / 3.0f;  // 패턴 크기에 따른 반지름
+	FRotator BossRotation = GetActorRotation();  // 보스의 현재 회전 값
+
+
+	/////////////// 플레이어 위치 ///////////////
+	FVector PlayerLocation = player->GetActorLocation();
 
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
-		float Angle = i * (360.0f / Pattern.NumberOfBullets);
+		// YZ 평면에서 랜덤 위치 생성
+		float Angle = FMath::FRandRange(0.0f, 360.0f);
 		float Rad = FMath::DegreesToRadians(Angle);
-
 		FVector Offset = FVector(0.0f, FMath::Cos(Rad) * Radius, FMath::Sin(Rad) * Radius);
 		FVector SpawnLocation = BossLocation + Offset;
 
-		FRotator SpawnRotation = BossRotation;
+		// 플레이어를 향한 방향 계산
+		FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
+		FRotator SpawnRotation = Direction.Rotation();
 
+		// 총알 스폰
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 

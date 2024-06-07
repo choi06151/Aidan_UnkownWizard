@@ -69,10 +69,19 @@ protected:
 	// 총알 수명 타이머 핸들
 	FTimerHandle LifespanTimer;
 
+	// 총알의 회전 속도
+	UPROPERTY(EditAnywhere)
+	float RotateSpeed_RollX;
+	
+private:
 	// 움직임 패턴 관련 변수 초기화
 	UPROPERTY(EditAnywhere)
 	float OscillationFrequency = 5.0f;	// 진동주파수
 	UPROPERTY(EditAnywhere)
 	float OscillationRadius = 1.0f;		// 진동반경
+	UPROPERTY(VisibleAnywhere)
+	class URotatingMovementComponent* movement;
+
+	
 
 };
