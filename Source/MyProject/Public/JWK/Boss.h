@@ -176,6 +176,8 @@ public:
 	// 모든 곡을 미리 분석하는 함수
 	void PreAnalyzeAllMusicData();
 
+	UPROPERTY(EditAnywhere)
+	class ABullet_Pooled* bullet;
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -186,7 +188,9 @@ private:
 
 	
 	//////////////////////////////////////// BulletHell 패턴 관련 ////////////////////////////////////////
-
+	UPROPERTY()
+	class AActor* player;
+	
 	void FireRandomStraightPattern(const FBulletHellPattern& Pattern); // 랜덤 직선
 
 	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
@@ -197,7 +201,7 @@ private:
 	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset); // 소용돌이
 
 
-	void FireButterflyPattern(const FBulletHellPattern& Pattern); // 나비
+	void FireTargetCrossPattern(const FBulletHellPattern& Pattern); // 유도 십자가
 
 	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
 
