@@ -56,6 +56,9 @@ public:
 	// 총알을 비활성화하는 함수
 	void Deactivate();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BulletHP")
+	int bulletHP;
+	
 protected:
 	// 총알의 활성화 상태
 	bool Active;
@@ -69,10 +72,6 @@ protected:
 	// 총알 수명 타이머 핸들
 	FTimerHandle LifespanTimer;
 
-	// 총알의 회전 속도
-	UPROPERTY(EditAnywhere)
-	float RotateSpeed_RollX;
-	
 private:
 	// 움직임 패턴 관련 변수 초기화
 	UPROPERTY(EditAnywhere)

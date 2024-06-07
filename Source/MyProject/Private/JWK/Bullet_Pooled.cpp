@@ -2,7 +2,6 @@
 
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "GameFramework/RotatingMovementComponent.h"
 
 
 ABullet_Pooled::ABullet_Pooled()
@@ -26,10 +25,6 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->InitialSpeed = 0.0f;
 	movementComp->MaxSpeed = 3000.0f;
 	movementComp->bShouldBounce = false;
-
-	movement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Movement"));
-
-	RotateSpeed_RollX = -100;
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -58,8 +53,6 @@ void ABullet_Pooled::Tick(float DeltaTime)
 
 	// 새로운 위치로 총알 이동
 	SetActorLocation(NewLocation);
-
-	movement->RotationRate = FRotator(0.0f, 0.0f, RotateSpeed_RollX);
 }
 
 // 총알 비활성화

@@ -10,10 +10,12 @@ enum class EPatternType : uint8
 	Fan,			// 부채꼴			O
 	Circle,			// 원형				O
 	Swirl,			// 소용돌이			O
-	TrumpetFlower,	// 나팔꽃			O
-	Butterfly,		// 나비				? 이게 왜 나비?
-	Crescent,		// 초승달			X
-	Angel			// 천사				X
+
+	
+	TrumpetFlower,	// 나팔꽃			수정
+	Butterfly,		// 나비				수정
+	Crescent,		// 초승달			수정
+	Angel			// 천사				수정
 	
 };
 
