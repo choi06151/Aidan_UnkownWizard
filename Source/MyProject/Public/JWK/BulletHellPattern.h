@@ -6,16 +6,16 @@
 UENUM(BlueprintType)
 enum class EPatternType : uint8
 {
-	RandomStraight,	// 랜덤 직선			O
-	Fan,			// 부채꼴			O
-	Circle,			// 원형				O
-	Swirl,			// 소용돌이			O
+	RandomStraight,		// 랜덤 직선			O
+	Fan,				// 부채꼴			O
+	Circle,				// 원형				O
+	Swirl,				// 소용돌이?			O
+	TargetCross,		// 유도 십자가		O
 
 	
-	TrumpetFlower,	// 나팔꽃			수정
-	Butterfly,		// 나비				수정
-	Crescent,		// 초승달			수정
-	Angel			// 천사				수정
+	TrumpetFlower,		// 나팔꽃			수정
+	Crescent,			// 초승달			수정
+	Angel				// 천사				수정
 	
 };
 
