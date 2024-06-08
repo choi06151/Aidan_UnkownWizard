@@ -200,12 +200,11 @@ private:
 	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 소용돌이
 	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset); // 소용돌이
 
-
 	void FireTargetCrossPattern(const FBulletHellPattern& Pattern); // 유도 십자가
 
-	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
+	void FireWallPattern(const FBulletHellPattern& Pattern); // 벽
 
-	void FireCrescentPattern(const FBulletHellPattern& Pattern); // 초승달
+	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
 
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
@@ -224,15 +223,6 @@ private:
 
 	FTimerHandle FireRateTimerHandle;
 
-
-	// 부채꼴 관련 변수
-	float FanAngleStep; // 각도 변경
-	float FanStartAngle; // 초기 각도 변경
-
-
-	// 기본 패턴 설정
-	FBulletHellPattern DefaultRandomStraightPattern;
-
 	// 패턴 델리게이트 맵
 	TMap<EPatternType, FPatternDelegate> PatternDelegates;
 
@@ -245,9 +235,11 @@ private:
 
 
 	FTimerHandle TimerHandle;
-	
+	//////////////////////////////////////// 커튼 애니메이션 함수 ////////////////////////////////////////
+	void HandleState();
 	int cnt = 0;
 	
-	void HandleState();
-	
+	bool bTestFire = false;
+	int CurrentEmptyLine = 3;
+	float TimeElapsed;
 };

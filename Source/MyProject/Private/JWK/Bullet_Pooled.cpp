@@ -25,6 +25,7 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->InitialSpeed = 0.0f;
 	movementComp->MaxSpeed = 3000.0f;
 	movementComp->bShouldBounce = false;
+	
 }
 
 void ABullet_Pooled::BeginPlay()
