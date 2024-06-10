@@ -118,7 +118,7 @@ void ABoss::BeginPlay()
 		return;
 	}
 
-	FireBullet();
+	// FireBullet();
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -128,16 +128,16 @@ void ABoss::Tick(float DeltaTime)
 	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
 		MusicStart();*/
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	TimeElapsed += DeltaTime;
-
-	// 5초 간격으로 저장된 패턴 발사
-	if (TimeElapsed >= 5.0f && bTestFire)
-	{
-		bTestFire = false;
-		FireBullet();
-	}
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// TimeElapsed += DeltaTime;
+	//
+	// // 5초 간격으로 저장된 패턴 발사
+	// if (TimeElapsed >= 5.0f && bTestFire)
+	// {
+	// 	bTestFire = false;
+	// 	FireBullet();
+	// }
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -742,7 +742,7 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 	}), BulletTime, false);
 	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
-	UE_LOG(LogTemp, Warning, TEXT("Star"));
+	UE_LOG(LogTemp, Warning, TEXT("Octagon"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
@@ -758,50 +758,50 @@ void ABoss::InitializeDefaultPatterns()
 	// Interval : 발사 주기 ( 높을수록 발사 빈도수 적어짐)	// PatternSize : 패턴의 크기
 	// NumberOfBullets : 한 번에 발사되는 총알의 수		// BulletSpeed : 총알의 속도
 
-	// // 랜덤 직선
-	// FBulletHellPattern RandomStraightPattern;
-	// RandomStraightPattern.PatternType = EPatternType::RandomStraight;
-	// RandomStraightPattern.NumberOfBullets = 6;
-	// RandomStraightPattern.BulletSpeed = 300.0f;
-	// BulletPatterns.Add(RandomStraightPattern);
+	// 랜덤 직선
+	FBulletHellPattern RandomStraightPattern;
+	RandomStraightPattern.PatternType = EPatternType::RandomStraight;
+	RandomStraightPattern.NumberOfBullets = 6;
+	RandomStraightPattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(RandomStraightPattern);
 
-	// // 부채꼴
-	// FBulletHellPattern FanPattern;
-	// FanPattern.PatternType = EPatternType::Fan;
-	// FanPattern.FanAngle = 90.0f; // 부채꼴 패턴의 각도 설정
-	// FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
-	// FanPattern.BulletSpeed = 300.0f;
-	// BulletPatterns.Add(FanPattern);
+	// 부채꼴
+	FBulletHellPattern FanPattern;
+	FanPattern.PatternType = EPatternType::Fan;
+	FanPattern.FanAngle = 90.0f; // 부채꼴 패턴의 각도 설정
+	FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
+	FanPattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(FanPattern);
 
-	// // 원형 패턴
-	// FBulletHellPattern TargetCirclePattern;
-	// TargetCirclePattern.PatternType = EPatternType::TargetCircle;
-	// TargetCirclePattern.PatternSize = 400.0f; // 원형 패턴의 크기 설정
-	// TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
-	// TargetCirclePattern.BulletSpeed = 300.0f;
-	// BulletPatterns.Add(TargetCirclePattern);
+	// 원형 패턴
+	FBulletHellPattern TargetCirclePattern;
+	TargetCirclePattern.PatternType = EPatternType::TargetCircle;
+	TargetCirclePattern.PatternSize = 400.0f; // 원형 패턴의 크기 설정
+	TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
+	TargetCirclePattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(TargetCirclePattern);
 
-	// // 소용돌이(십자가) 
-	// FBulletHellPattern SwirlPattern;
-	// SwirlPattern.PatternType = EPatternType::Swirl;
-	// SwirlPattern.PatternSize = 150.0f; // 원형 패턴의 크기 설정
-	// SwirlPattern.NumberOfBullets = 4; // 총알의 수
-	// SwirlPattern.BulletSpeed = 300.0f;
-	// BulletPatterns.Add(SwirlPattern);
+	// 소용돌이(십자가) 
+	FBulletHellPattern SwirlPattern;
+	SwirlPattern.PatternType = EPatternType::Swirl;
+	SwirlPattern.PatternSize = 150.0f; // 원형 패턴의 크기 설정
+	SwirlPattern.NumberOfBullets = 4; // 총알의 수
+	SwirlPattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(SwirlPattern);
 
-	// // 유도 십자가
-	// FBulletHellPattern TargetCrossPattern;
-	// TargetCrossPattern.PatternType = EPatternType::TargetCross;
-	// TargetCrossPattern.NumberOfBullets = 20;
-	// TargetCrossPattern.BulletSpeed = 350.0f;
-	// BulletPatterns.Add(TargetCrossPattern);
+	// 유도 십자가
+	FBulletHellPattern TargetCrossPattern;
+	TargetCrossPattern.PatternType = EPatternType::TargetCross;
+	TargetCrossPattern.NumberOfBullets = 20;
+	TargetCrossPattern.BulletSpeed = 350.0f;
+	BulletPatterns.Add(TargetCrossPattern);
 
-	// // 벽 패턴
-	// FBulletHellPattern WallPatter;
-	// WallPatter.PatternType = EPatternType::Wall;
-	// WallPatter.NumberOfBullets = 30;
-	// WallPatter.BulletSpeed = 300.0f;
-	// BulletPatterns.Add(WallPatter);
+	// 벽 패턴
+	FBulletHellPattern WallPatter;
+	WallPatter.PatternType = EPatternType::Wall;
+	WallPatter.NumberOfBullets = 30;
+	WallPatter.BulletSpeed = 300.0f;
+	BulletPatterns.Add(WallPatter);
 
 	// 유도 오각형
 	FBulletHellPattern OctagonPattern;
