@@ -210,6 +210,19 @@ private:
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
 
+	//// 추가 한 패턴들
+	void FireHeartPattern(const FBulletHellPattern& Pattern); // 하트
+	void DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize); // 하트 모양 정의
+
+	void FireExpandingSpherePattern(const FBulletHellPattern& Pattern); // 구가 커지는 패턴
+	void DefineExpandingSphereShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius); // 구 모양 정의
+
+	UFUNCTION()
+	void OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBullet); // 총알 이동 거리 이벤트 핸들러
+
+	//Fire패턴이름(const FBulletHellPattern& Pattern) 추가
+
+
 	UPROPERTY(EditAnywhere, Category = "Combat") // 총알 생성
 	USpawn_Bullet* BulletSpawner;
 

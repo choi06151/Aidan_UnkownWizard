@@ -15,7 +15,11 @@ enum class EPatternType : uint8
 	
 	TrumpetFlower,		// 나팔꽃			수정
 	Crescent,			// 초승달			수정
-	Angel				// 천사				수정
+	Angel,				// 천사				수정
+
+	Heart,               // 하트
+	ExpandingSphere      // 구 모양 변경되는
+	// 새로운 패턴 추가시 이름 여기에 추가
 	
 };
 
@@ -44,4 +48,10 @@ public:
 	float ZigzagFrequency;		// 지그재그
 	
 	float CrescentAngle;		// 반달
+
+	// 추가된 변수들
+	float InitialPatternSize; // 초기 패턴 크기
+	float FinalPatternSize;   // 최종 패턴 크기
+	float SizeChangeDistance; // 크기 변경이 일어나는 거리
+
 };
