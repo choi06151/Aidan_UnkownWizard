@@ -195,7 +195,7 @@ private:
 
 	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
 
-	void FireCirclePattern(const FBulletHellPattern& Pattern); // 원
+	void FireTargetCirclePattern(const FBulletHellPattern& Pattern); // 원
 
 	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 소용돌이
 	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset); // 소용돌이
@@ -204,7 +204,7 @@ private:
 
 	void FireWallPattern(const FBulletHellPattern& Pattern); // 벽
 
-	void FireTrumpetFlowerPattern(const FBulletHellPattern& Pattern); // 나팔꽃
+	void FireTargetOctagonPattern(const FBulletHellPattern& Pattern); // 나팔꽃
 
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
