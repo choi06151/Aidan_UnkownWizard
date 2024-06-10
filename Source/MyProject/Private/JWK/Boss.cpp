@@ -209,8 +209,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		       *MusicTitle);
 
 		// 패턴 조건 업데이트 타이머 설정 (한 바 단위로 패턴 업데이트)
-		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate,
-		                                true);
+		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate, true);
 
 		// 음악 재생 시작
 		UE_LOG(LogTemp, Warning,
@@ -219,8 +218,9 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		{
 			UGameplayStatics::PlaySound2D(this, Music);
 
-			// 탄막 발사 시작
-			StartFiring();
+			// // 탄막 발사 시작
+			// StartFiring();
+			FireBullet();
 		}
 		else
 		{
@@ -320,7 +320,7 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 					{
-						return Pattern.PatternType == EPatternType::Fan;
+						return Pattern.PatternType == EPatternType::TargetCross;
 					});
 				}
 
@@ -444,19 +444,33 @@ GetActorRightVector() * FMath::RandRange(-200, 200);
 // 랜덤 직선 : YZ 평면 랜덤좌표에서 총알들이 발사됨
 void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 300.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -550;
 
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
 		float RandomY = FMath::FRandRange(-400.0f, 400.0f);
-		float RandomZ = FMath::FRandRange(-200.0f, 100.0f);
+		float RandomZ = FMath::FRandRange(0, 150.0f);
 		FVector SpawnLocation = FVector(BossLocation.X, BossLocation.Y + RandomY, BossLocation.Z + RandomZ);
 		FRotator SpawnRotation = GetActorRotation();
 
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BulletTimer;
+	float BulletTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	}), BulletTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	
 	UE_LOG(LogTemp, Warning, TEXT("RandomStraight"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
@@ -487,12 +501,9 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 // 유도 원형 : 발사될 때는 원형이다가 Player에게 다가올 때 쯤에는 한 점으로 모임
 void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() *
-		FMath::RandRange(-200, 200) + GetActorUpVector() * FMath::RandRange(0, 150);
-	BossLocation.Z = 300.0f; // 보스의 높이를 설정
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(-200, 200) + GetActorUpVector() *
+		FMath::RandRange(-150, 150);
 	float Radius = Pattern.PatternSize / 3.0f; // 패턴 크기에 따른 반지름
-	FRotator BossRotation = GetActorRotation(); // 보스의 현재 회전 값
-
 
 	/////////////// 플레이어 위치 ///////////////
 	FVector PlayerLocation = player->GetActorLocation();
@@ -512,6 +523,21 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 		// 총알 스폰
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
+
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BulletTimer;
+	float BulletTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	}), BulletTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
 	UE_LOG(LogTemp, Warning, TEXT("Circle"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
@@ -546,6 +572,21 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BulletTimer;
+	float BulletTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	}), BulletTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
+	
 	UE_LOG(LogTemp, Warning, TEXT("TargetCircle"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
@@ -569,9 +610,7 @@ void ABoss::DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 // 유도 십자가 : + 모양의 탄막이 플레이어의 위치로 모임
 void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() *
-		FMath::RandRange(-200, 200);
-	BossLocation.Z = 300.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(0, 400) + GetActorUpVector() * FMath::RandRange(0, 400);
 
 	// 보스의 전방 벡터
 	FVector Forward = GetActorForwardVector();
@@ -592,16 +631,33 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 		FVector(0, 0, -200) // 뒤쪽
 	};
 
-	for (int32 i = 0; i < 9; ++i)
+	for(int32 j=0; j<2; j++)
 	{
-		FVector SpawnLocation = BossLocation + Forward * CrossOffsets[i].X + FVector::RightVector * CrossOffsets[i].Y +
-			FVector::UpVector * CrossOffsets[i].Z;
-		// 플레이어를 향한 방향 계산
-		FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
-		FRotator SpawnRotation = Direction.Rotation();
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		for (int32 i = 0; i < 9; ++i)
+		{
+			FVector SpawnLocation = BossLocation + Forward * CrossOffsets[i].X + FVector::RightVector * CrossOffsets[i].Y + FVector::UpVector * CrossOffsets[i].Z;
+			// 플레이어를 향한 방향 계산
+			FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
+			FRotator SpawnRotation = Direction.Rotation();
+			BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		}
 	}
 
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BulletTimer;
+	float BulletTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	}), BulletTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
+	
 	UE_LOG(LogTemp, Warning, TEXT("Cross"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
@@ -610,7 +666,7 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 // 벽 : 3 X 9 (가로 X 세로)의 벽 중에서 세로 2줄의 빈 공간이 생기고 발사. 누적될 때 마다 빈 공간(세로 2줄)이 옆으로 이동함
 void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -300.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FRotator BossRotation = GetActorRotation();
 
 	// 탄환 발사 위치 설정
@@ -652,11 +708,9 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 	for (int i = 0; i < WallSize; i++)
 	{
 		// 비어있는 열이 아닌 경우에만 벽 생성
-		if (i % WallWidth != CurrentEmptyLine && i % WallWidth != CurrentEmptyLine + 1)
+		if (i % WallWidth != CurrentEmptyLine && i % WallWidth != CurrentEmptyLine + 1 && i % WallWidth != CurrentEmptyLine + 2)
 		{
-			FVector SpawnLocation = BossLocation + GetActorForwardVector() * Wall[i].X + GetActorRightVector() * Wall[i]
-				.Y +
-				GetActorUpVector() * Wall[i].Z;
+			FVector SpawnLocation = BossLocation + GetActorForwardVector() * Wall[i].X + GetActorRightVector() * Wall[i].Y + GetActorUpVector() * Wall[i].Z;
 
 			BulletSpawner->SpawnPooledBullet(SpawnLocation, BossRotation, Pattern.BulletSpeed);
 		}
@@ -687,7 +741,7 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -400;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	FRotator BossRotation = GetActorRotation();
 
 	// 탄환 발사 위치 설정
@@ -764,7 +818,7 @@ void ABoss::InitializeDefaultPatterns()
 	RandomStraightPattern.NumberOfBullets = 6;
 	RandomStraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(RandomStraightPattern);
-
+	
 	// 부채꼴
 	FBulletHellPattern FanPattern;
 	FanPattern.PatternType = EPatternType::Fan;
@@ -772,15 +826,15 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
 	FanPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(FanPattern);
-
+	
 	// 원형 패턴
 	FBulletHellPattern TargetCirclePattern;
 	TargetCirclePattern.PatternType = EPatternType::TargetCircle;
-	TargetCirclePattern.PatternSize = 400.0f; // 원형 패턴의 크기 설정
+	TargetCirclePattern.PatternSize = 300.0f; // 원형 패턴의 크기 설정
 	TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
 	TargetCirclePattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(TargetCirclePattern);
-
+	
 	// 소용돌이(십자가) 
 	FBulletHellPattern SwirlPattern;
 	SwirlPattern.PatternType = EPatternType::Swirl;
@@ -788,21 +842,21 @@ void ABoss::InitializeDefaultPatterns()
 	SwirlPattern.NumberOfBullets = 4; // 총알의 수
 	SwirlPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(SwirlPattern);
-
+	
 	// 유도 십자가
 	FBulletHellPattern TargetCrossPattern;
 	TargetCrossPattern.PatternType = EPatternType::TargetCross;
 	TargetCrossPattern.NumberOfBullets = 20;
 	TargetCrossPattern.BulletSpeed = 350.0f;
 	BulletPatterns.Add(TargetCrossPattern);
-
+	
 	// 벽 패턴
 	FBulletHellPattern WallPatter;
 	WallPatter.PatternType = EPatternType::Wall;
 	WallPatter.NumberOfBullets = 30;
 	WallPatter.BulletSpeed = 300.0f;
 	BulletPatterns.Add(WallPatter);
-
+	
 	// 유도 오각형
 	FBulletHellPattern OctagonPattern;
 	OctagonPattern.PatternType = EPatternType::Octagon;
