@@ -67,8 +67,13 @@ void USelectStageUI::NativePreConstruct()
 	}
 	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
 	
-	if(SpawnWidget)
+	if(SpawnWidget){
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
+		int32 ScrollCount = SpawnWidget->CurrentStage;
+		FColor ClickColor = FColor(255, 100, 22, 255);
+		
+		SetSelectUIColor(ScrollCount, ClickColor);
+	}
 }
 
 void USelectStageUI::NativeConstruct()

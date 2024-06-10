@@ -37,7 +37,8 @@ public:
 	void CurtainOpenAnim();
 	void CurtainCloseAnim();
 	void CurtainShakeAnim();
-	
+
+	int32 CurrentStage = 1;
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;
