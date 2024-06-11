@@ -34,7 +34,7 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	case EBossState::WALK: TickWalk();
 		break;
 
-	case EBossState::ATTACK: TickAttack();
+	case EBossState::COMMAND: TickCommand();
 		break;
 
 	case EBossState::PHASE_2: TickPhase_2();
@@ -51,7 +51,7 @@ void UBossFSM::TickIdle()
 		SetState(EBossState::WALK);
 
 	if(me->bIsArrive && me->bIsAttack)
-		SetState(EBossState::ATTACK);
+		SetState(EBossState::COMMAND);
 	
 	// UE_LOG(LogTemp, Warning, TEXT("IDLE"));
 }
@@ -67,7 +67,7 @@ void UBossFSM::TickWalk()
 }
 
 //////////////////////////////////////// Attack ////////////////////////////////////////
-void UBossFSM::TickAttack()
+void UBossFSM::TickCommand()
 {
 	// 일정 체력 이하일 때 Phase2 진입
 	if (me->bIsPhase)

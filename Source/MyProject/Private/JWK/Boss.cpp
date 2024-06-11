@@ -13,7 +13,7 @@ ABoss::ABoss()
 
 	// 보스
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss_Gentle/Mesh/SK_skltnGent.SK_skltnGent'"));
+		"/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss/Mesh/SK_skltnGent.SK_skltnGent'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -21,35 +21,37 @@ ABoss::ABoss()
 		GetMesh()->SetWorldScale3D(FVector(1.6f));
 	}
 
-	// bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
-	// bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
-	// bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
-	// bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
-	//
-	// ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
-	// 	TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	// if (tempEyeMesh.Succeeded())
-	// {
-	// 	bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
-	// 	bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
-	// 	bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
-	// 	bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
-	// 	bossEyeMesh_L->SetWorldScale3D(FVector(0.075));
-	// 	bossEyeMesh_R->SetWorldScale3D(FVector(0.075));
-	// }
+	bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
+	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
+	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
+	bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
+	
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
+		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	if (tempEyeMesh.Succeeded())
+	{
+		bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
+		bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
+		
+		bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
+		bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
+		
+		bossEyeMesh_L->SetWorldScale3D(FVector(0.05));
+		bossEyeMesh_R->SetWorldScale3D(FVector(0.05));
+	}
 
 	// 지휘봉
-	// batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
-	// batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-	//
-	// ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
-	// 	TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
-	// if (tempBatonMesh.Succeeded())
-	// {
-	// 	batonMesh->SetStaticMesh(tempBatonMesh.Object);
-	// 	batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(0, 0, 0));
-	// 	batonMesh->SetWorldScale3D(FVector(1.5f));
-	// }
+	batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
+	batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
+	
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
+		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
+	if (tempBatonMesh.Succeeded())
+	{
+		batonMesh->SetStaticMesh(tempBatonMesh.Object);
+		batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(0, 0, 0));
+		batonMesh->SetWorldScale3D(FVector(1.5f));
+	}
 
 	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("bossFSM"));
 
@@ -164,28 +166,26 @@ void ABoss::HandleState()
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
 		break;
+		
 	case 1:
 		bIsArrive = true;
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false); // 10 - 7.5 = 2.5
 		break;
+		
 	case 2:
 		if (SpawnWidget != nullptr)
-		{
 			SpawnWidget->CurtainCloseAnim();
-		}
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false); // 20 - 10 = 10
 		break;
+		
 	case 3:
 		if (SpawnWidget != nullptr)
-		{
 			SpawnWidget->CurtainShakeAnim();
-			SpawnWidget->MusicPlay();
-		}
-		bIsAttack = true;
 		cnt++;
 		break;
+		
 	default:
 		break;
 	}
