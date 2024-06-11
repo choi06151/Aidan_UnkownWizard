@@ -695,13 +695,16 @@ void ABoss::FireExpandingSpherePattern(const FBulletHellPattern& Pattern)
 	{
 		FVector SpawnLocation = BossLocation + Offset;
 		FRotator SpawnRotation = GetActorForwardVector().Rotation();
-		if (ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed))
+		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
 			Bullet->SetDistanceThreshold(Pattern.SizeChangeDistance);
 			Bullet->InitialRadius = Pattern.InitialPatternSize; // 초기 크기 설정
 			Bullet->FinalRadius = Pattern.FinalPatternSize; // 최종 크기 설정
 			Bullet->SizeChangeDistance = Pattern.SizeChangeDistance; // 크기 변화 거리 설정
+
+			// 이미 바인딩되어 있는지 확인한 후에 이벤트 추가
 			if (!Bullet->OnBulletTravelled.IsAlreadyBound(this, &ABoss::OnBulletTravelled))
 			{
 				Bullet->OnBulletTravelled.AddDynamic(this, &ABoss::OnBulletTravelled);
@@ -768,25 +771,23 @@ void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBull
 
 	if (Pattern)
 	{
-		// 이동 거리가 크기 변경 거리를 초과하면 총알 크기 변경
-		if (DistanceTraveled >= Pattern->SizeChangeDistance)
+		float TotalTime = Pattern->FinalPatternSize - Pattern->InitialPatternSize;
+
+		// 경과 시간에 따라 새로운 반지름 계산
+		float NewRadius = FMath::Lerp(PooledBullet->InitialRadius, PooledBullet->FinalRadius, PooledBullet->GetElapsedTime() / TotalTime);
+
+		TArray<FVector> SphereShape;
+		DefineExpandingSphereShape(SphereShape, Pattern->NumberOfBullets, NewRadius);
+
+		FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+		BossLocation.Z = 300.0f;
+
+		if (SphereShape.Num() > 0)
 		{
-			// 이동 거리에 따라 새로운 반지름 계산
-			float NewRadius = FMath::Lerp(PooledBullet->InitialRadius, PooledBullet->FinalRadius,
-				(DistanceTraveled - Pattern->SizeChangeDistance) / (Pattern->FinalPatternSize - Pattern->InitialPatternSize));
-
-			TArray<FVector> SphereShape;
-			DefineExpandingSphereShape(SphereShape, Pattern->NumberOfBullets, NewRadius);
-
-			FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-			BossLocation.Z = 300.0f;
-
-			if (SphereShape.Num() > 0)
+			for (int32 i = 0; i < SphereShape.Num(); ++i)
 			{
-				for (int32 i = 0; i < SphereShape.Num(); ++i)
-				{
-					PooledBullet->SetActorLocation(BossLocation + SphereShape[i]);
-				}
+				// 총알의 위치를 업데이트하여 구체의 크기를 변화시킴
+				PooledBullet->SetActorLocation(BossLocation + SphereShape[i]);
 			}
 		}
 	}

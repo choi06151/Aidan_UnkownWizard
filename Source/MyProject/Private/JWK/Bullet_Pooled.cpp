@@ -31,6 +31,7 @@ ABullet_Pooled::ABullet_Pooled()
 	FinalRadius = 0.0f;          // 추가된 부분
 	SizeChangeDistance = 0.0f;   // 추가된 부분
 	bHasBroadcasted = false;     // 추가된 부분
+	FrameCounter = 0; 
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -38,7 +39,9 @@ void ABullet_Pooled::BeginPlay()
 	Super::BeginPlay();
 
 	movementComp->SetUpdatedComponent(boxComp);
-	InitialLocation = GetActorLocation(); // 초기 위치 설정 //추가
+	//추가
+	InitialLocation = GetActorLocation(); // 초기 위치 설정
+	TimeSinceSpawned = 0.0f; // 생성된 이후 경과 시간 초기화
 }
 
 void ABullet_Pooled::Tick(float DeltaTime)
@@ -64,7 +67,7 @@ void ABullet_Pooled::Tick(float DeltaTime)
 	///////기존 코드 move로 옯기고 수정
 	if (Active)
 	{
-		MoveBullet(DeltaTime); // 총알 이동 
+		MoveBullet(DeltaTime); // 총알 이동
 	}
 }
 
@@ -96,16 +99,28 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 
 	// 이동 거리 계산
 	DistanceTraveled += MoveDelta.Size(); // 이동 거리 누적
-	//UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::MoveBullet: New Location: %s, Distance traveled: %f"), *NewLocation.ToString(), DistanceTraveled); // 디버깅 로그 추가
+	// 경과 시간 누적
+	ElapsedTime += DeltaTime;
 
-	// 이동 거리가 임계값을 초과할 때 이벤트 호출
-	if (DistanceTraveled >= SomeThreshold && !bHasBroadcasted)
+	// 크기 변경을 매 10번째 프레임마다 수행
+	if (FrameCounter % 10 == 0)
+	{
+		float TotalTime = 5.0f; // 구의 크기가 변화하는 총 시간 (초 단위로 설정, 예: 5초)
+		float NewRadius = FMath::Lerp(InitialRadius, FinalRadius, ElapsedTime / TotalTime);
+
+		SetActorScale3D(FVector(NewRadius));
+
+		FrameCounter = 0; // 프레임 카운터 초기화
+	}
+
+	FrameCounter++; // 프레임 카운터 증가
+
+	if (ElapsedTime >= SomeThreshold && !bHasBroadcasted)
 	{
 		if (OnBulletTravelled.IsBound())
 		{
-			OnBulletTravelled.Broadcast(DistanceTraveled, this); // 이벤트 호출
-			bHasBroadcasted = true; // 이벤트가 호출되었음을 표시
-			//UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::MoveBullet onbullet호출"));
+			OnBulletTravelled.Broadcast(ElapsedTime, this);
+			bHasBroadcasted = true;
 		}
 	}
 }
@@ -113,6 +128,11 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 void ABullet_Pooled::SetDistanceThreshold(float Threshold)
 {
 	SomeThreshold = Threshold;
+}
+
+float ABullet_Pooled::GetElapsedTime() const
+{
+	return ElapsedTime;
 }
 
 // 총알의 패턴 타입 설정 함수
@@ -137,7 +157,10 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	//추가
 	InitialLocation = GetActorLocation(); // 활성화 시 초기 위치 설정
 	DistanceTraveled = 0.0f; // 이동 거리 초기화
+	ElapsedTime = 0.0f; // 경과 시간 초기화
+	TimeSinceSpawned = 0.0f;
 	bHasBroadcasted = false; // 플래그 초기화
+	FrameCounter = 0.0f; // 프레임 초기화
 }
 
 // bullet의 수명을 set
