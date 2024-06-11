@@ -13,56 +13,43 @@ ABoss::ABoss()
 
 	// 보스
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/JWK/Skeleton_Boss/ToonSkeleton/Characters/Meshes/SKM_ToonSkeleton.SKM_ToonSkeleton'"));
+		"/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss_Gentle/Mesh/SK_skltnGent.SK_skltnGent'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
-		GetMesh()->SetWorldScale3D(FVector(1));
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-		GetMesh()->SetWorldScale3D(FVector(2, 2, 2));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -160), FRotator(0, -90, 0));
+		GetMesh()->SetWorldScale3D(FVector(1.6f));
 	}
 
-	bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
-	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
-	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
-	bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
-
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
-		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	if (tempEyeMesh.Succeeded())
-	{
-		bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
-		bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
-		bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
-		bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
-		bossEyeMesh_L->SetWorldScale3D(FVector(0.075));
-		bossEyeMesh_R->SetWorldScale3D(FVector(0.075));
-	}
+	// bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
+	// bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
+	// bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
+	// bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
+	//
+	// ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
+	// 	TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	// if (tempEyeMesh.Succeeded())
+	// {
+	// 	bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
+	// 	bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
+	// 	bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
+	// 	bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
+	// 	bossEyeMesh_L->SetWorldScale3D(FVector(0.075));
+	// 	bossEyeMesh_R->SetWorldScale3D(FVector(0.075));
+	// }
 
 	// 지휘봉
-	batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
-	batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
-		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
-	if (tempBatonMesh.Succeeded())
-	{
-		batonMesh->SetStaticMesh(tempBatonMesh.Object);
-		batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(-90, 65, -25));
-		batonMesh->SetWorldScale3D(FVector(2));
-	}
-
-	capMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("capMesh"));
-	capMesh->SetupAttachment(GetMesh(), TEXT("Hat"));
-
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempCapMesh(
-		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Hat/CapCartola.CapCartola'"));
-	if (tempCapMesh.Succeeded())
-	{
-		capMesh->SetStaticMesh(tempCapMesh.Object);
-		capMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 90));
-		capMesh->SetWorldScale3D(FVector(1, 1, 1));
-	}
+	// batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
+	// batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
+	//
+	// ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
+	// 	TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
+	// if (tempBatonMesh.Succeeded())
+	// {
+	// 	batonMesh->SetStaticMesh(tempBatonMesh.Object);
+	// 	batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(0, 0, 0));
+	// 	batonMesh->SetWorldScale3D(FVector(1.5f));
+	// }
 
 	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("bossFSM"));
 

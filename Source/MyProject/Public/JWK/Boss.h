@@ -90,13 +90,13 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	class USkeletalMesh* bossMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* bossEyeMesh_L;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UStaticMeshComponent* bossEyeMesh_R;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// class UStaticMeshComponent* bossEyeMesh_L;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// class UStaticMeshComponent* bossEyeMesh_R;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCharacterMovementComponent* movementComp;
@@ -106,12 +106,6 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* batonMesh;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* capMesh;
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* tuxedoMesh;
 	
 	
 	////////////////////////////////////// Boss Play 관련 bool //////////////////////////////////////
