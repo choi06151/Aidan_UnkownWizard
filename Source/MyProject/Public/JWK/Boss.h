@@ -4,6 +4,7 @@
 #include "Spawn_Bullet.h"
 #include "GameFramework/Character.h"
 #include "BulletHellPattern.h"
+#include "Spawn_Baton.h"
 #include "Boss.generated.h"
 
 DECLARE_DELEGATE_OneParam(FPatternDelegate, const FBulletHellPattern&);
@@ -208,6 +209,10 @@ private:
 
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
+	void ThrowBaton();
+
+	UPROPERTY(EditAnywhere, Category = "Combeat")
+	USpawn_Baton* BatonSpawner;
 
 	UPROPERTY(EditAnywhere, Category = "Combat") // 총알 생성
 	USpawn_Bullet* BulletSpawner;

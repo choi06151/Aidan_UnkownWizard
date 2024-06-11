@@ -68,6 +68,8 @@ ABoss::ABoss()
 
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
 
+	BatonSpawner = CreateDefaultSubobject<USpawn_Baton>(TEXT("BatonSpawner"));
+
 	FireRate = 1.0f;
 
 	CurrentPatternIndex = 0;
@@ -119,10 +121,11 @@ void ABoss::BeginPlay()
 	}
 
 	// FireBullet();
+	ThrowBaton();
 }
 
 void ABoss::Tick(float DeltaTime)
-{
+{ 
 	Super::Tick(DeltaTime);
 
 	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
@@ -137,7 +140,17 @@ void ABoss::Tick(float DeltaTime)
 	// 	bTestFire = false;
 	// 	FireBullet();
 	// }
-	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
+
+	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
+	TimeElapsed += DeltaTime;
+
+	if(TimeElapsed >= 5.0f && bTestFire)
+	{
+		bTestFire = false;
+		ThrowBaton();
+	}
+	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -803,6 +816,37 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 {
+}
+
+
+//////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
+void ABoss::ThrowBaton()
+{
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
+	// 보스의 전방 벡터
+	FVector Forward = GetActorForwardVector();
+
+	//플레이어 위치
+	FVector PlayerLocation = player->GetActorLocation() + player->GetActorUpVector() * -500;
+	FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();
+	FRotator SpawnRotation = Direction.Rotation();
+	
+	BatonSpawner->SpawnPooledBaton(BossLocation, SpawnRotation, 500);
+
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BatonTimer;
+	float BatonTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BatonTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("----TestFire Is True----"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BatonTimer);
+	}), BatonTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 }
 
 
