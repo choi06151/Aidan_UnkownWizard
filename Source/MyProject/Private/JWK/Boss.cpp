@@ -813,7 +813,7 @@ void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBull
 	if (Pattern)
 	{
 		float TotalTime = Pattern->SizeChangeDistance; // 크기 변화가 일어나는 총 시간 (초 단위)
-		ㅓ
+		
 		// 경과 시간에 따라 새로운 반지름 계산
 		float NewRadius = FMath::Lerp(PooledBullet->InitialRadius, PooledBullet->FinalRadius, PooledBullet->GetElapsedTime() / TotalTime);
 
