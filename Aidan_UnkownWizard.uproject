@@ -41,6 +41,10 @@
 		{
 			"Name": "SQLiteSupport",
 			"Enabled": true
+		},
+		{
+			"Name": "ElectraPlayer",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
