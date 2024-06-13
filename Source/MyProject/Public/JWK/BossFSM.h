@@ -9,10 +9,10 @@
 UENUM(BlueprintType)
 enum class EBossState : uint8
 {
-	IDLE	UMETA(DisplayName = "IDLE"),
-	WALK	UMETA(DisplayName = "WALK"),
-	ATTACK	UMETA(DisplayName = "ATTACK"),
-	PHASE_2	UMETA(DisplayName = "PHASE_2")
+	IDLE		UMETA(DisplayName = "IDLE"),
+	WALK		UMETA(DisplayName = "WALK"),
+	COMMAND		UMETA(DisplayName = "COMMAND"),
+	PHASE_2		UMETA(DisplayName = "PHASE_2")
 	
 };
 
@@ -65,6 +65,6 @@ public:
 	
 	void TickIdle();
 	void TickWalk();
-	void TickAttack();
+	void TickCommand();
 	void TickPhase_2();
 };

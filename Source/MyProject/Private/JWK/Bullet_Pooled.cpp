@@ -61,21 +61,20 @@ void ABullet_Pooled::Tick(float DeltaTime)
 	meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
 }
 
-// 총알 비활성화
-void ABullet_Pooled::Deactivate()
-{
-	SetActive(false);
-	GetWorldTimerManager().ClearAllTimersForObject(this);
-	OnPooledBulletDespawn.Broadcast(this);
-}
-
 // 총알 상태 활성화 or 비활성화
 void ABullet_Pooled::SetActive(bool IsActive)
 {
 	Active = IsActive;
 	SetActorHiddenInGame(!IsActive);
 	GetWorldTimerManager().SetTimer(LifespanTimer, this, &ABullet_Pooled::Deactivate, LifeSpan, false);
+}
 
+// 총알 비활성화
+void ABullet_Pooled::Deactivate()
+{
+	SetActive(false);
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	OnPooledBulletDespawn.Broadcast(this);
 }
 
 // bullet의 수명을 set

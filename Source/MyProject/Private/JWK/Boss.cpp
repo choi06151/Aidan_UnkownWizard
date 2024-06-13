@@ -13,60 +13,51 @@ ABoss::ABoss()
 
 	// 보스
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/JWK/Skeleton_Boss/ToonSkeleton/Characters/Meshes/SKM_ToonSkeleton.SKM_ToonSkeleton'"));
+		"/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss/Mesh/SK_skltnGent.SK_skltnGent'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
-		GetMesh()->SetWorldScale3D(FVector(1));
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-		GetMesh()->SetWorldScale3D(FVector(2, 2, 2));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -160), FRotator(0, -90, 0));
+		GetMesh()->SetWorldScale3D(FVector(1.6f));
 	}
 
 	bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
 	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
 	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
 	bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
-
+	
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
 		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (tempEyeMesh.Succeeded())
 	{
 		bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
 		bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
+		
 		bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
 		bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
-		bossEyeMesh_L->SetWorldScale3D(FVector(0.075));
-		bossEyeMesh_R->SetWorldScale3D(FVector(0.075));
+		
+		bossEyeMesh_L->SetWorldScale3D(FVector(0.05));
+		bossEyeMesh_R->SetWorldScale3D(FVector(0.05));
 	}
 
 	// 지휘봉
 	batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
 	batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-
+	
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
 		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
 	if (tempBatonMesh.Succeeded())
 	{
 		batonMesh->SetStaticMesh(tempBatonMesh.Object);
-		batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(-90, 65, -25));
-		batonMesh->SetWorldScale3D(FVector(2));
-	}
-
-	capMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("capMesh"));
-	capMesh->SetupAttachment(GetMesh(), TEXT("Hat"));
-
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempCapMesh(
-		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Hat/CapCartola.CapCartola'"));
-	if (tempCapMesh.Succeeded())
-	{
-		capMesh->SetStaticMesh(tempCapMesh.Object);
-		capMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 90));
-		capMesh->SetWorldScale3D(FVector(1, 1, 1));
+		batonMesh->SetRelativeLocationAndRotation(FVector(2, -1, 10), FRotator(0, 0, 0));
+		batonMesh->SetWorldScale3D(FVector(1.5f));
 	}
 
 	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("bossFSM"));
 
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
+
+	BatonSpawner = CreateDefaultSubobject<USpawn_Baton>(TEXT("BatonSpawner"));
 
 	FireRate = 1.0f;
 
@@ -119,10 +110,11 @@ void ABoss::BeginPlay()
 	}
 
 	// FireBullet();
+	ThrowBaton();
 }
 
 void ABoss::Tick(float DeltaTime)
-{
+{ 
 	Super::Tick(DeltaTime);
 
 	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
@@ -137,7 +129,17 @@ void ABoss::Tick(float DeltaTime)
 	// 	bTestFire = false;
 	// 	FireBullet();
 	// }
-	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
+
+	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
+	// TimeElapsed += DeltaTime;
+	//
+	// if(TimeElapsed >= 5.0f && bTestFire)
+	// {
+	// 	bTestFire = false;
+	// 	ThrowBaton();
+	// }
+	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
 }
 
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -164,28 +166,26 @@ void ABoss::HandleState()
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
 		break;
+		
 	case 1:
 		bIsArrive = true;
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false); // 10 - 7.5 = 2.5
 		break;
+		
 	case 2:
 		if (SpawnWidget != nullptr)
-		{
 			SpawnWidget->CurtainCloseAnim();
-		}
 		cnt++;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false); // 20 - 10 = 10
 		break;
+		
 	case 3:
 		if (SpawnWidget != nullptr)
-		{
 			SpawnWidget->CurtainShakeAnim();
-			SpawnWidget->MusicPlay();
-		}
-		bIsAttack = true;
 		cnt++;
 		break;
+		
 	default:
 		break;
 	}
@@ -219,8 +219,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 			UGameplayStatics::PlaySound2D(this, Music);
 
 			// // 탄막 발사 시작
-			// StartFiring();
-			FireBullet();
+			StartFiring();
 		}
 		else
 		{
@@ -803,6 +802,37 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 {
+}
+
+
+//////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
+void ABoss::ThrowBaton()
+{
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
+	// 보스의 전방 벡터
+	FVector Forward = GetActorForwardVector();
+
+	//플레이어 위치
+	FVector PlayerLocation = player->GetActorLocation() + player->GetActorUpVector() * -500;
+	FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();
+	FRotator SpawnRotation = Direction.Rotation();
+	
+	BatonSpawner->SpawnPooledBaton(BossLocation, SpawnRotation, 500);
+
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	FTimerHandle BatonTimer;
+	float BatonTime = 5.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(BatonTimer, FTimerDelegate::CreateLambda([ & ]()
+	{
+		// 실행할 내용
+		bTestFire = true;
+		TimeElapsed = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("----TestFire Is True----"));
+		// TimerHandle 초기화
+		GetWorld()->GetTimerManager().ClearTimer(BatonTimer);
+	}), BatonTime, false);
+	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 }
 
 
