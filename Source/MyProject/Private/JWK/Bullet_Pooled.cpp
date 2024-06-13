@@ -31,7 +31,7 @@ ABullet_Pooled::ABullet_Pooled()
 	FinalRadius = 0.0f;          // 추가된 부분
 	SizeChangeDistance = 0.0f;   // 추가된 부분
 	bHasBroadcasted = false;     // 추가된 부분
-	FrameCounter = 0; 
+	TimeSinceSpawned = 0.0f;
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -102,19 +102,7 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	// 경과 시간 누적
 	ElapsedTime += DeltaTime;
 
-	// 크기 변경을 매 10번째 프레임마다 수행
-	if (FrameCounter % 10 == 0)
-	{
-		float TotalTime = 5.0f; // 구의 크기가 변화하는 총 시간 (초 단위로 설정, 예: 5초)
-		float NewRadius = FMath::Lerp(InitialRadius, FinalRadius, ElapsedTime / TotalTime);
-
-		SetActorScale3D(FVector(NewRadius));
-
-		FrameCounter = 0; // 프레임 카운터 초기화
-	}
-
-	FrameCounter++; // 프레임 카운터 증가
-
+	// 일정 시간이 경과하면 이벤트 호출
 	if (ElapsedTime >= SomeThreshold && !bHasBroadcasted)
 	{
 		if (OnBulletTravelled.IsBound())
@@ -160,7 +148,6 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	ElapsedTime = 0.0f; // 경과 시간 초기화
 	TimeSinceSpawned = 0.0f;
 	bHasBroadcasted = false; // 플래그 초기화
-	FrameCounter = 0.0f; // 프레임 초기화
 }
 
 // bullet의 수명을 set

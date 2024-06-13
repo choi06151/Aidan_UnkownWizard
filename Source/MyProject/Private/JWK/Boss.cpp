@@ -75,6 +75,9 @@ ABoss::ABoss()
 	//////////////////////////////////////// 음악분석 관련 추가 ////////////////////////////////////////
 	CurrentTimeIndex = 0; // CurrentTimeIndex 초기화
 
+	// 0613
+	bIsMusicFinished = false;
+
 	// DELEGATE Map 초기화
 	PatternDelegates.Add(EPatternType::RandomStraight,
 		FPatternDelegate::CreateUObject(this, &ABoss::FireRandomStraightPattern));
@@ -86,7 +89,7 @@ ABoss::ABoss()
 		FPatternDelegate::CreateUObject(this, &ABoss::FireTrumpetFlowerPattern));
 	PatternDelegates.Add(EPatternType::Crescent, FPatternDelegate::CreateUObject(this, &ABoss::FireCrescentPattern));
 	PatternDelegates.Add(EPatternType::Angel, FPatternDelegate::CreateUObject(this, &ABoss::FireAngelPattern));
-
+	////// 0613
 	PatternDelegates.Add(EPatternType::Heart, FPatternDelegate::CreateUObject(this, &ABoss::FireHeartPattern));
 	PatternDelegates.Add(EPatternType::ExpandingSphere, FPatternDelegate::CreateUObject(this, &ABoss::FireExpandingSpherePattern));
 
@@ -107,7 +110,7 @@ void ABoss::BeginPlay()
 		return;
 	}
 
-	StartFiring();
+	//StartFiring(); 0613
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -120,28 +123,28 @@ void ABoss::Tick(float DeltaTime)
 	static float TimeElapsed = 0.0f;
 	TimeElapsed += DeltaTime;
 
-	// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
-	if (TimeElapsed > 1.5f && TimeElapsed <= 3.0f && !bIsDie)
-	{
-		StopFiring();
-		ChangePattern();
-		StartFiring();
-	}
-	// 3.0초 5.5초 발사 중지
-	if (TimeElapsed > 3.0f && TimeElapsed <= 5.5f && !bIsDie)
-	{
-		StopFiring();
-	}
+	//// 1.5초 ~ 3.0초 랜덤 탄막 패턴 발사
+	//if (TimeElapsed > 1.5f && TimeElapsed <= 3.0f && !bIsDie)
+	//{
+	//	StopFiring();
+	//	ChangePattern();
+	//	StartFiring();
+	//}
+	//// 3.0초 5.5초 발사 중지
+	//if (TimeElapsed > 3.0f && TimeElapsed <= 5.5f && !bIsDie)
+	//{
+	//	StopFiring();
+	//}
 
-	// 5.5초 초과시 다음 탄막 패턴 발사
-	if (TimeElapsed > 5.5f && !bIsDie)
-	{
-		ChangePattern();
-		StartFiring();
+	//// 5.5초 초과시 다음 탄막 패턴 발사
+	//if (TimeElapsed > 5.5f && !bIsDie)
+	//{
+	//	ChangePattern();
+	//	StartFiring();
 
-		// 타이머 리셋
-		TimeElapsed = 0.0f;
-	}
+	//	// 타이머 리셋
+	//	TimeElapsed = 0.0f;
+	//}
 
 }
 
@@ -203,24 +206,32 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 {
 	if (AnalyzedDataMap.Contains(MusicTitle))
 	{
-		auto AnalyzedData = AnalyzedDataMap[MusicTitle];
-		float Tempo = AnalyzedData.Key;
-		FinalPatternData = AnalyzedData.Value;
+		// AnalyzedDataMap에서 분석된 데이터를 가져옴
+		FMusicAnalysisData AnalyzedData = AnalyzedDataMap[MusicTitle];
+		float Tempo = AnalyzedData.Tempo;
+		float TotalDuration = AnalyzedData.TotalDuration;  // 노래의 전체 길이 (초 단위)
+		FinalPatternData = AnalyzedData.FinalPatternDataArray;
 		CurrentTimeIndex = 0;
 
 		// FireRate 설정 (템포에 맞춰 조정)
 		float BeatLength = 60.0f / Tempo; // 한 비트의 길이
 		FireRate = BeatLength * 4; // 4/4 박자를 위해 4배로 설정
 
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s."), *MusicTitle);
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s. Total Duration: %f seconds"), *MusicTitle, TotalDuration);
 
 		// 패턴 조건 업데이트 타이머 설정 (한 바 단위로 패턴 업데이트)
 		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate, true);
+
+		// 노래가 끝났음을 감지하기 위한 타이머 설정
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &ABoss::OnMusicFinished, TotalDuration, false);
 
 		// 음악 재생 시작
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
 		if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
 		{
+			// 노래 시작 시 변수 초기화
+			bIsMusicFinished = false;
+
 			UGameplayStatics::PlaySound2D(this, Music);
 
 			// 탄막 발사 시작
@@ -271,11 +282,10 @@ void ABoss::UpdatePatternConditions()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
 		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // 타이머를 중지하여 패턴 업데이트를 멈춤
-		StopFiring(); // 탄막 발사 중지
 	}
 }
 
-// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수 0613
 void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath)
 {
 	// JSON 파일을 문자열로 로드
@@ -294,6 +304,8 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 
 			// JSON 객체에서 템포, 비트, 강도, 주파수 대역별 데이터 값을 가져옴
 			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
+			float TotalDuration = JsonObject->GetNumberField(TEXT("total_duration"));  // 전체 길이 (초 단위)
+
 			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
 			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
 			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
@@ -317,37 +329,32 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Fan;
+							return Pattern.PatternType == EPatternType::ExpandingSphere;
 						});
 				}
-
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Circle;
+							return Pattern.PatternType == EPatternType::ExpandingSphere;
 						});
 				}
-
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::TargetCross;
+							return Pattern.PatternType == EPatternType::ExpandingSphere;
 						});
 				}
-
 				else if (HighArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::TrumpetFlower;
+							return Pattern.PatternType == EPatternType::ExpandingSphere;
 						});
 				}
 
 				// 비트 시간과 현재 인덱스가 가까운 경우 탄막 속도를 감소시킴
-				// 탄막 발사 타이밍을 음악의 비트와 동기화하여 더 리드미컬하게 만들기 위함임
-				// 제대로 되는지는 모르겠음
 				for (const auto& BeatValue : BeatsArray)
 				{
 					float BeatTime = BeatValue->AsNumber();
@@ -361,10 +368,15 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 
 				// 생성된 패턴 데이터를 배열에 추가
 				FinalPatternDataArray.Add(FinalData);
-
 			}
-			// Tempo 값을 TMap에 함께 저장합니다.
-			AnalyzedDataMap.Add(MusicTitle, TPair<float, TArray<FFinalPatternData>>(Tempo, FinalPatternDataArray));
+
+			// 분석된 데이터 구조체 생성 및 저장
+			FMusicAnalysisData AnalysisData;
+			AnalysisData.Tempo = Tempo;
+			AnalysisData.FinalPatternDataArray = FinalPatternDataArray;
+			AnalysisData.TotalDuration = TotalDuration;
+
+			AnalyzedDataMap.Add(MusicTitle, AnalysisData);
 
 			UE_LOG(LogTemp, Warning, TEXT("ABoss::PreAnalyzeMusicData: Pre-analyzed %d conditions for %s."), FinalPatternDataArray.Num(), *MusicTitle);
 		}
@@ -384,9 +396,35 @@ void ABoss::PreAnalyzeAllMusicData()
 	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 
 	// 각 음악에 대해 미리 분석 수행
-	PreAnalyzeMusicData(TEXT("butterfly"), ButterflyJsonPath);
+	// MusicTitle 여기에서 수정 가능!!
+	PreAnalyzeMusicData(TEXT("dragonfly"), ButterflyJsonPath);
 	PreAnalyzeMusicData(TEXT("Elise"), EliseJsonPath);
 	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
+}
+
+float ABoss::GetTotalDuration(const FString& MusicTitle) const
+{
+	if (AnalyzedDataMap.Contains(MusicTitle))
+	{
+		const FMusicAnalysisData& AnalyzedData = AnalyzedDataMap[MusicTitle];
+		return AnalyzedData.TotalDuration;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABoss::GetTotalDuration: Failed to find music data for: %s"), *MusicTitle);
+		return -1.0f; // 실패를 나타내는 값
+	}
+}
+
+void ABoss::OnMusicFinished()
+{
+	bIsMusicFinished = true;
+	UE_LOG(LogTemp, Warning, TEXT("ABoss::OnMusicFinished: Music has finished."));
+
+	// 노래가 끝나면 탄막 발사 중지 
+	StopFiring();
+
+	// 여기 함수에 보스 죽는 bool값 넣으면 될 듯?
 }
 
 ////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
@@ -403,7 +441,10 @@ void ABoss::FireBullet()
 
 void ABoss::StartFiring()
 {
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true, 0.0f);
+	if (!bIsMusicFinished)  // 노래가 끝나지 않았을 때만 탄막 발사를 시작 0613
+	{
+		GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABoss::FireBullet, FireRate, true, 0.0f);
+	}
 }
 
 void ABoss::StopFiring()
@@ -762,7 +803,7 @@ void ABoss::DefineExpandingSphereShape(TArray<FVector>& OutShape, int32 NumberOf
 
 void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBullet)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("ABoss::OnBulletTravelled: Bullet travelled distance: %f"), DistanceTraveled);
+	UE_LOG(LogTemp, Warning, TEXT("ABoss::OnBulletTravelled: Bullet travelled distance: %f"), DistanceTraveled);
 	// 총알과 관련된 패턴 찾기
 	const FBulletHellPattern* Pattern = BulletPatterns.FindByPredicate([PooledBullet](const FBulletHellPattern& Pattern)
 		{
@@ -771,8 +812,8 @@ void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBull
 
 	if (Pattern)
 	{
-		float TotalTime = Pattern->FinalPatternSize - Pattern->InitialPatternSize;
-
+		float TotalTime = Pattern->SizeChangeDistance; // 크기 변화가 일어나는 총 시간 (초 단위)
+		ㅓ
 		// 경과 시간에 따라 새로운 반지름 계산
 		float NewRadius = FMath::Lerp(PooledBullet->InitialRadius, PooledBullet->FinalRadius, PooledBullet->GetElapsedTime() / TotalTime);
 
@@ -786,7 +827,7 @@ void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBull
 		{
 			for (int32 i = 0; i < SphereShape.Num(); ++i)
 			{
-				// 총알의 위치를 업데이트하여 구체의 크기를 변화시킴
+				// 총알의 위치를 업데이트하여 구의 크기를 변화시킴
 				PooledBullet->SetActorLocation(BossLocation + SphereShape[i]);
 			}
 		}
@@ -879,7 +920,7 @@ void ABoss::InitializeDefaultPatterns()
 	ExpandingSpherePattern.PatternType = EPatternType::ExpandingSphere;
 	ExpandingSpherePattern.InitialPatternSize = 100.0f; // 초기 구 크기 설정
 	ExpandingSpherePattern.FinalPatternSize = 500.0f; // 최종 구 크기 설정
-	ExpandingSpherePattern.SizeChangeDistance = 100.0f; // 크기 변화가 일어나는 거리 설정
+	ExpandingSpherePattern.SizeChangeDistance = 3.0f; // 크기 변화가 일어나는 거리 설정
 	ExpandingSpherePattern.NumberOfBullets = 30; // 총알의 수
 	ExpandingSpherePattern.BulletSpeed = 600.0f;
 	BulletPatterns.Add(ExpandingSpherePattern);
