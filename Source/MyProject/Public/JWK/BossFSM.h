@@ -9,10 +9,11 @@
 UENUM(BlueprintType)
 enum class EBossState : uint8
 {
-	IDLE		UMETA(DisplayName = "IDLE"),
-	WALK		UMETA(DisplayName = "WALK"),
-	COMMAND		UMETA(DisplayName = "COMMAND"),
-	PHASE_2		UMETA(DisplayName = "PHASE_2")
+	IDLE			UMETA(DisplayName = "IDLE"),
+	WALK			UMETA(DisplayName = "WALK"),
+	COMMANDWAIT		UMETA(DisplayName = "COMMANDWAIT"),
+	COMMAND			UMETA(DisplayName = "COMMAND"),
+	PHASE_2			UMETA(DisplayName = "PHASE_2")
 	
 };
 
@@ -31,22 +32,25 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// boss
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Boss")
 	class ABoss* me;
 
 	// Animation
-	UPROPERTY(EditAnywhere)
-	class UAnim_Boss* bossAnim;
+	UPROPERTY(EditAnywhere, Category = "Boss")
+	class UAnimMontage* commandWait;
 
 	// Boss의 State
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss")
 	EBossState state;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Boss")
 	class AAIController* ai;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Boss")
 	int curTime = 0;
 
+	UPROPERTY(EditAnywhere, Category = "Boss")
+	float commandTime  = 0;
 	
 	////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -65,6 +69,7 @@ public:
 	
 	void TickIdle();
 	void TickWalk();
+	void TickCommandWait();
 	void TickCommand();
 	void TickPhase_2();
 };

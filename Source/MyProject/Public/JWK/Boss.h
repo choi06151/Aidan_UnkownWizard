@@ -128,7 +128,7 @@ public:
 	bool bIsPhase = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
-	bool bIsDie = false;
+	bool bIsStageEnd = false;
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
@@ -176,6 +176,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ABullet_Pooled* bullet;
+
+	void ThrowBaton();
+	
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -206,7 +209,7 @@ private:
 
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
-	void ThrowBaton();
+	
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
 	USpawn_Baton* BatonSpawner;

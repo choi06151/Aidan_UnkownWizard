@@ -28,10 +28,12 @@ void UAnim_Boss::NativeUpdateAnimation(float DeltaSeconds)
 
 void UAnim_Boss::AnimNotify_Attack_Start()
 {
+	UE_LOG(LogTemp, Error, TEXT("CommandStart!!!!!!!!!CommandStart!!!!!!!!!"));
 	me->bIsAttack = true;
 	SpawnWidget->MusicPlay();
 }
 
 void UAnim_Boss::AnimNotify_Boss_Throw()
 {
+	me->ThrowBaton();
 }
