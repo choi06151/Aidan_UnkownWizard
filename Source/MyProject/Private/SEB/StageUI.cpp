@@ -77,5 +77,20 @@ void UStageUI::OnSelectStageClicked()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ParentSelectStageUI is null"));
 	}
+	ChangeButtonColor(FColor(255, 100, 22, 255));
+}
+
+void UStageUI::ChangeButtonColor(const FColor& NewColor)
+{
+	if (SelectStageBtn)
+	{
+		FButtonStyle ButtonStyle = SelectStageBtn->WidgetStyle;
+
+		FSlateBrush NormalBrush = ButtonStyle.Normal;
+		NormalBrush.TintColor = FSlateColor(NewColor);
+		ButtonStyle.SetNormal(NormalBrush);
+
+		SelectStageBtn->SetStyle(ButtonStyle);
+	}
 }
 

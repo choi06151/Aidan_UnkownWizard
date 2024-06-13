@@ -39,8 +39,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* MusicName;
 	
-	UPROPERTY(meta = (BindWidget))
-	class UButton* SelectStageBtn;
+	
 
 	int32 DifficultyNum;
 
@@ -51,6 +50,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class USelectStageUI> SelectStageUIClass;
 
-	
-	
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SelectStageBtn;
+
+	void ChangeButtonColor(const FColor& NewColor);
 };

@@ -25,6 +25,7 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->InitialSpeed = 0.0f;
 	movementComp->MaxSpeed = 3000.0f;
 	movementComp->bShouldBounce = false;
+	
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -53,14 +54,11 @@ void ABullet_Pooled::Tick(float DeltaTime)
 
 	// 새로운 위치로 총알 이동
 	SetActorLocation(NewLocation);
-}
 
-// 총알 비활성화
-void ABullet_Pooled::Deactivate()
-{
-	SetActive(false);
-	GetWorldTimerManager().ClearAllTimersForObject(this);
-	OnPooledBulletDespawn.Broadcast(this);
+	// meshComponent 회전 로직 추가
+	FRotator CurrentRotation = meshComp->GetComponentRotation();
+	FRotator DeltaRotation(0, DeltaTime * 100, 0);  // Y축을 기준으로 회전 속도 설정
+	meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
 }
 
 // 총알 상태 활성화 or 비활성화
@@ -69,7 +67,14 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	Active = IsActive;
 	SetActorHiddenInGame(!IsActive);
 	GetWorldTimerManager().SetTimer(LifespanTimer, this, &ABullet_Pooled::Deactivate, LifeSpan, false);
+}
 
+// 총알 비활성화
+void ABullet_Pooled::Deactivate()
+{
+	SetActive(false);
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	OnPooledBulletDespawn.Broadcast(this);
 }
 
 // bullet의 수명을 set

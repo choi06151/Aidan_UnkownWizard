@@ -67,8 +67,13 @@ void USelectStageUI::NativePreConstruct()
 	}
 	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
 	
-	if(SpawnWidget)
+	if(SpawnWidget){
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
+		int32 ScrollCount = SpawnWidget->CurrentStage;
+		FColor ClickColor = FColor(255, 100, 22, 255);
+		
+		SetSelectUIColor(ScrollCount, ClickColor);
+	}
 }
 
 void USelectStageUI::NativeConstruct()
@@ -133,6 +138,11 @@ void USelectStageUI::OnPlayClicked()
 //버튼 클릭 시 좌측 정보 업데이트
 void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoText)
 {
+	int32 ScrollCount = MainScroll->GetChildrenCount();
+	FColor ClickColor = FColor(184, 121, 16, 255);
+	
+	SetSelectUIColor(ScrollCount, ClickColor);
+	
 	//NewText라는 ArtistName열을 가진 행 탐색
 	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString(), "MusicName", NewInfoText.ToString());
 	if (!SpecificRow)
@@ -232,4 +242,30 @@ FMusicInfoDT* USelectStageUI::FindRowByColumnValue(const FString& ColumnName1, c
 	}
 
 	return nullptr;
+}
+
+void USelectStageUI::SetSelectUIColor(int32 ScrollCount, const FColor& ClickColor)
+{
+	for (int32 i = 0; i < ScrollCount; ++i)
+	{
+		UWidget* ChildWidget = MainScroll->GetChildAt(i);
+		if (UStageUI* StageUI = Cast<UStageUI>(ChildWidget))
+		{
+			if (StageUI->SelectStageBtn)
+			{
+				FButtonStyle ButtonStyle = StageUI->SelectStageBtn->WidgetStyle;
+
+				FSlateBrush NormalBrush = ButtonStyle.Normal;
+				NormalBrush.TintColor = FSlateColor(ClickColor);
+				ButtonStyle.SetNormal(NormalBrush);
+
+
+				StageUI->SelectStageBtn->SetStyle(ButtonStyle);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Child widget is not of type UStageUI"));
+		}
+	}
 }

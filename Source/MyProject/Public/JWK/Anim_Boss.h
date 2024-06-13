@@ -18,13 +18,17 @@ public:
 
 	UPROPERTY()
 	class UBossFSM* bossFSM;
+
+	UPROPERTY()
+	class ABoss* me;
 	
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
 	EBossState state;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAttacck;
+	UPROPERTY(EditAnywhere, Category = "Spawn_Widget")
+	class ASpawnWidget* SpawnWidget;
 	
 	//////////////////////////////////////// Notify ////////////////////////////////////////
+	void AnimNotify_Attack_Start();
 	void AnimNotify_Boss_Throw();
 };

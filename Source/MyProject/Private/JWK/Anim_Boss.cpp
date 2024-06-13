@@ -1,6 +1,7 @@
 #include "JWK/Anim_Boss.h"
 
 #include "JWK/Boss.h"
+#include "SEB/SpawnWidget.h"
 
 void UAnim_Boss::NativeInitializeAnimation()
 {
@@ -10,7 +11,7 @@ void UAnim_Boss::NativeInitializeAnimation()
 	if(nullptr == owner)
 		return;
 	
-	ABoss* me = Cast<ABoss>(owner);
+	me = Cast<ABoss>(owner);
 
 	bossFSM = me->bossFSM;
 }
@@ -23,6 +24,12 @@ void UAnim_Boss::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 
 	state = bossFSM->state;
+}
+
+void UAnim_Boss::AnimNotify_Attack_Start()
+{
+	me->bIsAttack = true;
+	SpawnWidget->MusicPlay();
 }
 
 void UAnim_Boss::AnimNotify_Boss_Throw()
