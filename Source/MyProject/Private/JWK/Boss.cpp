@@ -132,13 +132,13 @@ void ABoss::Tick(float DeltaTime)
 	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
 
 	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
-	TimeElapsed += DeltaTime;
-
-	if(TimeElapsed >= 5.0f && bTestFire)
-	{
-		bTestFire = false;
-		ThrowBaton();
-	}
+	// TimeElapsed += DeltaTime;
+	//
+	// if(TimeElapsed >= 5.0f && bTestFire)
+	// {
+	// 	bTestFire = false;
+	// 	ThrowBaton();
+	// }
 	//////////////////////////////////////// Phase2 지휘봉 테스트용 코드 ////////////////////////////////////////
 }
 
@@ -219,8 +219,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 			UGameplayStatics::PlaySound2D(this, Music);
 
 			// // 탄막 발사 시작
-			// StartFiring();
-			FireBullet();
+			StartFiring();
 		}
 		else
 		{
