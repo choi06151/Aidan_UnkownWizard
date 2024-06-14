@@ -40,6 +40,9 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	case EBossState::PHASE_2: TickPhase_2();
 		break;
+
+	default:
+		break;
 	}
 
 	// if(me->bIsArrive)
@@ -73,17 +76,17 @@ void UBossFSM::TickWalk()
 //////////////////////////////////////// CommandWait ////////////////////////////////////////
 void UBossFSM::TickCommandWait()
 {
-	// UE_LOG(LogTemp, Error, TEXT("COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT"));
-	
 	// 지휘대기 애니메이션이 끝날 경우
 	if(me->bIsAttackStart)
 		SetState(EBossState::COMMAND);
+	
+	// UE_LOG(LogTemp, Error, TEXT("COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT"));
 }
 
 //////////////////////////////////////// Command ////////////////////////////////////////
 void UBossFSM::TickCommand()
 {
-	// 일정 체력 이하일 때 Phase2 진입
+	// 일정 조건일 때 Phase2 진입
 	if (me->bIsPhase)
 		SetState(EBossState::PHASE_2);
 

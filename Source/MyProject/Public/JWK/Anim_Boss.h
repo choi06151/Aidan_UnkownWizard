@@ -36,5 +36,5 @@ public:
 	void AnimNotify_Music_Start();
 	
 	UFUNCTION()
-	void AnimNotify_Boss_Throw();
+	void AnimNotify_Throw_Baton();
 };
