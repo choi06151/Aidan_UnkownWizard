@@ -16,8 +16,6 @@ void UBossFSM::BeginPlay()
 
 	me = Cast<ABoss>(GetOwner());
 
-	bossAnim = Cast<UAnim_Boss>(me->GetMesh()->GetAnimInstance());
-
 	ai = Cast<AAIController>(me->GetController());
 }
 
@@ -34,12 +32,18 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	case EBossState::WALK: TickWalk();
 		break;
 
+	case EBossState::COMMANDWAIT: TickCommandWait();
+		break;
+		
 	case EBossState::COMMAND: TickCommand();
 		break;
 
 	case EBossState::PHASE_2: TickPhase_2();
 		break;
 	}
+
+	// if(me->bIsArrive)
+	// 	commandTime += DeltaTime;
 }
 
 // bIsGameStart, bIsWalk, bIsArrive, bIsAttack, bIsPhase, bIsDie
@@ -48,12 +52,12 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 void UBossFSM::TickIdle()
 {
 	if (me->bIsGameStart && me->bIsWalk && !me->bIsArrive)
-		SetState(EBossState::WALK);
-
-	if(me->bIsArrive && me->bIsAttack)
-		SetState(EBossState::COMMAND);
+			SetState(EBossState::WALK);
 	
-	// UE_LOG(LogTemp, Warning, TEXT("IDLE"));
+	if (me->bIsGameStart && me->bIsArrive && me->bIsCommandWait)
+		SetState(EBossState::COMMANDWAIT);// 도착하고 지휘대기
+
+	// UE_LOG(LogTemp, Error, TEXT("IDLE"));
 }
 
 //////////////////////////////////////// Walk ////////////////////////////////////////
@@ -66,7 +70,17 @@ void UBossFSM::TickWalk()
 	// UE_LOG(LogTemp, Warning, TEXT("Walk"));
 }
 
-//////////////////////////////////////// Attack ////////////////////////////////////////
+//////////////////////////////////////// CommandWait ////////////////////////////////////////
+void UBossFSM::TickCommandWait()
+{
+	// UE_LOG(LogTemp, Error, TEXT("COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT"));
+	
+	// 지휘대기 애니메이션이 끝날 경우
+	if(me->bIsAttackStart)
+		SetState(EBossState::COMMAND);
+}
+
+//////////////////////////////////////// Command ////////////////////////////////////////
 void UBossFSM::TickCommand()
 {
 	// 일정 체력 이하일 때 Phase2 진입
@@ -82,13 +96,14 @@ void UBossFSM::TickPhase_2()
 	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 
+//////////////////////////////////////// Damaged ////////////////////////////////////////
 void UBossFSM::TakeDamaged(int damage)
 {
 	bossHP -= damage;
 
 	if(bossHP <=0)
 	{
-		me->bIsDie = true;
+		me->bIsStageEnd = true;
 		/* 죽음 Montage, Sound 추가 */
 		me->PlayAnimMontage(deadMontage, 1, FName("Dead"));
 	}

@@ -122,18 +122,19 @@ public:
 	bool bIsCommandWait = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격을 시작했는가?
-	bool bIsAttack = false;
+	bool bIsAttackStart = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 공격과 동시에 음악이 시작되었는가??
+	bool bIsMusicStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 체력 이하로 떨어졌을 때 다음 페이즈로 진입했는가?
 	bool bIsPhase = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
-	bool bIsDie = false;
+	bool bIsStageEnd = false;
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 음악이 시작되었는가??
-	bool bIsMusicStart;
 
 	UFUNCTION()
 	void MusicStart();	// 음악이 시작되고 커튼 애니메이션 재생 및 보스 행동 시작
@@ -176,6 +177,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ABullet_Pooled* bullet;
+
+	void ThrowBaton();
+	
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -206,7 +210,7 @@ private:
 
 	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
 
-	void ThrowBaton();
+	
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
 	USpawn_Baton* BatonSpawner;
