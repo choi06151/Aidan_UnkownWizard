@@ -34,4 +34,6 @@ public:
 	float HP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SCORE;
+
+	
 };

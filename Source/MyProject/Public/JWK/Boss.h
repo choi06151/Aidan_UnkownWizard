@@ -122,18 +122,22 @@ public:
 	bool bIsCommandWait = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격을 시작했는가?
-	bool bIsAttack = false;
+	bool bIsAttackStart = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 공격과 동시에 음악이 시작되었는가??
+	bool bIsMusicStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 체력 이하로 떨어졌을 때 다음 페이즈로 진입했는가?
 	bool bIsPhase = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 페이즈 진입 후 지휘봉을 던지는가?
+	bool bThrowBaton = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
-	bool bIsDie = false;
+	bool bIsStageEnd = false;
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 음악이 시작되었는가??
-	bool bIsMusicStart;
 
 	UFUNCTION()
 	void MusicStart();	// 음악이 시작되고 커튼 애니메이션 재생 및 보스 행동 시작
@@ -176,6 +180,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ABullet_Pooled* bullet;
+
+	void ThrowBaton();
+	
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -188,25 +195,40 @@ private:
 	//////////////////////////////////////// BulletHell 패턴 관련 ////////////////////////////////////////
 	UPROPERTY()
 	class AActor* player;
+	// 랜덤 직선
+	void FireRandomStraightPattern(const FBulletHellPattern& Pattern);
+
 	
-	void FireRandomStraightPattern(const FBulletHellPattern& Pattern); // 랜덤 직선
+	// 부채꼴
+	void FireFanPattern(const FBulletHellPattern& Pattern);
 
-	void FireFanPattern(const FBulletHellPattern& Pattern); // 부채꼴
+	
+	// 원
+	void FireTargetCirclePattern(const FBulletHellPattern& Pattern);
 
-	void FireTargetCirclePattern(const FBulletHellPattern& Pattern); // 원
+	
+	// 소용돌이
+	void FireSwirlPattern(const FBulletHellPattern& Pattern);
+	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset);
 
-	void FireSwirlPattern(const FBulletHellPattern& Pattern); // 소용돌이
-	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset); // 소용돌이
+	
+	// 유도 십자가
+	void FireTargetCrossPattern(const FBulletHellPattern& Pattern);
 
-	void FireTargetCrossPattern(const FBulletHellPattern& Pattern); // 유도 십자가
+	
+	// 벽
+	void FireWallPattern(const FBulletHellPattern& Pattern);
+	int CurrentEmptyLine = 3;
 
-	void FireWallPattern(const FBulletHellPattern& Pattern); // 벽
+	
+	// 나팔꽃
+	void FireTargetOctagonPattern(const FBulletHellPattern& Pattern);
 
-	void FireTargetOctagonPattern(const FBulletHellPattern& Pattern); // 나팔꽃
+	
+	// 천사
+	void FireAngelPattern(const FBulletHellPattern& Pattern);
 
-	void FireAngelPattern(const FBulletHellPattern& Pattern); // 천사
-
-	void ThrowBaton();
+	
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
 	USpawn_Baton* BatonSpawner;
@@ -240,8 +262,8 @@ private:
 	//////////////////////////////////////// 커튼 애니메이션 함수 ////////////////////////////////////////
 	void HandleState();
 	int cnt = 0;
-	
+
+	//////////////////////////////////////// 탄막 테스트 변수 ////////////////////////////////////////
 	bool bTestFire = false;
-	int CurrentEmptyLine = 3;
 	float TimeElapsed;
 };

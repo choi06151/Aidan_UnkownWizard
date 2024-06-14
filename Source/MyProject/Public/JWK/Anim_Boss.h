@@ -29,6 +29,12 @@ public:
 	class ASpawnWidget* SpawnWidget;
 	
 	//////////////////////////////////////// Notify ////////////////////////////////////////
+	UFUNCTION()
 	void AnimNotify_Attack_Start();
-	void AnimNotify_Boss_Throw();
+	
+	UFUNCTION()
+	void AnimNotify_Music_Start();
+	
+	UFUNCTION()
+	void AnimNotify_Throw_Baton();
 };

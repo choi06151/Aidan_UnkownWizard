@@ -25,17 +25,17 @@ ABoss::ABoss()
 	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
 	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
 	bossEyeMesh_R->SetupAttachment(GetMesh(), TEXT("BossEye_R"));
-	
+
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempEyeMesh(
 		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	if (tempEyeMesh.Succeeded())
 	{
 		bossEyeMesh_L->SetStaticMesh(tempEyeMesh.Object);
 		bossEyeMesh_R->SetStaticMesh(tempEyeMesh.Object);
-		
+
 		bossEyeMesh_L->SetRelativeLocation(FVector(3, 12, -5));
 		bossEyeMesh_R->SetRelativeLocation(FVector(3, 12, 5));
-		
+
 		bossEyeMesh_L->SetWorldScale3D(FVector(0.05));
 		bossEyeMesh_R->SetWorldScale3D(FVector(0.05));
 	}
@@ -43,7 +43,7 @@ ABoss::ABoss()
 	// 지휘봉
 	batonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("batonMesh"));
 	batonMesh->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-	
+
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempBatonMesh(
 		TEXT("/Script/Engine.StaticMesh'/Game/JWK/Asset/Baton/Baton.Baton'"));
 	if (tempBatonMesh.Succeeded())
@@ -109,17 +109,23 @@ void ABoss::BeginPlay()
 		return;
 	}
 
+	// StartFiring();
 	// FireBullet();
-	ThrowBaton();
 }
 
 void ABoss::Tick(float DeltaTime)
-{ 
+{
 	Super::Tick(DeltaTime);
 
-	/*if(bIsGameStart)		// GameStart 버튼이 눌리고
-		MusicStart();*/
+	if(bIsMusicStart)
+	{
+		bIsMusicStart = false;
+		SpawnWidget->MusicPlay();
+	}
 
+	if(bThrowBaton)
+		ThrowBaton();
+	
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// TimeElapsed += DeltaTime;
 	//
@@ -147,6 +153,7 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+//////////////////////////////////////// 시작 커튼 애니메이션 관련 ////////////////////////////////////////
 void ABoss::MusicStart()
 {
 	if (SpawnWidget != nullptr)
@@ -161,35 +168,39 @@ void ABoss::HandleState()
 {
 	switch (cnt)
 	{
-	case 0:
+	case 0:		// 목적지까지 이동
 		bIsWalk = true;
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.5f, false); // 7.5 - 5 = 2.5
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.2f, false);
 		break;
-		
-	case 1:
+
+	case 1:		// 도착하고 커튼 닫히기까지
 		bIsArrive = true;
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false); // 10 - 7.5 = 2.5
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 1.5f, false);
 		break;
-		
+
 	case 2:
 		if (SpawnWidget != nullptr)
+		{
 			SpawnWidget->CurtainCloseAnim();
+			// SpawnWidget->MusicPlay();		// 지휘 시작 시 음악 재생
+		}
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false); // 20 - 10 = 10
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false);
 		break;
 		
 	case 3:
-		if (SpawnWidget != nullptr)
-			SpawnWidget->CurtainShakeAnim();
+		bIsCommandWait = true;
 		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false);
 		break;
-		
+
 	default:
 		break;
 	}
 }
+
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
@@ -212,8 +223,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		GetWorldTimerManager().SetTimer(PatternUpdateTimerHandle, this, &ABoss::UpdatePatternConditions, FireRate, true);
 
 		// 음악 재생 시작
-		UE_LOG(LogTemp, Warning,
-		       TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
 		if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
 		{
 			UGameplayStatics::PlaySound2D(this, Music);
@@ -391,6 +401,7 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
 }
 
+
 ////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
 void ABoss::FireBullet()
 {
@@ -455,21 +466,21 @@ void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	
 	UE_LOG(LogTemp, Warning, TEXT("RandomStraight"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
@@ -523,20 +534,20 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
-
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
 	UE_LOG(LogTemp, Warning, TEXT("Circle"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
@@ -571,21 +582,21 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
 
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
-	
 	UE_LOG(LogTemp, Warning, TEXT("TargetCircle"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
@@ -630,7 +641,7 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 		FVector(0, 0, -200) // 뒤쪽
 	};
 
-	for(int32 j=0; j<2; j++)
+	for (int32 j = 0; j < 2; j++)
 	{
 		for (int32 i = 0; i < 9; ++i)
 		{
@@ -642,21 +653,21 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 		}
 	}
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
 
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
-	
 	UE_LOG(LogTemp, Warning, TEXT("Cross"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
@@ -718,20 +729,20 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 	// 비어있는 열을 오른쪽으로 이동
 	CurrentEmptyLine = (CurrentEmptyLine + 1) % WallWidth;
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
-
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("bTestFire Is True!!!"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
 	UE_LOG(LogTemp, Warning, TEXT("Wall"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
@@ -763,8 +774,6 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 		FVector(0.0f, 0.0f, 250.0f)
 	};
 
-	// 보스의 전방 벡터
-	FVector Forward = GetActorForwardVector();
 
 	//플레이어 위치
 	FVector PlayerLocation = player->GetActorLocation();
@@ -780,20 +789,20 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-	FTimerHandle BulletTimer;
-	float BulletTime = 5.0f;
-
-	GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
-	{
-		// 실행할 내용
-		bTestFire = true;
-		TimeElapsed = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("----TestFire Is True----"));
-		// TimerHandle 초기화
-		GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
-	}), BulletTime, false);
-	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
+	// FTimerHandle BulletTimer;
+	// float BulletTime = 5.0f;
+	//
+	// GetWorld()->GetTimerManager().SetTimer(BulletTimer, FTimerDelegate::CreateLambda([ & ]()
+	// {
+	// 	// 실행할 내용
+	// 	bTestFire = true;
+	// 	TimeElapsed = 0.0f;
+	// 	UE_LOG(LogTemp, Warning, TEXT("----TestFire Is True----"));
+	// 	// TimerHandle 초기화
+	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
+	// }), BulletTime, false);
+	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 
 	UE_LOG(LogTemp, Warning, TEXT("Octagon"));
 	UE_LOG(LogTemp, Warning, TEXT("------------"));
@@ -808,15 +817,18 @@ void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 //////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
 void ABoss::ThrowBaton()
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
-	// 보스의 전방 벡터
-	FVector Forward = GetActorForwardVector();
-
+	bThrowBaton = false;
+	
+	// FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
+	
+	// USkeletalMeshComponent* MeshComponent = GetMesh();
+	FVector BossLocation = GetMesh()->GetSocketLocation(FName("Weapon_R"));
+	
 	//플레이어 위치
 	FVector PlayerLocation = player->GetActorLocation() + player->GetActorUpVector() * -500;
 	FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();
 	FRotator SpawnRotation = Direction.Rotation();
-	
+
 	BatonSpawner->SpawnPooledBaton(BossLocation, SpawnRotation, 500);
 
 	//////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -848,7 +860,7 @@ void ABoss::InitializeDefaultPatterns()
 	RandomStraightPattern.NumberOfBullets = 6;
 	RandomStraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(RandomStraightPattern);
-	
+
 	// 부채꼴
 	FBulletHellPattern FanPattern;
 	FanPattern.PatternType = EPatternType::Fan;
@@ -856,7 +868,7 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
 	FanPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(FanPattern);
-	
+
 	// 원형 패턴
 	FBulletHellPattern TargetCirclePattern;
 	TargetCirclePattern.PatternType = EPatternType::TargetCircle;
@@ -864,7 +876,7 @@ void ABoss::InitializeDefaultPatterns()
 	TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
 	TargetCirclePattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(TargetCirclePattern);
-	
+
 	// 소용돌이(십자가) 
 	FBulletHellPattern SwirlPattern;
 	SwirlPattern.PatternType = EPatternType::Swirl;
@@ -872,21 +884,21 @@ void ABoss::InitializeDefaultPatterns()
 	SwirlPattern.NumberOfBullets = 4; // 총알의 수
 	SwirlPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(SwirlPattern);
-	
+
 	// 유도 십자가
 	FBulletHellPattern TargetCrossPattern;
 	TargetCrossPattern.PatternType = EPatternType::TargetCross;
 	TargetCrossPattern.NumberOfBullets = 20;
 	TargetCrossPattern.BulletSpeed = 350.0f;
 	BulletPatterns.Add(TargetCrossPattern);
-	
+
 	// 벽 패턴
 	FBulletHellPattern WallPatter;
 	WallPatter.PatternType = EPatternType::Wall;
 	WallPatter.NumberOfBullets = 30;
 	WallPatter.BulletSpeed = 300.0f;
 	BulletPatterns.Add(WallPatter);
-	
+
 	// 유도 오각형
 	FBulletHellPattern OctagonPattern;
 	OctagonPattern.PatternType = EPatternType::Octagon;

@@ -2,8 +2,8 @@
 
 
 #include "SEB/LeftUI.h"
-
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 void ULeftUI::NativeConstruct()
 {
@@ -15,6 +15,8 @@ void ULeftUI::NativeConstruct()
 	// 타이머 설정: 1초마다 UpdateTimer 함수를 호출
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ULeftUI::UpdateTImer, 0.01f, true);
 
+
+	
 }
 
 void ULeftUI::UpdateTImer()
@@ -39,3 +41,4 @@ FString ULeftUI::GetFormattedTime() const
 
 	return FString::Printf(TEXT("%02d:%02d:%02d"), Minutes, Seconds, Centiseconds);
 }
+
