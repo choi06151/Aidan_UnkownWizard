@@ -122,6 +122,9 @@ void ABoss::Tick(float DeltaTime)
 		bIsMusicStart = false;
 		SpawnWidget->MusicPlay();
 	}
+
+	if(bThrowBaton)
+		ThrowBaton();
 	
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// TimeElapsed += DeltaTime;
@@ -150,6 +153,7 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+//////////////////////////////////////// 시작 커튼 애니메이션 관련 ////////////////////////////////////////
 void ABoss::MusicStart()
 {
 	if (SpawnWidget != nullptr)
@@ -196,6 +200,7 @@ void ABoss::HandleState()
 		break;
 	}
 }
+
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
 void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath)
@@ -395,6 +400,7 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Elise"), EliseJsonPath);
 	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
 }
+
 
 ////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
 void ABoss::FireBullet()
@@ -811,9 +817,13 @@ void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 //////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
 void ABoss::ThrowBaton()
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
-	// 보스의 전방 벡터
-
+	bThrowBaton = false;
+	
+	// FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100;
+	
+	// USkeletalMeshComponent* MeshComponent = GetMesh();
+	FVector BossLocation = GetMesh()->GetSocketLocation(FName("Weapon_R"));
+	
 	//플레이어 위치
 	FVector PlayerLocation = player->GetActorLocation() + player->GetActorUpVector() * -500;
 	FVector Direction = (PlayerLocation - BossLocation).GetSafeNormal();

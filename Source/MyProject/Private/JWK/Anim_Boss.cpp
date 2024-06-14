@@ -38,7 +38,7 @@ void UAnim_Boss::AnimNotify_Music_Start()
 	me->bIsMusicStart = true;
 }
 
-void UAnim_Boss::AnimNotify_Boss_Throw()
+void UAnim_Boss::AnimNotify_Throw_Baton()
 {
-	me->ThrowBaton();
+	me->bThrowBaton = true;
 }
