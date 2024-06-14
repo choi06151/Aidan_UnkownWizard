@@ -229,7 +229,8 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 			UGameplayStatics::PlaySound2D(this, Music);
 
 			// // 탄막 발사 시작
-			StartFiring();
+			// StartFiring();
+			FireBullet();
 		}
 		else
 		{
