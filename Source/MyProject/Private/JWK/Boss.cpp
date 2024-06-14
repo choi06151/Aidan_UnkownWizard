@@ -117,6 +117,12 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bIsMusicStart)
+	{
+		bIsMusicStart = false;
+		SpawnWidget->MusicPlay();
+	}
+	
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// TimeElapsed += DeltaTime;
 	//
@@ -156,19 +162,12 @@ void ABoss::MusicStart()
 
 void ABoss::HandleState()
 {
-	// 1. 커튼 열리기 시작하고				2초 뒤에 
-	// 2. 걸어가기 시작하고				2.1초 뒤에
-	// 3. 멈추기 시작하고					1.5초 뒤에
-	// 4. 커튼 닫히기 시작하고				3.0초 뒤에
-	// 5. 대기자세						4.0초 뒤에
-	// 6. 커튼 흔들리기 시작하고, 지휘 시작
-	
 	switch (cnt)
 	{
 	case 0:		// 목적지까지 이동
 		bIsWalk = true;
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.1f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.2f, false);
 		break;
 
 	case 1:		// 도착하고 커튼 닫히기까지
@@ -184,15 +183,13 @@ void ABoss::HandleState()
 			// SpawnWidget->MusicPlay();		// 지휘 시작 시 음악 재생
 		}
 		cnt++;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 5.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false);
 		break;
-
+		
 	case 3:
-		SpawnWidget->MusicPlay();
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.0f, false);
-		if (SpawnWidget != nullptr)
-			SpawnWidget->CurtainShakeAnim();
+		bIsCommandWait = true;
 		cnt++;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 3.0f, false);
 		break;
 
 	default:

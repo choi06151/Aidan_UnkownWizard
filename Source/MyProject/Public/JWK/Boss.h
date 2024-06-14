@@ -122,7 +122,10 @@ public:
 	bool bIsCommandWait = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격을 시작했는가?
-	bool bIsAttack = false;
+	bool bIsAttackStart = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 공격과 동시에 음악이 시작되었는가??
+	bool bIsMusicStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 체력 이하로 떨어졌을 때 다음 페이즈로 진입했는가?
 	bool bIsPhase = false;
@@ -132,8 +135,6 @@ public:
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 음악이 시작되었는가??
-	bool bIsMusicStart;
 
 	UFUNCTION()
 	void MusicStart();	// 음악이 시작되고 커튼 애니메이션 재생 및 보스 행동 시작

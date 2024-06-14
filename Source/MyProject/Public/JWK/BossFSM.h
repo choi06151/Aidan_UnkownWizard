@@ -49,8 +49,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Boss")
 	int curTime = 0;
 
-	UPROPERTY(EditAnywhere, Category = "Boss")
-	float commandTime  = 0;
+	// UPROPERTY(EditAnywhere, Category = "Boss")
+	// float commandTime  = 0;
 	
 	////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -58,6 +58,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int bossHP = bossMaxHP;
+	
 	UFUNCTION(BlueprintCallable)
 	void TakeDamaged(int damage);
 

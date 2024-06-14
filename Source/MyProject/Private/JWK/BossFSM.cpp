@@ -42,8 +42,8 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		break;
 	}
 
-	if(me->bIsArrive)
-		commandTime += DeltaTime;
+	// if(me->bIsArrive)
+	// 	commandTime += DeltaTime;
 }
 
 // bIsGameStart, bIsWalk, bIsArrive, bIsAttack, bIsPhase, bIsDie
@@ -54,12 +54,10 @@ void UBossFSM::TickIdle()
 	if (me->bIsGameStart && me->bIsWalk && !me->bIsArrive)
 			SetState(EBossState::WALK);
 	
-	// if (me->bIsGameStart && me->bIsArrive)
-	// {
-	// 	// 도착하고 지휘대기
-	// 	SetState(EBossState::COMMANDWAIT);
-	// }
-	UE_LOG(LogTemp, Error, TEXT("IDLE"));
+	if (me->bIsGameStart && me->bIsArrive && me->bIsCommandWait)
+		SetState(EBossState::COMMANDWAIT);// 도착하고 지휘대기
+
+	// UE_LOG(LogTemp, Error, TEXT("IDLE"));
 }
 
 //////////////////////////////////////// Walk ////////////////////////////////////////
@@ -67,18 +65,18 @@ void UBossFSM::TickWalk()
 {
 	ai->MoveToLocation(FVector(1480.000000, 650.000000, 169.999991), 0.1f);
 	if(me->bIsArrive)
-		SetState(EBossState::COMMANDWAIT);
+		SetState(EBossState::IDLE);
 	
-	UE_LOG(LogTemp, Warning, TEXT("Walk"));
+	// UE_LOG(LogTemp, Warning, TEXT("Walk"));
 }
 
 //////////////////////////////////////// CommandWait ////////////////////////////////////////
 void UBossFSM::TickCommandWait()
 {
-	UE_LOG(LogTemp, Error, TEXT("COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT"))
-	// 지휘대기 애니메이션이 끝날 경우
+	// UE_LOG(LogTemp, Error, TEXT("COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT // COMMANDWAIT"));
 	
-	if(commandTime >= 6.5f)
+	// 지휘대기 애니메이션이 끝날 경우
+	if(me->bIsAttackStart)
 		SetState(EBossState::COMMAND);
 }
 
