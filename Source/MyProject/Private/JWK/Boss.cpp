@@ -396,9 +396,9 @@ void ABoss::PreAnalyzeAllMusicData()
 	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 
 	// 각 음악에 대해 미리 분석 수행
-	PreAnalyzeMusicData(TEXT("butterfly"), ButterflyJsonPath);
-	PreAnalyzeMusicData(TEXT("Elise"), EliseJsonPath);
-	PreAnalyzeMusicData(TEXT("Lacrimosa"), LacrimosaJsonPath);
+	PreAnalyzeMusicData(TEXT("Butter-Fly"), ButterflyJsonPath);
+	PreAnalyzeMusicData(TEXT("Fur Elise"), EliseJsonPath);
+	PreAnalyzeMusicData(TEXT("Requiem – Lacrimosa"), LacrimosaJsonPath);
 }
 
 
