@@ -15,9 +15,9 @@ class MYPROJECT_API ULeftUI : public UUserWidget
 	GENERATED_BODY()
 protected:
 	virtual void NativeConstruct() override;
+	
 private:
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UProgressBar* HPBar;
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* PlayTime;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -29,4 +29,7 @@ private:
 	float TimeElapsed;
 	void UpdateTImer();
 	FString GetFormattedTime() const;
+
+
+
 };
