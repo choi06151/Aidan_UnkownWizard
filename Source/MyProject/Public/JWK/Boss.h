@@ -207,6 +207,16 @@ public:
 	UFUNCTION()
 	void OnMusicFinished();
 
+	/////////// 재생 되고 있는 노래 조절할 수 있는 
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void SetMusicVolume(float Volume);
+
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void SetMusicSpeed(float Speed);
+
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void PlayMusic();
+
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -245,9 +255,10 @@ private:
 
 	void FireExpandingSpherePattern(const FBulletHellPattern& Pattern); // 구가 커지는 패턴
 	void DefineExpandingSphereShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius); // 구 모양 정의
-
 	UFUNCTION()
 	void OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBullet); // 총알 이동 거리 이벤트 핸들러
+
+	void FireDandelionPattern(const FBulletHellPattern& Pattern); //민들레
 
 	//Fire패턴이름(const FBulletHellPattern& Pattern) 추가
 
@@ -291,5 +302,11 @@ private:
 	int cnt = 0;
 	
 	void HandleState();
-	
+
+	////////////////////////////////////노래 재생관련 0614
+	UPROPERTY(EditAnywhere, Category = "Music")
+	USoundBase* Music;
+
+	UPROPERTY(VisibleAnywhere, Category = "Music")
+	UAudioComponent* MusicAudioComponent;
 };

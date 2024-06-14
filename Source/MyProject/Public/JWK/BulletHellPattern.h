@@ -18,7 +18,9 @@ enum class EPatternType : uint8
 	Angel,				// 천사				수정
 
 	Heart,               // 하트
-	ExpandingSphere      // 구 모양 변경되는
+	ExpandingSphere,      // 구 모양 변경되는
+
+	Dandelion       // 민들레 패턴 추가
 	// 새로운 패턴 추가시 이름 여기에 추가
 	
 };
@@ -54,4 +56,6 @@ public:
 	float FinalPatternSize;   // 최종 패턴 크기
 	float SizeChangeDistance; // 크기 변경이 일어나는 거리
 
+	// 민들레 패턴에 필요한 변수
+	float SpreadDelay; // 퍼지기 시작하는 시간
 };

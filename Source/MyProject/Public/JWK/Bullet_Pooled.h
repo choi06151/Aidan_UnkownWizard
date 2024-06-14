@@ -90,8 +90,15 @@ public:
 	float TimeSinceSpawned; // 생성된 이후 경과 시간
 	int32 FrameCounter; //  프레임 카운터
 	
+	// 민들레 패턴에 필요한 변수들
+	FVector InitialDirection; // 초기 방향
+	bool bShouldSpread; // 퍼지기 시작할지 여부
+	float SpreadDelay; // 퍼지기 시작하는 시간
+	float TimeSinceFired; // 발사된 후 경과 시간
+	FRotator SpreadRotation; // 퍼질 때 사용할 회전 각도
 
-	
+	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation);
+	void CheckAndSpread(); // 퍼지는 로직을 처리하는 함수
 	
 protected:
 	// 총알의 활성화 상태

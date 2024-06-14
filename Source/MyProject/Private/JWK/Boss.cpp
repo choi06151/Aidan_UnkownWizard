@@ -1,5 +1,6 @@
 #include "JWK/Boss.h"
 
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/BossFSM.h"
 #include "Kismet/GameplayStatics.h"
@@ -77,6 +78,8 @@ ABoss::ABoss()
 
 	// 0613
 	bIsMusicFinished = false;
+	MusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicAudioComponent"));
+	MusicAudioComponent->SetupAttachment(RootComponent);
 
 	// DELEGATE Map 초기화
 	PatternDelegates.Add(EPatternType::RandomStraight,
@@ -92,7 +95,7 @@ ABoss::ABoss()
 	////// 0613
 	PatternDelegates.Add(EPatternType::Heart, FPatternDelegate::CreateUObject(this, &ABoss::FireHeartPattern));
 	PatternDelegates.Add(EPatternType::ExpandingSphere, FPatternDelegate::CreateUObject(this, &ABoss::FireExpandingSpherePattern));
-
+	PatternDelegates.Add(EPatternType::Dandelion, FPatternDelegate::CreateUObject(this, &ABoss::FireDandelionPattern));
 
 }
 
@@ -110,7 +113,12 @@ void ABoss::BeginPlay()
 		return;
 	}
 
-	//StartFiring(); 0613
+	//StartFiring(); 0613//0614
+	if (Music)
+	{
+		MusicAudioComponent->SetSound(Music);
+		
+	}
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -225,14 +233,30 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		// 노래가 끝났음을 감지하기 위한 타이머 설정
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &ABoss::OnMusicFinished, TotalDuration, false);
 
-		// 음악 재생 시작
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
-		if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+		//// 음악 재생 시작
+		//UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
+		//if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+		//{
+		//	// 노래 시작 시 변수 초기화
+		//	bIsMusicFinished = false;
+
+		//	//UGameplayStatics::PlaySound2D(this, Music); 0614
+		//	UGameplayStatics::SpawnSound2D(this, Music);
+		//	
+		//	// 탄막 발사 시작
+		//	StartFiring();
+		//}
+		// 음악 설정 및 재생
+		if (USoundBase* LoadedMusic = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
 		{
 			// 노래 시작 시 변수 초기화
 			bIsMusicFinished = false;
 
-			UGameplayStatics::PlaySound2D(this, Music);
+			// 음악을 AudioComponent에 설정
+			MusicAudioComponent->SetSound(LoadedMusic);
+
+			// 음악 재생 시작
+			PlayMusic();
 
 			// 탄막 발사 시작
 			StartFiring();
@@ -329,28 +353,28 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::ExpandingSphere;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::ExpandingSphere;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::ExpandingSphere;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::ExpandingSphere;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 
@@ -425,6 +449,31 @@ void ABoss::OnMusicFinished()
 	StopFiring();
 
 	// 여기 함수에 보스 죽는 bool값 넣으면 될 듯?
+}
+
+void ABoss::SetMusicVolume(float Volume)
+{
+	if (MusicAudioComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::SetMusicVolume: Setting volume to: %f"), Volume); // 볼륨 값 로그 출력
+		MusicAudioComponent->SetVolumeMultiplier(Volume);
+	}
+}
+
+void ABoss::SetMusicSpeed(float Speed)
+{
+	if (MusicAudioComponent)
+	{
+		MusicAudioComponent->SetPitchMultiplier(Speed);
+	}
+}
+
+void ABoss::PlayMusic()
+{
+	if (MusicAudioComponent && !MusicAudioComponent->IsPlaying())
+	{
+		MusicAudioComponent->Play();
+	}
 }
 
 ////////////////////////////////////////////////// 발사 관련 함수 //////////////////////////////////////////////////
@@ -838,6 +887,52 @@ void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBull
 	}
 }
 
+void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
+{
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	BossLocation.Z = 300.0f;
+
+	// 각도 지정 
+	TArray<float> VerticalAngles = { -30.0f, -15.0f, 0.0f, 15.0f, 30.0f }; // 세로 각도
+	TArray<float> HorizontalAngles = { -45.0f, -27.0f, -9.0f, 9.0f, 27.0f, 45.0f }; // 가로 각도
+
+	int32 BulletIndex = 0;
+
+	// 총알을 발사하고 퍼질 각도를 설정
+	for (float VerticalAngle : VerticalAngles)
+	{
+		for (float HorizontalAngle : HorizontalAngles)
+		{
+			FVector SpawnLocation = BossLocation;
+			FRotator SpawnRotation = GetActorRotation();
+
+			if (BulletIndex >= Pattern.NumberOfBullets)
+				break;
+
+			ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+			if (Bullet)
+			{
+				Bullet->InitialDirection = GetActorForwardVector(); // 올바른 방향 설정
+
+				// 퍼질 각도를 계산
+				FRotator SpreadRotation = FRotator(VerticalAngle, HorizontalAngle, 0);
+
+				// bShouldSpread를 true로 설정
+				Bullet->SetSpreadParams(true, Pattern.SpreadDelay, SpreadRotation);
+				BulletIndex++;
+
+				// 로그 추가
+				/*UE_LOG(LogTemp, Warning, TEXT("ABoss::FireDandelionPattern:Bullet Fired. InitialDirection: %s, SpreadRotation: %s"),
+					*Bullet->InitialDirection.ToString(),
+					*SpreadRotation.ToString());*/
+			}
+		}
+	}
+
+    UE_LOG(LogTemp, Warning, TEXT("Dandelion Pattern Fired"));
+    UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+}
+
 
 ////////////////////////////////////////////////// 패턴들 특성 //////////////////////////////////////////////////
 void ABoss::InitializeDefaultPatterns()
@@ -915,13 +1010,21 @@ void ABoss::InitializeDefaultPatterns()
 	//HeartPattern.BulletSpeed = 300.0f;
 	//BulletPatterns.Add(HeartPattern);
 
-	// 구의 크기가 커지는 패턴
-	FBulletHellPattern ExpandingSpherePattern;
-	ExpandingSpherePattern.PatternType = EPatternType::ExpandingSphere;
-	ExpandingSpherePattern.InitialPatternSize = 100.0f; // 초기 구 크기 설정
-	ExpandingSpherePattern.FinalPatternSize = 500.0f; // 최종 구 크기 설정
-	ExpandingSpherePattern.SizeChangeDistance = 3.0f; // 크기 변화가 일어나는 거리 설정
-	ExpandingSpherePattern.NumberOfBullets = 30; // 총알의 수
-	ExpandingSpherePattern.BulletSpeed = 600.0f;
-	BulletPatterns.Add(ExpandingSpherePattern);
+	//// 구의 크기가 커지는 패턴
+	//FBulletHellPattern ExpandingSpherePattern;
+	//ExpandingSpherePattern.PatternType = EPatternType::ExpandingSphere;
+	//ExpandingSpherePattern.InitialPatternSize = 100.0f; // 초기 구 크기 설정
+	//ExpandingSpherePattern.FinalPatternSize = 500.0f; // 최종 구 크기 설정
+	//ExpandingSpherePattern.SizeChangeDistance = 3.0f; // 크기 변화가 일어나는 거리 설정
+	//ExpandingSpherePattern.NumberOfBullets = 30; // 총알의 수
+	//ExpandingSpherePattern.BulletSpeed = 600.0f;
+	//BulletPatterns.Add(ExpandingSpherePattern);
+
+	// 민들레 패턴 초기화
+	FBulletHellPattern DandelionPattern;
+	DandelionPattern.PatternType = EPatternType::Dandelion;
+	DandelionPattern.NumberOfBullets = 30;
+	DandelionPattern.BulletSpeed = 300.0f;
+	DandelionPattern.SpreadDelay = 2.0f; // 2초 후에 퍼짐
+	BulletPatterns.Add(DandelionPattern);
 }

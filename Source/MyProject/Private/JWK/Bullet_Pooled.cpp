@@ -32,6 +32,11 @@ ABullet_Pooled::ABullet_Pooled()
 	SizeChangeDistance = 0.0f;   // 추가된 부분
 	bHasBroadcasted = false;     // 추가된 부분
 	TimeSinceSpawned = 0.0f;
+	// 민들레 패턴을 위한 변수 초기화
+	bShouldSpread = false;
+	SpreadDelay = 0.0f;
+	TimeSinceFired = 0.0f;
+	SpreadRotation = FRotator::ZeroRotator;
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -67,6 +72,7 @@ void ABullet_Pooled::Tick(float DeltaTime)
 	///////기존 코드 move로 옯기고 수정
 	if (Active)
 	{
+		TimeSinceFired += DeltaTime;
 		MoveBullet(DeltaTime); // 총알 이동
 	}
 }
@@ -82,7 +88,7 @@ void ABullet_Pooled::Deactivate()
 void ABullet_Pooled::MoveBullet(float DeltaTime)
 {
 	// 기존 총알 이동 로직
-	FVector BulletVelocity = GetActorForwardVector() * movementComp->InitialSpeed;
+	FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
 
 	// 현재 시간을 기반으로한 진동 운동 계산
 	float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
@@ -101,6 +107,12 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	DistanceTraveled += MoveDelta.Size(); // 이동 거리 누적
 	// 경과 시간 누적
 	ElapsedTime += DeltaTime;
+
+	// 일정 시간이 경과하면 퍼지는 로직 호출
+	if (ElapsedTime >= SpreadDelay)
+	{
+		CheckAndSpread();
+	}
 
 	// 일정 시간이 경과하면 이벤트 호출
 	if (ElapsedTime >= SomeThreshold && !bHasBroadcasted)
@@ -123,6 +135,34 @@ float ABullet_Pooled::GetElapsedTime() const
 	return ElapsedTime;
 }
 
+void ABullet_Pooled::SetSpreadParams(bool bSpread, float Delay, FRotator Rotation)
+{
+	bShouldSpread = bSpread;
+	SpreadDelay = Delay;
+	SpreadRotation = Rotation;
+
+	// 로그 추가
+	/*UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::SetSpreadParams: SetSpreadParams called. Spread: %s, SpreadDelay: %f, SpreadRotation: %s"),
+		bShouldSpread ? TEXT("true") : TEXT("false"), SpreadDelay, *SpreadRotation.ToString());*/
+}
+
+void ABullet_Pooled::CheckAndSpread()
+{
+	if (bShouldSpread)
+	{
+		// 퍼지는 로직
+		InitialDirection = SpreadRotation.RotateVector(InitialDirection);
+		movementComp->Velocity = InitialDirection * movementComp->InitialSpeed;
+
+		// 퍼진 후 초기화
+		bShouldSpread = false; // 한 번 퍼진 후에는 다시 퍼지지 않도록 설정
+		ElapsedTime = 0.0f; // 경과 시간 초기화
+		// 로그 추가
+		/*UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::CheckAndSpread: CheckAndSpread called. Spread occurred. New InitialDirection: %s"),
+			*InitialDirection.ToString());*/
+	}
+}
+
 // 총알의 패턴 타입 설정 함수
 void ABullet_Pooled::SetPatternType(EPatternType Type)
 {
@@ -142,12 +182,24 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	Active = IsActive;
 	SetActorHiddenInGame(!IsActive);
 	GetWorldTimerManager().SetTimer(LifespanTimer, this, &ABullet_Pooled::Deactivate, LifeSpan, false);
-	//추가
+
+	// 추가
 	InitialLocation = GetActorLocation(); // 활성화 시 초기 위치 설정
 	DistanceTraveled = 0.0f; // 이동 거리 초기화
 	ElapsedTime = 0.0f; // 경과 시간 초기화
 	TimeSinceSpawned = 0.0f;
 	bHasBroadcasted = false; // 플래그 초기화
+
+	// 민들레 패턴 변수 초기화
+	bShouldSpread = false; // 초기에는 퍼지지 않도록 설정, FireDandelionPattern에서 설정
+	SpreadDelay = 0.0f; // 초기값, 실제 패턴에서 설정됨
+	TimeSinceFired = 0.0f;
+	SpreadRotation = FRotator::ZeroRotator;
+	// 로그 추가
+	/*UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::SetActive: Bullet Activated. Spread: %s, SpreadDelay: %f, InitialDirection: %s"),
+		bShouldSpread ? TEXT("true") : TEXT("false"),
+		SpreadDelay,
+		*InitialDirection.ToString());*/
 }
 
 // bullet의 수명을 set
