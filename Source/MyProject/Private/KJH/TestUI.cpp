@@ -45,6 +45,7 @@ void UTestUI::OnMusic1Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1111Clicked"));
 	if (Boss)
 	{
+		Boss->StopMusic(); // ÇöÀç Àç»ý ÁßÀÎ À½¾Ç°ú Åº¸·À» ¸ØÃä´Ï´Ù.
 		FString MusicTitle = TEXT("dragonfly");
 		FString MusicFilePath = TEXT("/Game/Music/butterfly.butterfly");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
@@ -61,6 +62,7 @@ void UTestUI::OnMusic2Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic22222Clicked"));
 	if (Boss)
 	{
+		Boss->StopMusic();
 		FString MusicTitle = TEXT("Elise");
 		FString MusicFilePath = TEXT("/Game/Music/Elise.Elise");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
@@ -77,6 +79,7 @@ void UTestUI::OnMusic3Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
 	if (Boss)
 	{
+		Boss->StopMusic();
 		FString MusicTitle = TEXT("Lacrimosa");
 		FString MusicFilePath = TEXT("/Game/Music/Lacrimosa.Lacrimosa");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);

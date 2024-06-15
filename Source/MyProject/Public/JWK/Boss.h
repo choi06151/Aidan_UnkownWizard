@@ -217,6 +217,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Music")
 	void PlayMusic();
 
+	// 게임 내에서 음악과 탄막 발사를 중지할 필요가 있을 때 호출할 함수~
+	void StopMusic();
+
 private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -253,12 +256,9 @@ private:
 	void FireHeartPattern(const FBulletHellPattern& Pattern); // 하트
 	void DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize); // 하트 모양 정의
 
-	void FireExpandingSpherePattern(const FBulletHellPattern& Pattern); // 구가 커지는 패턴
-	void DefineExpandingSphereShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius); // 구 모양 정의
-	UFUNCTION()
-	void OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBullet); // 총알 이동 거리 이벤트 핸들러
-
 	void FireDandelionPattern(const FBulletHellPattern& Pattern); //민들레
+
+	void FireHAPattern(const FBulletHellPattern& Pattern); //HA
 
 	//Fire패턴이름(const FBulletHellPattern& Pattern) 추가
 
@@ -309,4 +309,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Music")
 	UAudioComponent* MusicAudioComponent;
+
+	
 };

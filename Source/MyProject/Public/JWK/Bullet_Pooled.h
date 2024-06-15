@@ -7,8 +7,6 @@
 
 // 총알이 비활성화될 때 호출되는 델리게이트 선언
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPooledBulletDespawn, ABullet_Pooled*, Bullet);
-// 총알이 이동한 거리를 계산할 때 호출되는 델리게이트 선언 ////추가
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBulletTravelled, float, DistanceTraveled, ABullet_Pooled*, PooledBullet);
 
 UCLASS()
 class MYPROJECT_API ABullet_Pooled : public AActor
@@ -37,11 +35,6 @@ public:
 	// 총알이 비활성화될 때 호출되는 Event
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Events")
 	FOnPooledBulletDespawn OnPooledBulletDespawn;
-
-	//////////추가
-	// 총알이 이동한 거리를 계산할 때 호출되는 Event
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Events")
-	FOnBulletTravelled OnBulletTravelled;
 	
 	// 총알을 활성화 또는 비활성화하는 함수
 	void SetActive(bool IsActive);
@@ -77,16 +70,6 @@ public:
 	// 총알을 이동시키는 함수
 	void MoveBullet(float DeltaTime);
 
-	// 패턴 변화하는 거리 정하는 함수
-	void SetDistanceThreshold(float Threshold);
-
-	// 패턴 생성된 시간 가져오는 함수
-	float GetElapsedTime() const;
-
-	float InitialRadius; // 총알이 처음 생성될 때의 초기 크기
-	float FinalRadius; // 총알이 이동하면서 도달할 최종 크기
-	float SizeChangeDistance; // 총알의 크기가 변하기 시작하는 거리 기준
-	float SizeChangeTime; // 크기 변화에 걸리는 시간
 	float TimeSinceSpawned; // 생성된 이후 경과 시간
 	int32 FrameCounter; //  프레임 카운터
 	
@@ -122,9 +105,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float DistanceTraveled = 0.0f; // 이동 거리
-	float SomeThreshold; // 임계값 (이 거리에 다다르면 패턴 변화
 	float ElapsedTime; // 경과 시간을 저장하는 변수
-	bool bHasBroadcasted;
+
 
 
 

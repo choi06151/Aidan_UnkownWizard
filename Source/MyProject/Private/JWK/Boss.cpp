@@ -94,8 +94,8 @@ ABoss::ABoss()
 	PatternDelegates.Add(EPatternType::Angel, FPatternDelegate::CreateUObject(this, &ABoss::FireAngelPattern));
 	////// 0613
 	PatternDelegates.Add(EPatternType::Heart, FPatternDelegate::CreateUObject(this, &ABoss::FireHeartPattern));
-	PatternDelegates.Add(EPatternType::ExpandingSphere, FPatternDelegate::CreateUObject(this, &ABoss::FireExpandingSpherePattern));
 	PatternDelegates.Add(EPatternType::Dandelion, FPatternDelegate::CreateUObject(this, &ABoss::FireDandelionPattern));
+	PatternDelegates.Add(EPatternType::HA, FPatternDelegate::CreateUObject(this, &ABoss::FireHAPattern));
 
 }
 
@@ -117,7 +117,7 @@ void ABoss::BeginPlay()
 	if (Music)
 	{
 		MusicAudioComponent->SetSound(Music);
-		
+
 	}
 }
 
@@ -353,28 +353,28 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Dandelion;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (HighArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Dandelion;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 
@@ -447,6 +447,7 @@ void ABoss::OnMusicFinished()
 
 	// 노래가 끝나면 탄막 발사 중지 
 	StopFiring();
+	StopMusic();
 
 	// 여기 함수에 보스 죽는 bool값 넣으면 될 듯?
 }
@@ -473,6 +474,16 @@ void ABoss::PlayMusic()
 	if (MusicAudioComponent && !MusicAudioComponent->IsPlaying())
 	{
 		MusicAudioComponent->Play();
+	}
+}
+
+void ABoss::StopMusic()
+{
+	if (MusicAudioComponent && MusicAudioComponent->IsPlaying())
+	{
+		MusicAudioComponent->Stop();
+		bIsMusicFinished = true;
+		StopFiring();
 	}
 }
 
@@ -770,122 +781,6 @@ void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 		OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
 	}
 }
-//////////// 커지는 구
-void ABoss::FireExpandingSpherePattern(const FBulletHellPattern& Pattern)
-{
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 300.0f;
-
-	TArray<FVector> SphereShape;
-	float CurrentRadius = Pattern.InitialPatternSize;
-
-	DefineExpandingSphereShape(SphereShape, Pattern.NumberOfBullets, CurrentRadius);
-
-	for (const FVector& Offset : SphereShape)
-	{
-		FVector SpawnLocation = BossLocation + Offset;
-		FRotator SpawnRotation = GetActorForwardVector().Rotation();
-		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
-		if (Bullet)
-		{
-			Bullet->SetPatternType(Pattern.PatternType);
-			Bullet->SetDistanceThreshold(Pattern.SizeChangeDistance);
-			Bullet->InitialRadius = Pattern.InitialPatternSize; // 초기 크기 설정
-			Bullet->FinalRadius = Pattern.FinalPatternSize; // 최종 크기 설정
-			Bullet->SizeChangeDistance = Pattern.SizeChangeDistance; // 크기 변화 거리 설정
-
-			// 이미 바인딩되어 있는지 확인한 후에 이벤트 추가
-			if (!Bullet->OnBulletTravelled.IsAlreadyBound(this, &ABoss::OnBulletTravelled))
-			{
-				Bullet->OnBulletTravelled.AddDynamic(this, &ABoss::OnBulletTravelled);
-			}
-		}
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("ExpandingSphere"));
-	UE_LOG(LogTemp, Warning, TEXT("---------------"));
-}
-
-void ABoss::DefineExpandingSphereShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius)
-{
-	// 기존에 저장된 점들을 초기화합니다.
-	OutShape.Empty();
-
-	// Sin 및 Cos 값을 미리 계산하여 저장할 배열을 선언합니다.
-	TArray<float> SinPhi, CosPhi, SinTheta, CosTheta;
-
-	// 위도와 경도 각도를 계산할 때 사용할 간격을 설정합니다.
-	float PhiStep = PI / NumberOfPoints;       // 위도 각도 간격
-	float ThetaStep = 2 * PI / NumberOfPoints; // 경도 각도 간격
-
-	// 위도(Phi)에 대한 Sin, Cos 값을 미리 계산하여 저장합니다.
-	for (int32 i = 0; i < NumberOfPoints; ++i)
-	{
-		float Phi = i * PhiStep;              // 현재 위도 각도 계산
-		SinPhi.Add(FMath::Sin(Phi));          // 위도 각도의 Sine 값을 배열에 추가
-		CosPhi.Add(FMath::Cos(Phi));          // 위도 각도의 Cosine 값을 배열에 추가
-	}
-
-	// 경도(Theta)에 대한 Sin, Cos 값을 미리 계산하여 저장합니다.
-	for (int32 j = 0; j < NumberOfPoints; ++j)
-	{
-		float Theta = j * ThetaStep;          // 현재 경도 각도 계산
-		SinTheta.Add(FMath::Sin(Theta));      // 경도 각도의 Sine 값을 배열에 추가
-		CosTheta.Add(FMath::Cos(Theta));      // 경도 각도의 Cosine 값을 배열에 추가
-	}
-
-	// 미리 계산한 Sin, Cos 값을 사용하여 구의 표면 점들을 계산합니다.
-	for (int32 i = 0; i < NumberOfPoints; ++i)
-	{
-		for (int32 j = 0; j < NumberOfPoints; ++j)
-		{
-			// 구 표면의 X, Y, Z 좌표를 계산합니다.
-			float X = Radius * SinPhi[i] * CosTheta[j]; // X 좌표 계산
-			float Y = Radius * SinPhi[i] * SinTheta[j]; // Y 좌표 계산
-			float Z = Radius * CosPhi[i];               // Z 좌표 계산
-
-			// 계산된 점을 결과 배열에 추가합니다.
-			OutShape.Add(FVector(X, Y, Z));
-		}
-	}
-}
-
-void ABoss::OnBulletTravelled(float DistanceTraveled, ABullet_Pooled* PooledBullet)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ABoss::OnBulletTravelled: Bullet travelled distance: %f"), DistanceTraveled);
-	// 총알과 관련된 패턴 찾기
-	const FBulletHellPattern* Pattern = BulletPatterns.FindByPredicate([PooledBullet](const FBulletHellPattern& Pattern)
-		{
-			return PooledBullet->GetPatternType() == Pattern.PatternType;
-		});
-
-	if (Pattern)
-	{
-		float TotalTime = Pattern->SizeChangeDistance; // 크기 변화가 일어나는 총 시간 (초 단위)
-		
-		// 경과 시간에 따라 새로운 반지름 계산
-		float NewRadius = FMath::Lerp(PooledBullet->InitialRadius, PooledBullet->FinalRadius, PooledBullet->GetElapsedTime() / TotalTime);
-
-		TArray<FVector> SphereShape;
-		DefineExpandingSphereShape(SphereShape, Pattern->NumberOfBullets, NewRadius);
-
-		FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-		BossLocation.Z = 300.0f;
-
-		if (SphereShape.Num() > 0)
-		{
-			for (int32 i = 0; i < SphereShape.Num(); ++i)
-			{
-				// 총알의 위치를 업데이트하여 구의 크기를 변화시킴
-				PooledBullet->SetActorLocation(BossLocation + SphereShape[i]);
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::OnBulletTravelled: Pattern not found for bullet"));
-	}
-}
 
 void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 {
@@ -920,17 +815,80 @@ void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 				// bShouldSpread를 true로 설정
 				Bullet->SetSpreadParams(true, Pattern.SpreadDelay, SpreadRotation, Pattern.PatternType);
 				BulletIndex++;
-
-				// 로그 추가
-				UE_LOG(LogTemp, Warning, TEXT("ABoss::FireDandelionPattern:Bullet Fired. InitialDirection: %s, SpreadRotation: %s, PatternType: %d"),
-					*Bullet->InitialDirection.ToString(),
-					*SpreadRotation.ToString(),
-					Pattern.PatternType);
 			}
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Dandelion Pattern Fired"));
+	UE_LOG(LogTemp, Warning, TEXT("Dandelion"));
+	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+}
+
+void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
+{
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	BossLocation.Z = 300.0f;
+
+
+	TArray<FVector> HAPatternShape = {
+
+
+		// "H"
+		FVector(0, 350, 400), FVector(0, 350, 250), FVector(0, 350, 100), FVector(0, 350, -50), FVector(0, 350, -200),
+		FVector(0, 250, 100), FVector(0, 150, 100),
+		FVector(0, 50, 400), FVector(0, 50, 250), FVector(0, 50, 100), FVector(0, 50, -50), FVector(0, 50, -200),
+		
+		// "A"
+		FVector(0, -200, 400), FVector(0, -150, 250), FVector(0, -100, 100), FVector(0, -100, -50), FVector(0, -100, -200),
+		FVector(0, -300, 250), FVector(0, -300, 100), FVector(0, -300, -50), FVector(0, -100, -200),
+		//FVector(0, -100, 200), FVector(0, -100, 100), FVector(0, -100, 0), FVector(0, -100, -100),
+		//FVector(0, -100, -200), FVector(0, -100, -300), FVector(0, -200, 0)
+
+		//// "H"
+		//FVector(0, 200, 300), FVector(0, 100, 200), FVector(0, 200, 200), FVector(0, 0, 100),
+		//FVector(0, 200, 100), FVector(0, -100, 0), FVector(0, -200, -100), FVector(0, -200, -200),
+		//FVector(0, -100, -200), FVector(0, -200, -300), FVector(0, 0, -100), FVector(0, 100, -200),
+		//FVector(0, 200, -300), FVector(0, 100, 0), FVector(0, -100, 100),
+		//// "A"
+		//FVector(0, -300, 300), FVector(0, -300, 200), FVector(0, -300, 100), FVector(0, -300, 0),
+		//FVector(0, -300, -100), FVector(0, -300, -200), FVector(0, -300, -300), FVector(0, -100, 300),
+		//FVector(0, -100, 200), FVector(0, -100, 100), FVector(0, -100, 0), FVector(0, -100, -100),
+		//FVector(0, -100, -200), FVector(0, -100, -300), FVector(0, -200, 0)
+
+	};
+
+	//// H
+	//for (int32 i = -2; i <= 2; ++i)
+	//{
+	//	HAPatternShape.Add(FVector(0, -200, i * 100)); // 좌측 세로선
+	//	HAPatternShape.Add(FVector(0, 0, i * 100)); // 우측 세로선
+	//	if (i == 0)
+	//	{
+	//		HAPatternShape.Add(FVector(0, -100, i * 100)); // 중앙 가로선
+	//	}
+	//}
+
+	//// A
+	//for (int32 i = -2; i <= 2; ++i)
+	//{
+	//	HAPatternShape.Add(FVector(0, 200 + i * 100, i * 100)); // 좌측 대각선
+	//	HAPatternShape.Add(FVector(0, 200 - i * 100, i * 100)); // 우측 대각선
+	//	if (i == 0 || i == -1)
+	//	{
+	//		HAPatternShape.Add(FVector(0, 200 - i * 100, 0)); // 중앙 가로선
+	//	}
+	//}
+
+	for (const FVector& Offset : HAPatternShape)
+	{
+		FVector SpawnLocation = BossLocation + Offset;
+
+		// 보스의 정면을 향하는 방향으로 설정
+		FRotator SpawnRotation = GetActorRotation();
+
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("HA Pattern"));
 	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
@@ -1003,29 +961,26 @@ void ABoss::InitializeDefaultPatterns()
 	// AngelPattern.BulletSpeed = 250.0f;
 	// BulletPatterns.Add(AngelPattern);
 
-	// 하트 모양 패턴
-	FBulletHellPattern HeartPattern;
-	HeartPattern.PatternType = EPatternType::Heart;
-	HeartPattern.PatternSize = 100.0f; // 하트 모양 패턴의 크기 설정
-	HeartPattern.NumberOfBullets = 30; // 총알의 수
-	HeartPattern.BulletSpeed = 300.0f;
-	BulletPatterns.Add(HeartPattern);
+	//// 하트 모양 패턴
+	//FBulletHellPattern HeartPattern;
+	//HeartPattern.PatternType = EPatternType::Heart;
+	//HeartPattern.PatternSize = 100.0f; // 하트 모양 패턴의 크기 설정
+	//HeartPattern.NumberOfBullets = 30; // 총알의 수
+	//HeartPattern.BulletSpeed = 300.0f;
+	//BulletPatterns.Add(HeartPattern);
 
-	//// 구의 크기가 커지는 패턴
-	//FBulletHellPattern ExpandingSpherePattern;
-	//ExpandingSpherePattern.PatternType = EPatternType::ExpandingSphere;
-	//ExpandingSpherePattern.InitialPatternSize = 100.0f; // 초기 구 크기 설정
-	//ExpandingSpherePattern.FinalPatternSize = 500.0f; // 최종 구 크기 설정
-	//ExpandingSpherePattern.SizeChangeDistance = 3.0f; // 크기 변화가 일어나는 거리 설정
-	//ExpandingSpherePattern.NumberOfBullets = 30; // 총알의 수
-	//ExpandingSpherePattern.BulletSpeed = 600.0f;
-	//BulletPatterns.Add(ExpandingSpherePattern);
+	//// 민들레 패턴 
+	//FBulletHellPattern DandelionPattern;
+	//DandelionPattern.PatternType = EPatternType::Dandelion;
+	//DandelionPattern.NumberOfBullets = 30;
+	//DandelionPattern.BulletSpeed = 300.0f;
+	//DandelionPattern.SpreadDelay = 2.0f; // 2초 후에 퍼짐
+	//BulletPatterns.Add(DandelionPattern);
 
-	// 민들레 패턴 초기화
-	FBulletHellPattern DandelionPattern;
-	DandelionPattern.PatternType = EPatternType::Dandelion;
-	DandelionPattern.NumberOfBullets = 30;
-	DandelionPattern.BulletSpeed = 300.0f;
-	DandelionPattern.SpreadDelay = 2.0f; // 2초 후에 퍼짐
-	BulletPatterns.Add(DandelionPattern);
+	// HA 패턴
+	FBulletHellPattern HAPattern;
+	HAPattern.PatternType = EPatternType::HA;
+	HAPattern.NumberOfBullets = 25; // "HA" 패턴의 점 수에 맞춰서 설정
+	HAPattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(HAPattern);
 }

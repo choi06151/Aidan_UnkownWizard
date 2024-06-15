@@ -27,11 +27,6 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->bShouldBounce = false;
 
 	// 추가된 변수들 초기화
-	InitialRadius = 0.0f;        // 추가된 부분
-	FinalRadius = 0.0f;          // 추가된 부분
-	SizeChangeDistance = 0.0f;   // 추가된 부분
-	bHasBroadcasted = false;     // 추가된 부분
-	TimeSinceSpawned = 0.0f;
 	// 민들레 패턴을 위한 변수 초기화
 	bShouldSpread = false;
 	SpreadDelay = 0.0f;
@@ -113,26 +108,6 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	{
 		CheckAndSpread();
 	}
-
-	// 일정 시간이 경과하면 이벤트 호출
-	if (ElapsedTime >= SomeThreshold && !bHasBroadcasted)
-	{
-		if (OnBulletTravelled.IsBound())
-		{
-			OnBulletTravelled.Broadcast(ElapsedTime, this);
-			bHasBroadcasted = true;
-		}
-	}
-}
-
-void ABullet_Pooled::SetDistanceThreshold(float Threshold)
-{
-	SomeThreshold = Threshold;
-}
-
-float ABullet_Pooled::GetElapsedTime() const
-{
-	return ElapsedTime;
 }
 
 void ABullet_Pooled::SetSpreadParams(bool bSpread, float Delay, FRotator Rotation, EPatternType Type)
@@ -141,9 +116,6 @@ void ABullet_Pooled::SetSpreadParams(bool bSpread, float Delay, FRotator Rotatio
 	SpreadDelay = Delay;
 	SpreadRotation = Rotation;
 	PatternType = Type;
-
-	UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::SetSpreadParams: SetSpreadParams called. Spread: %s, SpreadDelay: %f, SpreadRotation: %s, PatternType: %d"),
-		bShouldSpread ? TEXT("true") : TEXT("false"), SpreadDelay, *SpreadRotation.ToString(), PatternType);
 }
 
 void ABullet_Pooled::CheckAndSpread()
@@ -157,8 +129,6 @@ void ABullet_Pooled::CheckAndSpread()
 		// 퍼진 후 초기화
 		bShouldSpread = false; // 한 번 퍼진 후에는 다시 퍼지지 않도록 설정
 		ElapsedTime = 0.0f; // 경과 시간 초기화
-		UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::CheckAndSpread: CheckAndSpread called. Spread occurred. New InitialDirection: %s"),
-			*InitialDirection.ToString());
 	}
 }
 
@@ -187,7 +157,6 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	DistanceTraveled = 0.0f; // 이동 거리 초기화
 	ElapsedTime = 0.0f; // 경과 시간 초기화
 	TimeSinceSpawned = 0.0f;
-	bHasBroadcasted = false; // 플래그 초기화
 
 	// 민들레 패턴 변수 초기화
 	bShouldSpread = false; // 초기에는 퍼지지 않도록 설정
@@ -199,9 +168,6 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	InitialDirection = GetActorForwardVector();
 	// 이동 속도 초기화
 	movementComp->Velocity = InitialDirection * movementComp->InitialSpeed;
-
-	UE_LOG(LogTemp, Warning, TEXT("ABullet_Pooled::SetActive: Bullet Activated. Spread: %s, SpreadDelay: %f, InitialDirection: %s"),
-		bShouldSpread ? TEXT("true") : TEXT("false"), SpreadDelay, *InitialDirection.ToString());
 }
 
 // bullet의 수명을 set
