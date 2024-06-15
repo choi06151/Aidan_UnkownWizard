@@ -97,7 +97,7 @@ public:
 	float TimeSinceFired; // 발사된 후 경과 시간
 	FRotator SpreadRotation; // 퍼질 때 사용할 회전 각도
 
-	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation);
+	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation, EPatternType Type);
 	void CheckAndSpread(); // 퍼지는 로직을 처리하는 함수
 	
 protected:

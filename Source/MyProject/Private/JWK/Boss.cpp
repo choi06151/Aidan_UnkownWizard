@@ -259,7 +259,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 			PlayMusic();
 
 			// 탄막 발사 시작
-			StartFiring();
+			FireBullet();
 		}
 		else
 		{
@@ -353,14 +353,14 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Dandelion;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Dandelion;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
@@ -745,9 +745,8 @@ void ABoss::FireHeartPattern(const FBulletHellPattern& Pattern)
 	{
 		FVector SpawnLocation = BossLocation + Offset;
 
-		// 플레이어를 향한 방향 계산
-		FVector Direction = (player->GetActorLocation() - SpawnLocation).GetSafeNormal();
-		FRotator SpawnRotation = Direction.Rotation();
+		// 플레이어를 향한 방향 계산 대신 보스의 초기 회전을 사용
+		FRotator SpawnRotation = GetActorRotation();
 
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
@@ -767,7 +766,8 @@ void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 		float x = 16 * FMath::Pow(FMath::Sin(t), 3);
 		float y = 13 * FMath::Cos(t) - 5 * FMath::Cos(2 * t) - 2 * FMath::Cos(3 * t) - FMath::Cos(4 * t);
 
-		OutShape.Add(FVector(0.0f, x * PatternSize / 16.0f, y * PatternSize / 13.0f));
+		// 여기서 하트 크기 조정 가능 같은 비율로 x랑y 나누는 수 변경해주기~
+		OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
 	}
 }
 //////////// 커지는 구
@@ -918,19 +918,20 @@ void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 				FRotator SpreadRotation = FRotator(VerticalAngle, HorizontalAngle, 0);
 
 				// bShouldSpread를 true로 설정
-				Bullet->SetSpreadParams(true, Pattern.SpreadDelay, SpreadRotation);
+				Bullet->SetSpreadParams(true, Pattern.SpreadDelay, SpreadRotation, Pattern.PatternType);
 				BulletIndex++;
 
 				// 로그 추가
-				/*UE_LOG(LogTemp, Warning, TEXT("ABoss::FireDandelionPattern:Bullet Fired. InitialDirection: %s, SpreadRotation: %s"),
+				UE_LOG(LogTemp, Warning, TEXT("ABoss::FireDandelionPattern:Bullet Fired. InitialDirection: %s, SpreadRotation: %s, PatternType: %d"),
 					*Bullet->InitialDirection.ToString(),
-					*SpreadRotation.ToString());*/
+					*SpreadRotation.ToString(),
+					Pattern.PatternType);
 			}
 		}
 	}
 
-    UE_LOG(LogTemp, Warning, TEXT("Dandelion Pattern Fired"));
-    UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("Dandelion Pattern Fired"));
+	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
 
@@ -954,7 +955,7 @@ void ABoss::InitializeDefaultPatterns()
 	//FanPattern.NumberOfBullets = 7; // 부채꼴 패턴에서 발사할 총알 수
 	//FanPattern.BulletSpeed = 300.0f;
 	//BulletPatterns.Add(FanPattern);
-	//
+	////
 	//// 원형 패턴
 	//FBulletHellPattern CirclePattern;
 	//CirclePattern.PatternType = EPatternType::Circle;
@@ -1002,13 +1003,13 @@ void ABoss::InitializeDefaultPatterns()
 	// AngelPattern.BulletSpeed = 250.0f;
 	// BulletPatterns.Add(AngelPattern);
 
-	//// 하트 모양 패턴
-	//FBulletHellPattern HeartPattern;
-	//HeartPattern.PatternType = EPatternType::Heart;
-	//HeartPattern.PatternSize = 100.0f; // 하트 모양 패턴의 크기 설정
-	//HeartPattern.NumberOfBullets = 30; // 총알의 수
-	//HeartPattern.BulletSpeed = 300.0f;
-	//BulletPatterns.Add(HeartPattern);
+	// 하트 모양 패턴
+	FBulletHellPattern HeartPattern;
+	HeartPattern.PatternType = EPatternType::Heart;
+	HeartPattern.PatternSize = 100.0f; // 하트 모양 패턴의 크기 설정
+	HeartPattern.NumberOfBullets = 30; // 총알의 수
+	HeartPattern.BulletSpeed = 300.0f;
+	BulletPatterns.Add(HeartPattern);
 
 	//// 구의 크기가 커지는 패턴
 	//FBulletHellPattern ExpandingSpherePattern;
