@@ -45,7 +45,8 @@ void UTestUI::OnMusic1Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1111Clicked"));
 	if (Boss)
 	{
-		FString MusicTitle = TEXT("Butter-Fly");
+		Boss->StopMusic(); // 현재 재생 중인 음악과 탄막을 멈춥니다.
+		FString MusicTitle = TEXT("dragonfly");
 		FString MusicFilePath = TEXT("/Game/Music/butterfly.butterfly");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1Clicked"));
@@ -61,7 +62,8 @@ void UTestUI::OnMusic2Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic22222Clicked"));
 	if (Boss)
 	{
-		FString MusicTitle = TEXT("Fur Elise");
+		Boss->StopMusic();
+		FString MusicTitle = TEXT("Elise");
 		FString MusicFilePath = TEXT("/Game/Music/Elise.Elise");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic2Clicked"));
@@ -77,66 +79,14 @@ void UTestUI::OnMusic3Clicked()
 	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
 	if (Boss)
 	{
-		FString MusicTitle = TEXT("Requiem ? Lacrimosa");
+		Boss->StopMusic();
+		FString MusicTitle = TEXT("Lacrimosa");
 		FString MusicFilePath = TEXT("/Game/Music/Lacrimosa.Lacrimosa");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3Clicked"));
 	}
 }
 
-void UTestUI::OnShow5SecInfoClicked()
-{
-	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/butterfly.json");
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnShow5SecInfoClicked: Loading JSON from: %s"), *JsonFilePath);
-
-	FString JsonString;
-	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
-	{
-		TSharedPtr<FJsonObject> JsonObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
-
-		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
-		{
-			// 5초 시점의 정보를 로그에 출력
-			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
-			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
-			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
-			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
-			const TArray<TSharedPtr<FJsonValue>> LowMidArray = JsonObject->GetArrayField(TEXT("low_mid"));
-			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
-			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
-
-			float Intensity = IntensityArray[15]->AsNumber();
-			float LowFrequency = LowArray[15]->AsNumber();
-			float LowMidFrequency = LowMidArray[15]->AsNumber();
-			float HighMidFrequency = HighMidArray[15]->AsNumber();
-			float HighFrequency = HighArray[15]->AsNumber();
-
-			UE_LOG(LogTemp, Warning, TEXT("Tempo: %f"), Tempo);
-			for (const auto& BeatValue : BeatsArray)
-			{
-				float BeatTime = BeatValue->AsNumber();
-				if (BeatTime <= 15.0f)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Beat at: %f"), BeatTime);
-				}
-				else
-				{
-					break;
-				}
-			}
-			UE_LOG(LogTemp, Warning, TEXT("Intensity at 5 seconds: %f"), Intensity);
-			UE_LOG(LogTemp, Warning, TEXT("Low frequency band at 5 seconds: %f"), LowFrequency);
-			UE_LOG(LogTemp, Warning, TEXT("Low-mid frequency band at 5 seconds: %f"), LowMidFrequency);
-			UE_LOG(LogTemp, Warning, TEXT("High-mid frequency band at 5 seconds: %f"), HighMidFrequency);
-			UE_LOG(LogTemp, Warning, TEXT("High frequency band at 5 seconds: %f"), HighFrequency);
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *JsonFilePath);
-	}
-}
 
 void UTestUI::OnPreAnalyzeAllClicked()
 {
@@ -147,16 +97,3 @@ void UTestUI::OnPreAnalyzeAllClicked()
 	}
 }
 
-void UTestUI::PlayMusicAndLoadData(const FString& MusicFilePath, const FString& JsonFilePath)
-{
-	UE_LOG(LogTemp, Warning, TEXT("UTestUI::PlayMusicAndLoadData: Loading JSON from: %s"), *JsonFilePath);
-	if (Boss)
-	{
-		//Boss->LoadMusicDataAndSetPatterns(JsonFilePath, MusicFilePath); // JSON 파일, Music 경로 전달
-	}
-
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Boss is not valid!"));
-	}
-}
