@@ -18,9 +18,10 @@ enum class EPatternType : uint8
 	Angel,				// 천사				수정
 
 	Heart,               // 하트
-	Dandelion,       // 민들레 패턴 추가
-	HA         // 새로운 HA 패턴 추가
-	
+	Dandelion,       // 민들레
+	HA,         // HA
+	CircularMoving,  // 원형 이동
+	Pinwheel          // 바람개비
 	// 새로운 패턴 추가시 이름 여기에 추가
 	
 };
@@ -53,4 +54,10 @@ public:
 
 	// 민들레 패턴에 필요한 변수
 	float SpreadDelay; // 퍼지기 시작하는 시간
+	// 초기 위치 배열
+	TArray<FVector> InitialPositions;
+	// 궤도별 회전 속도
+	TArray<float> OrbitSpeeds;
+	// 궤도별 반지름
+	TArray<float> OrbitRadii;          
 };

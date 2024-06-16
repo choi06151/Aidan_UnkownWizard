@@ -261,9 +261,9 @@ private:
 
 	void FireHAPattern(const FBulletHellPattern& Pattern); //HA
 
+	void FireCircularMovingPattern(const FBulletHellPattern& Pattern); // 움직이는 원
+
 	void FirePinwheelPattern(const FBulletHellPattern& Pattern); // 바람개비
-	void UpdatePinwheelPattern();
-	FTimerHandle PinwheelTimerHandle;
 
 	//Fire패턴이름(const FBulletHellPattern& Pattern) 추가
 

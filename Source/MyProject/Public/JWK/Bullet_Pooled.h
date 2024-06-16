@@ -83,8 +83,14 @@ public:
 	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation, EPatternType Type);
 	void CheckAndSpread(); // 퍼지는 로직을 처리하는 함수
 
+	// 원형 이동 패턴에 필요한 변수들
+	FVector CircularCenter; // 원형 이동의 중심
+	float CircularRadius; // 원형 반지름
+	float CircularSpeed; // 원형 이동 속도
+	float CurrentAngle; // 현재 각도
+	FVector ForwardDirection; // 총알의 전진 방향
 
-
+	void SetCircularParams(const FVector& Center, float Radius, float Speed, const FVector& InitialDir);
 	
 protected:
 	// 총알의 활성화 상태

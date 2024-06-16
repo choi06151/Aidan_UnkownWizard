@@ -83,31 +83,69 @@ void ABullet_Pooled::Deactivate()
 ///////////////////////////////////////////추가/////////////////////////////////////////////
 void ABullet_Pooled::MoveBullet(float DeltaTime)
 {
-	// 기존 총알 이동 로직
-	FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
-
-	// 기존 진동 운동을 적용한 이동 벡터 계산
-	float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-	float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-
-	FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
-
-	// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
-	FVector NewLocation = GetActorLocation() + MoveDelta;
-
-	// 새로운 위치로 총알 이동
-	SetActorLocation(NewLocation);
-	
-
-	// 이동 거리 계산
-	DistanceTraveled += BulletVelocity.Size() * DeltaTime; // 이동 거리 누적
-	// 경과 시간 누적
-	ElapsedTime += DeltaTime;
-
-	// 일정 시간이 경과하면 퍼지는 로직 호출
-	if (bShouldSpread && ElapsedTime >= SpreadDelay)
+	// 바람개비 패턴
+	if (PatternType == EPatternType::Pinwheel)
 	{
-		CheckAndSpread();
+		// 바람개비 패턴
+		CurrentAngle += CircularSpeed * DeltaTime;
+		float Rad = FMath::DegreesToRadians(CurrentAngle);
+		FVector CircularOffset = FVector(0.0f, FMath::Cos(Rad) * CircularRadius, FMath::Sin(Rad) * CircularRadius);
+
+		// 앞으로 나아가는 거리 계산
+		FVector ForwardMovement = InitialDirection * movementComp->InitialSpeed * DeltaTime;
+
+		// 새로운 위치 계산
+		FVector NewLocation = CircularCenter + CircularOffset + ForwardMovement;
+		SetActorLocation(NewLocation);
+
+		// CircularCenter를 앞으로 나아가는 만큼 갱신
+		CircularCenter += ForwardMovement;
+	}
+	// 원형 이동 패턴
+	else if (PatternType == EPatternType::CircularMoving)
+	{
+		CurrentAngle += CircularSpeed * DeltaTime;
+		float Rad = FMath::DegreesToRadians(CurrentAngle);
+		FVector CircularOffset = FVector(0.0f, FMath::Cos(Rad) * CircularRadius, FMath::Sin(Rad) * CircularRadius);
+
+		// 앞으로 나아가는 거리 계산
+		FVector ForwardMovement = ForwardDirection * movementComp->InitialSpeed * DeltaTime;
+
+		// 새로운 위치 계산
+		FVector NewLocation = CircularCenter + CircularOffset + ForwardMovement;
+		SetActorLocation(NewLocation);
+
+		// CircularCenter를 앞으로 나아가는 만큼 갱신
+		CircularCenter += ForwardMovement;
+	}
+	else
+	{
+		// 기존 총알 이동 로직
+		FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
+
+		// 기존 진동 운동을 적용한 이동 벡터 계산
+		float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+		float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+
+		FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
+
+		// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
+		FVector NewLocation = GetActorLocation() + MoveDelta;
+
+		// 새로운 위치로 총알 이동
+		SetActorLocation(NewLocation);
+
+
+		// 이동 거리 계산
+		DistanceTraveled += BulletVelocity.Size() * DeltaTime; // 이동 거리 누적
+		// 경과 시간 누적
+		ElapsedTime += DeltaTime;
+
+		// 일정 시간이 경과하면 퍼지는 로직 호출
+		if (bShouldSpread && ElapsedTime >= SpreadDelay)
+		{
+			CheckAndSpread();
+		}
 	}
 }
 
@@ -133,6 +171,14 @@ void ABullet_Pooled::CheckAndSpread()
 	}
 }
 
+void ABullet_Pooled::SetCircularParams(const FVector& Center, float Radius, float Speed, const FVector& InitialDir)
+{
+	CircularCenter = Center;
+	CircularRadius = Radius;
+	CircularSpeed = Speed;
+	InitialDirection = InitialDir;
+	CurrentAngle = 0.0f;
+}
 
 
 // 총알의 패턴 타입 설정 함수
