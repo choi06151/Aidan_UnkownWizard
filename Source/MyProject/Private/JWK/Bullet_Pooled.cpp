@@ -32,6 +32,7 @@ ABullet_Pooled::ABullet_Pooled()
 	SpreadDelay = 0.0f;
 	TimeSinceFired = 0.0f;
 	SpreadRotation = FRotator::ZeroRotator;
+
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -85,11 +86,10 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	// 기존 총알 이동 로직
 	FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
 
-	// 현재 시간을 기반으로한 진동 운동 계산
+	// 기존 진동 운동을 적용한 이동 벡터 계산
 	float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
 	float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
 
-	// 진동 운동을 적용한 이동 벡터 계산
 	FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
 
 	// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
@@ -97,9 +97,10 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 
 	// 새로운 위치로 총알 이동
 	SetActorLocation(NewLocation);
+	
 
 	// 이동 거리 계산
-	DistanceTraveled += MoveDelta.Size(); // 이동 거리 누적
+	DistanceTraveled += BulletVelocity.Size() * DeltaTime; // 이동 거리 누적
 	// 경과 시간 누적
 	ElapsedTime += DeltaTime;
 
@@ -131,6 +132,8 @@ void ABullet_Pooled::CheckAndSpread()
 		ElapsedTime = 0.0f; // 경과 시간 초기화
 	}
 }
+
+
 
 // 총알의 패턴 타입 설정 함수
 void ABullet_Pooled::SetPatternType(EPatternType Type)

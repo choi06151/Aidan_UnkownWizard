@@ -4,6 +4,7 @@
 #include "Spawn_Bullet.h"
 #include "GameFramework/Character.h"
 #include "BulletHellPattern.h"
+#include "Sound/SoundWave.h" // 추가: 사운드 파일 관련 헤더
 #include "Boss.generated.h"
 
 DECLARE_DELEGATE_OneParam(FPatternDelegate, const FBulletHellPattern&);
@@ -260,6 +261,10 @@ private:
 
 	void FireHAPattern(const FBulletHellPattern& Pattern); //HA
 
+	void FirePinwheelPattern(const FBulletHellPattern& Pattern); // 바람개비
+	void UpdatePinwheelPattern();
+	FTimerHandle PinwheelTimerHandle;
+
 	//Fire패턴이름(const FBulletHellPattern& Pattern) 추가
 
 
@@ -310,5 +315,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Music")
 	UAudioComponent* MusicAudioComponent;
 
-	
+	//////////////////////탄막 효과음 추가
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundWave* HaSound; 
 };

@@ -82,6 +82,9 @@ public:
 
 	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation, EPatternType Type);
 	void CheckAndSpread(); // 퍼지는 로직을 처리하는 함수
+
+
+
 	
 protected:
 	// 총알의 활성화 상태

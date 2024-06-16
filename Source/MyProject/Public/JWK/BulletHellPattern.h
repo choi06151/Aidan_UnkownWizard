@@ -20,6 +20,7 @@ enum class EPatternType : uint8
 	Heart,               // 하트
 	Dandelion,       // 민들레 패턴 추가
 	HA         // 새로운 HA 패턴 추가
+	
 	// 새로운 패턴 추가시 이름 여기에 추가
 	
 };

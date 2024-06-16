@@ -81,6 +81,13 @@ ABoss::ABoss()
 	MusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicAudioComponent"));
 	MusicAudioComponent->SetupAttachment(RootComponent);
 
+	// 웃음 효과음
+	static ConstructorHelpers::FObjectFinder<USoundWave> HaSoundAsset(TEXT("/Script/Engine.SoundWave'/Game/KJH/SFX/Ha.Ha'"));
+	if (HaSoundAsset.Succeeded())
+	{
+		HaSound = HaSoundAsset.Object;
+	}
+
 	// DELEGATE Map 초기화
 	PatternDelegates.Add(EPatternType::RandomStraight,
 		FPatternDelegate::CreateUObject(this, &ABoss::FireRandomStraightPattern));
@@ -96,6 +103,7 @@ ABoss::ABoss()
 	PatternDelegates.Add(EPatternType::Heart, FPatternDelegate::CreateUObject(this, &ABoss::FireHeartPattern));
 	PatternDelegates.Add(EPatternType::Dandelion, FPatternDelegate::CreateUObject(this, &ABoss::FireDandelionPattern));
 	PatternDelegates.Add(EPatternType::HA, FPatternDelegate::CreateUObject(this, &ABoss::FireHAPattern));
+	
 
 }
 
@@ -233,19 +241,6 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 		// 노래가 끝났음을 감지하기 위한 타이머 설정
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &ABoss::OnMusicFinished, TotalDuration, false);
 
-		//// 음악 재생 시작
-		//UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Playing music synchronized with pattern conditions."));
-		//if (USoundBase* Music = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
-		//{
-		//	// 노래 시작 시 변수 초기화
-		//	bIsMusicFinished = false;
-
-		//	//UGameplayStatics::PlaySound2D(this, Music); 0614
-		//	UGameplayStatics::SpawnSound2D(this, Music);
-		//	
-		//	// 탄막 발사 시작
-		//	StartFiring();
-		//}
 		// 음악 설정 및 재생
 		if (USoundBase* LoadedMusic = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
 		{
@@ -838,35 +833,14 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 		FVector(0, 50, 400), FVector(0, 50, 250), FVector(0, 50, 100), FVector(0, 50, -50), FVector(0, 50, -200),
 		
 		// "A"
-		FVector(0, -200, 400), FVector(0, -150, 250), FVector(0, -100, 100), FVector(0, -100, -50), FVector(0, -100, -200),
-		FVector(0, -300, 250), FVector(0, -300, 100), FVector(0, -300, -50), FVector(0, -100, -200),
-		//FVector(0, -100, 200), FVector(0, -100, 100), FVector(0, -100, 0), FVector(0, -100, -100),
-		//FVector(0, -100, -200), FVector(0, -100, -300), FVector(0, -200, 0)
+		FVector(0, -250, 400),FVector(0, -150, 250),
+		FVector(0, -100, 100), FVector(0, -100, -50), FVector(0, -100, -200),
+		FVector(0, -350, 250),
+		FVector(0, -400, 100), FVector(0, -400, -50), FVector(0, -400, -200),
+		FVector(0, -200, 100), FVector(0, -300, 100)
 
 
 	};
-
-	//// H
-	//for (int32 i = -2; i <= 2; ++i)
-	//{
-	//	HAPatternShape.Add(FVector(0, -200, i * 100)); // 좌측 세로선
-	//	HAPatternShape.Add(FVector(0, 0, i * 100)); // 우측 세로선
-	//	if (i == 0)
-	//	{
-	//		HAPatternShape.Add(FVector(0, -100, i * 100)); // 중앙 가로선
-	//	}
-	//}
-
-	//// A
-	//for (int32 i = -2; i <= 2; ++i)
-	//{
-	//	HAPatternShape.Add(FVector(0, 200 + i * 100, i * 100)); // 좌측 대각선
-	//	HAPatternShape.Add(FVector(0, 200 - i * 100, i * 100)); // 우측 대각선
-	//	if (i == 0 || i == -1)
-	//	{
-	//		HAPatternShape.Add(FVector(0, 200 - i * 100, 0)); // 중앙 가로선
-	//	}
-	//}
 
 	for (const FVector& Offset : HAPatternShape)
 	{
@@ -878,10 +852,15 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
 
+	// 웃음 효과음 재생
+	if (HaSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HaSound, BossLocation);
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("HA Pattern"));
 	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
-
 
 ////////////////////////////////////////////////// 패턴들 특성 //////////////////////////////////////////////////
 void ABoss::InitializeDefaultPatterns()
@@ -970,7 +949,7 @@ void ABoss::InitializeDefaultPatterns()
 	// HA 패턴
 	FBulletHellPattern HAPattern;
 	HAPattern.PatternType = EPatternType::HA;
-	HAPattern.NumberOfBullets = 25; // "HA" 패턴의 점 수에 맞춰서 설정
+	HAPattern.NumberOfBullets = 23; // "HA" 패턴의 점 수에 맞춰서 설정
 	HAPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(HAPattern);
 }
