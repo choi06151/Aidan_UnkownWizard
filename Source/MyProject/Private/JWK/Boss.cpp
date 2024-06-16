@@ -843,16 +843,6 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 		//FVector(0, -100, 200), FVector(0, -100, 100), FVector(0, -100, 0), FVector(0, -100, -100),
 		//FVector(0, -100, -200), FVector(0, -100, -300), FVector(0, -200, 0)
 
-		//// "H"
-		//FVector(0, 200, 300), FVector(0, 100, 200), FVector(0, 200, 200), FVector(0, 0, 100),
-		//FVector(0, 200, 100), FVector(0, -100, 0), FVector(0, -200, -100), FVector(0, -200, -200),
-		//FVector(0, -100, -200), FVector(0, -200, -300), FVector(0, 0, -100), FVector(0, 100, -200),
-		//FVector(0, 200, -300), FVector(0, 100, 0), FVector(0, -100, 100),
-		//// "A"
-		//FVector(0, -300, 300), FVector(0, -300, 200), FVector(0, -300, 100), FVector(0, -300, 0),
-		//FVector(0, -300, -100), FVector(0, -300, -200), FVector(0, -300, -300), FVector(0, -100, 300),
-		//FVector(0, -100, 200), FVector(0, -100, 100), FVector(0, -100, 0), FVector(0, -100, -100),
-		//FVector(0, -100, -200), FVector(0, -100, -300), FVector(0, -200, 0)
 
 	};
 
