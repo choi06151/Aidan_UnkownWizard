@@ -223,7 +223,7 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 
 		// FireRate 설정 (템포에 맞춰 조정)
 		float BeatLength = 60.0f / Tempo; // 한 비트의 길이
-		FireRate = BeatLength * 4; // 4/4 박자를 위해 4배로 설정
+		FireRate = BeatLength * 6; // 6/4 박자를 위해 4배로 설정
 
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Loaded pre-analyzed conditions for %s. Total Duration: %f seconds"), *MusicTitle, TotalDuration);
 
