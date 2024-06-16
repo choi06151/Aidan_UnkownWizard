@@ -107,6 +107,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* batonMesh;
 	
+private:
+	FVector InitialLocation;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Floating")
+	class UTimelineComponent* FloatingTimeline;
+
+	UPROPERTY(EditAnywhere, Category = "Floating")
+	class UCurveFloat* FloatCurve;
+
+	UFUNCTION()
+	void HandleFloatProgress(float Value);
 	
 	////////////////////////////////////// Boss Play 관련 bool //////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되었는가?
