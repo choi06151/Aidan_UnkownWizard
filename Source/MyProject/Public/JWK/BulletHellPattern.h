@@ -21,7 +21,17 @@ enum class EPatternType : uint8
 	// 유도 오각형
 	Octagon,
 	// 천사 - 수정
-	Angel 
+	Angel,
+	// 하트
+	Heart,
+	// 민들레
+	Dandelion,  
+	// HA
+	HA,      
+	// 원형 이동
+	CircularMoving,  
+	// 바람개비
+	Pinwheel          
 };
 
 USTRUCT(BlueprintType)
@@ -49,4 +59,11 @@ public:
 	float ZigzagFrequency; // 지그재그
 
 	float CrescentAngle; // 반달
+
+	// 민들레 패턴에 필요한 변수
+	float SpreadDelay; // 퍼지기 시작하는 시간
+	// 바람개비 패턴에 필요한 변수
+	TArray<FVector> InitialPositions; // 초기 위치 배열
+	TArray<float> OrbitSpeeds; // 궤도별 회전 속도
+	TArray<float> OrbitRadii; // 궤도별 반지름
 };
