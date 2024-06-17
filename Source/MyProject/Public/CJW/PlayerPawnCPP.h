@@ -34,6 +34,15 @@ public:
 	float HP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SCORE;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MAXSCORE;
+public:
+	UFUNCTION(BlueprintCallable)
+	void UpdateMaxScore();
 
-	
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartTutorialStageCpp();
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartGamePlayStageCpp();
+
 };

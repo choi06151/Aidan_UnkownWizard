@@ -13,7 +13,7 @@
 #include "Components/WidgetComponent.h"
 #include "JWK/Boss.h"
 #include "SEB/GameOverUI.h"
-
+#include "CJW/PlayerPawnCPP.h"
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
@@ -117,6 +117,12 @@ void USelectStageUI::OnPlayClicked()
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 
+
+
+	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+	PlayerInfo->StartGamePlayStageCpp();
+
+	//GameStartUIClass->PlayerInfo->StartGamePlayStageCpp();
 	ABoss* Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if (Boss)
 	{

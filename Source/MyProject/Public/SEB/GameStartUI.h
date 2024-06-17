@@ -37,4 +37,7 @@ private:
 
 	UPROPERTY()
 	class ABoss* Boss;
+
+	UPROPERTY()
+	class APlayerPawnCPP* PlayerInfo;
 };
