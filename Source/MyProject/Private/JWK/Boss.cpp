@@ -405,7 +405,7 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
@@ -1042,11 +1042,11 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 		FVector(0, 50, 400), FVector(0, 50, 250), FVector(0, 50, 100), FVector(0, 50, -50), FVector(0, 50, -200),
 
 		// "A"
-		FVector(0, -250, 400),FVector(0, -150, 250),
-		FVector(0, -100, 100), FVector(0, -100, -50), FVector(0, -100, -200),
-		FVector(0, -350, 250),
-		FVector(0, -400, 100), FVector(0, -400, -50), FVector(0, -400, -200),
-		FVector(0, -200, 100), FVector(0, -300, 100)
+		FVector(0, -350, 400),
+		FVector(0, -300, 250),FVector(0, -250, 100),
+		FVector(0, -200, -50), FVector(0, -150, -200),		
+		FVector(0, -400, 250), FVector(0, -450, 100), FVector(0, -500, -50), FVector(0, -550, -200),
+		FVector(0, -300, 100), FVector(0, -400, 100)
 
 
 	};
@@ -1085,11 +1085,7 @@ void ABoss::FireCircularMovingPattern(const FBulletHellPattern& Pattern)
 		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
-			Bullet->CircularCenter = SpawnLocation; // 초기 위치를 중심으로 설정
-			Bullet->CircularRadius = Pattern.PatternSize;
-			Bullet->CircularSpeed = Pattern.BulletSpeed;
-			Bullet->CurrentAngle = 0.0f;
-			Bullet->ForwardDirection = GetActorForwardVector(); // 보스의 전진 방향 설정
+			Bullet->SetCircularParams(SpawnLocation, Pattern.PatternSize, Pattern.OrbitSpeed, GetActorForwardVector()); // OrbitSpeed 추가
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("CircularMoving"));
@@ -1267,8 +1263,9 @@ void ABoss::InitializeDefaultPatterns()
 	// CircularMoving 패턴 추가
 	FBulletHellPattern CircularMovingPattern;
 	CircularMovingPattern.PatternType = EPatternType::CircularMoving;
-	CircularMovingPattern.NumberOfBullets = 12; // 예시로 3개의 총알을 발사
-	CircularMovingPattern.BulletSpeed = 200.0f; // 원형 이동의 속도
+	CircularMovingPattern.NumberOfBullets = 12; // 예시로 12개의 총알을 발사
+	CircularMovingPattern.BulletSpeed = 200.0f; // 앞으로 전진하는 속도
+	CircularMovingPattern.OrbitSpeed = 50.0f; // 원을 그리는 속도
 	CircularMovingPattern.PatternSize = 200.0f; // 원형 반지름
 	// 초기 위치 설정
 	CircularMovingPattern.InitialPositions = {

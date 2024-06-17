@@ -146,21 +146,6 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	}
 	else
 	{
-		//// 기존 총알 이동 로직
-		//FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
-
-		//// 기존 진동 운동을 적용한 이동 벡터 계산
-		//float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-		//float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-
-		//FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
-
-		//// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
-		//FVector NewLocation = GetActorLocation() + MoveDelta;
-
-		//// 새로운 위치로 총알 이동
-		//SetActorLocation(NewLocation);
-
 		// 현재 총알의 속도를 계산
 		FVector BulletVelocity = GetActorForwardVector() * movementComp->InitialSpeed;
 		//FVector BulletVelocity = InitialDirection * movementComp->InitialSpeed;
@@ -233,7 +218,7 @@ void ABullet_Pooled::SetCircularParams(const FVector& Center, float Radius, floa
 {
 	CircularCenter = Center;
 	CircularRadius = Radius;
-	CircularSpeed = Speed;
+	CircularSpeed = OrbitSpeed; // 원을 그리는 속도
 	InitialDirection = InitialDir;
 	CurrentAngle = 0.0f;
 }

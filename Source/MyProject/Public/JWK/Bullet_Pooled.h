@@ -90,8 +90,12 @@ public:
 	float CurrentAngle; // 현재 각도
 	FVector ForwardDirection; // 총알의 전진 방향
 
-	void SetCircularParams(const FVector& Center, float Radius, float Speed, const FVector& InitialDir);
-	
+	void SetCircularParams(const FVector& Center, float Radius, float OrbitSpeed, const FVector& InitialDir);
+
+	// 0617
+	float OrbitSpeed; // 궤도 속도를 나타내는 새로운 변수
+
+
 protected:
 	// 총알의 활성화 상태
 	bool Active;

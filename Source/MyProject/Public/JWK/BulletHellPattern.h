@@ -66,4 +66,7 @@ public:
 	TArray<FVector> InitialPositions; // 초기 위치 배열
 	TArray<float> OrbitSpeeds; // 궤도별 회전 속도
 	TArray<float> OrbitRadii; // 궤도별 반지름
+
+	// 원을 그리는 속도를 위한 멤버 변수 추가 0617
+	float OrbitSpeed;
 };
