@@ -164,10 +164,7 @@ void ABoss::BeginPlay()
 
 	/////////////음악 재생을 위해
 	if (Music)
-	{
 		MusicAudioComponent->SetSound(Music);
-
-	}
 
 	// StartFiring();
 	// FireBullet();
@@ -221,6 +218,8 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ABoss::HandleFloatProgress(float Value)
 {
 	FVector NewBossLocation = InitialLocation;
+	float Time = GetWorld()->GetTimeSeconds();
+	float CurveValue = FMath::Sin(Time) * 100.0f;
 	NewBossLocation.Z += Value * 20.0f; // Adjust the multiplier to control the float height
 	SetActorLocation(NewBossLocation);
 }
@@ -405,21 +404,21 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighArray[i]->AsNumber() > 0.2f)

@@ -139,8 +139,11 @@ public:
 	////////////////////////////////////// Boss Play 관련 bool //////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되었는가?
 	bool bIsGameStart = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 포탈이 열렸는가??
+	bool bIsPortalCurtainOpned = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 움직이는가?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 보스가 앞으로 움직이는가?
 	bool bIsWalk = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 목적지에 도달했는가?
