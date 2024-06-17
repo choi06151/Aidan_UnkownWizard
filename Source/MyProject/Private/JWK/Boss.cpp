@@ -164,10 +164,7 @@ void ABoss::BeginPlay()
 
 	/////////////음악 재생을 위해
 	if (Music)
-	{
 		MusicAudioComponent->SetSound(Music);
-
-	}
 
 	// StartFiring();
 	// FireBullet();
@@ -221,6 +218,8 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ABoss::HandleFloatProgress(float Value)
 {
 	FVector NewBossLocation = InitialLocation;
+	float Time = GetWorld()->GetTimeSeconds();
+	float CurveValue = FMath::Sin(Time) * 100.0f;
 	NewBossLocation.Z += Value * 20.0f; // Adjust the multiplier to control the float height
 	SetActorLocation(NewBossLocation);
 }
