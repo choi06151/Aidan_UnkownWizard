@@ -1,5 +1,6 @@
 #include "JWK/Boss.h"
 
+#include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JWK/BossFSM.h"
 #include "Kismet/GameplayStatics.h"
@@ -93,12 +94,17 @@ ABoss::ABoss()
 
 	/* 추가 예정 */
 	PatternDelegates.Add(EPatternType::Angel, FPatternDelegate::CreateUObject(this, &ABoss::FireAngelPattern));
+
+
+	//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
+	FloatingTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("FloatingTimeline"));
 }
 
 void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 	if (BulletPatterns.Num() == 0)
 		InitializeDefaultPatterns();
 
@@ -109,6 +115,26 @@ void ABoss::BeginPlay()
 		return;
 	}
 
+	//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
+	InitialLocation = GetActorLocation();
+
+	if (FloatCurve)
+	{
+		FOnTimelineFloat ProgressFunction;
+		ProgressFunction.BindUFunction(this, FName("HandleFloatProgress"));
+
+		FloatingTimeline->AddInterpFloat(FloatCurve, ProgressFunction);
+		FloatingTimeline->SetLooping(true);
+		FloatingTimeline->PlayFromStart();
+	}
+
+	// boss의 하반신 안보이게
+	USkeletalMeshComponent* meshComp = GetMesh();
+	FName LeftLeg = TEXT("thigh_l");
+	FName RightLeg = TEXT("thigh_R");
+	meshComp->HideBoneByName(LeftLeg, PBO_None);
+	meshComp->HideBoneByName(RightLeg, PBO_None);
+	
 	// StartFiring();
 	// FireBullet();
 }
@@ -119,12 +145,15 @@ void ABoss::Tick(float DeltaTime)
 
 	if(bIsMusicStart)
 	{
-		bIsMusicStart = false;
+		bIsMusicStart = false;	
 		SpawnWidget->MusicPlay();
 	}
 
 	if(bThrowBaton)
 		ThrowBaton();
+
+	//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
+	FloatingTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
 	
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// TimeElapsed += DeltaTime;
@@ -151,6 +180,15 @@ void ABoss::Tick(float DeltaTime)
 void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+
+//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
+void ABoss::HandleFloatProgress(float Value)
+{
+	FVector NewBossLocation = InitialLocation;
+	NewBossLocation.Z += Value * 20.0f; // Adjust the multiplier to control the float height
+	SetActorLocation(NewBossLocation);
 }
 
 //////////////////////////////////////// 시작 커튼 애니메이션 관련 ////////////////////////////////////////
@@ -229,7 +267,8 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 			UGameplayStatics::PlaySound2D(this, Music);
 
 			// // 탄막 발사 시작
-			StartFiring();
+			// StartFiring();
+			FireBullet();
 		}
 		else
 		{

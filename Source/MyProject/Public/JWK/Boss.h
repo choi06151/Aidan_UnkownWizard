@@ -107,6 +107,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* batonMesh;
 	
+private:
+	FVector InitialLocation;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Floating")
+	class UTimelineComponent* FloatingTimeline;
+
+	UPROPERTY(EditAnywhere, Category = "Floating")
+	class UCurveFloat* FloatCurve;
+
+	UFUNCTION()
+	void HandleFloatProgress(float Value);
 	
 	////////////////////////////////////// Boss Play 관련 bool //////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되었는가?
@@ -127,7 +139,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 공격과 동시에 음악이 시작되었는가??
 	bool bIsMusicStart = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 체력 이하로 떨어졌을 때 다음 페이즈로 진입했는가?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 조건 달성 시   다음 페이즈로 진입했는가?
 	bool bIsPhase = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 페이즈 진입 후 지휘봉을 던지는가?
