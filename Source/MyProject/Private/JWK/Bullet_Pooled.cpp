@@ -109,30 +109,15 @@ void ABullet_Pooled::Deactivate()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ABullet_Pooled::MoveBullet(float DeltaTime)
 {
-	// 바람개비 패턴
-	if (PatternType == EPatternType::Pinwheel)
+	// 바람개비 혹은 움직이는 원 패턴일 경우
+	if (PatternType == EPatternType::Pinwheel || PatternType == EPatternType::CircularMoving)
 	{
-		// 바람개비 패턴
+		// 각도 업데이트
 		CurrentAngle += CircularSpeed * DeltaTime;
-		float Rad = FMath::DegreesToRadians(CurrentAngle);
-		FVector CircularOffset = FVector(0.0f, FMath::Cos(Rad) * CircularRadius, FMath::Sin(Rad) * CircularRadius);
+		float Radian = FMath::DegreesToRadians(CurrentAngle);
 
-		// 앞으로 나아가는 거리 계산
-		FVector ForwardMovement = InitialDirection * movementComp->InitialSpeed * DeltaTime;
-
-		// 새로운 위치 계산
-		FVector NewLocation = CircularCenter + CircularOffset + ForwardMovement;
-		SetActorLocation(NewLocation);
-
-		// CircularCenter를 앞으로 나아가는 만큼 갱신
-		CircularCenter += ForwardMovement;
-	}
-	// 원형 이동 패턴
-	else if (PatternType == EPatternType::CircularMoving)
-	{
-		CurrentAngle += CircularSpeed * DeltaTime;
-		float Rad = FMath::DegreesToRadians(CurrentAngle);
-		FVector CircularOffset = FVector(0.0f, FMath::Cos(Rad) * CircularRadius, FMath::Sin(Rad) * CircularRadius);
+		// 원형 궤도 이동 계산
+		FVector CircularOffset = FVector(0.0f, FMath::Cos(Radian) * CircularRadius, FMath::Sin(Radian) * CircularRadius);
 
 		// 앞으로 나아가는 거리 계산
 		FVector ForwardMovement = ForwardDirection * movementComp->InitialSpeed * DeltaTime;

@@ -38,11 +38,6 @@ void UTestUI::NativeConstruct()
 
 void UTestUI::OnMusic1Clicked()
 {
-	//FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/butterfly.butterfly'");
-	//// JsonFilePath를 절대 경로로 변환
-	//FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/butterfly.json");
-	//PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
-	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1111Clicked"));
 	if (Boss)
 	{
 		Boss->StopMusic();
@@ -55,11 +50,6 @@ void UTestUI::OnMusic1Clicked()
 
 void UTestUI::OnMusic2Clicked()
 {
-	//FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/Elise.Elise'");
-	//// JsonFilePath를 절대 경로로 변환
-	//FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/Elise.json");
-	//PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
-	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic22222Clicked"));
 	if (Boss)
 	{
 		Boss->StopMusic();
@@ -72,21 +62,15 @@ void UTestUI::OnMusic2Clicked()
 
 void UTestUI::OnMusic3Clicked()
 {
-	//FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/Lacrimosa.Lacrimosa'");
-	//// JsonFilePath를 절대 경로로 변환
-	//FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + TEXT("Content/Data/Lacrimosa.json");
-	//PlayMusicAndLoadData(MusicFilePath, JsonFilePath);
-	//UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3333Clicked"));
 	if (Boss)
 	{
 		Boss->StopMusic();
-		FString MusicTitle = TEXT("Requiem ? Lacrimosa");
+		FString MusicTitle = TEXT("Requiem - Lacrimosa");
 		FString MusicFilePath = TEXT("/Game/Music/Lacrimosa.Lacrimosa");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3Clicked"));
 	}
 }
-
 
 void UTestUI::OnPreAnalyzeAllClicked()
 {
@@ -96,5 +80,3 @@ void UTestUI::OnPreAnalyzeAllClicked()
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnPreAnalyzeAllClicked: All music data pre-analyzed."));
 	}
 }
-
-

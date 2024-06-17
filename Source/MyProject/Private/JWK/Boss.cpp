@@ -405,28 +405,28 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (HighArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 
@@ -1115,6 +1115,7 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 		return;
 	}
 
+	int32 OrbitIndex = 0;
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
 		FVector InitialOffset = Pattern.InitialPositions.IsValidIndex(i) ? Pattern.InitialPositions[i] : FVector::ZeroVector;
@@ -1126,7 +1127,11 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 			Bullet->SetPatternType(Pattern.PatternType);
 
 			// 궤도 속도와 반지름 설정
-			int OrbitIndex = FMath::Clamp(i / 4, 0, Pattern.OrbitSpeeds.Num() - 1);
+			if (i % 4 == 0 && i != 0) // 4개의 총알마다 다음 궤도 속도와 반지름을 사용
+			{
+				OrbitIndex++;
+			}
+
 			if (Pattern.OrbitSpeeds.IsValidIndex(OrbitIndex) && Pattern.OrbitRadii.IsValidIndex(OrbitIndex))
 			{
 				Bullet->SetCircularParams(BossLocation, Pattern.OrbitRadii[OrbitIndex], Pattern.OrbitSpeeds[OrbitIndex], GetActorForwardVector());
@@ -1137,7 +1142,7 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("FirePinwheel"));
+	UE_LOG(LogTemp, Warning, TEXT("Pinwheel"));
 	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
