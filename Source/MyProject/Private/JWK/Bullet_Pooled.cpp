@@ -218,7 +218,7 @@ void ABullet_Pooled::SetCircularParams(const FVector& Center, float Radius, floa
 {
 	CircularCenter = Center;
 	CircularRadius = Radius;
-	CircularSpeed = OrbitSpeed; // 원을 그리는 속도
+	CircularSpeed = Speed; // 원을 그리는 속도 설정
 	InitialDirection = InitialDir;
 	CurrentAngle = 0.0f;
 }

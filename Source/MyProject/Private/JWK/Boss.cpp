@@ -1085,7 +1085,11 @@ void ABoss::FireCircularMovingPattern(const FBulletHellPattern& Pattern)
 		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
-			Bullet->SetCircularParams(SpawnLocation, Pattern.PatternSize, Pattern.OrbitSpeed, GetActorForwardVector()); // OrbitSpeed 추가
+			Bullet->CircularCenter = SpawnLocation; // 초기 위치를 중심으로 설정
+			Bullet->CircularRadius = Pattern.PatternSize;
+			Bullet->CircularSpeed = Pattern.OrbitSpeed; // 원을 그리는 속도 설정
+			Bullet->CurrentAngle = 0.0f;
+			Bullet->ForwardDirection = GetActorForwardVector(); // 보스의 전진 방향 설정
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("CircularMoving"));
@@ -1256,14 +1260,14 @@ void ABoss::InitializeDefaultPatterns()
 	// HA 패턴
 	FBulletHellPattern HAPattern;
 	HAPattern.PatternType = EPatternType::HA;
-	HAPattern.NumberOfBullets = 23; // "HA" 패턴의 점 수에 맞춰서 설정
+	HAPattern.NumberOfBullets = 23;
 	HAPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(HAPattern);
 
 	// CircularMoving 패턴 추가
 	FBulletHellPattern CircularMovingPattern;
 	CircularMovingPattern.PatternType = EPatternType::CircularMoving;
-	CircularMovingPattern.NumberOfBullets = 12; // 예시로 12개의 총알을 발사
+	CircularMovingPattern.NumberOfBullets = 12; 
 	CircularMovingPattern.BulletSpeed = 200.0f; // 앞으로 전진하는 속도
 	CircularMovingPattern.OrbitSpeed = 50.0f; // 원을 그리는 속도
 	CircularMovingPattern.PatternSize = 200.0f; // 원형 반지름
