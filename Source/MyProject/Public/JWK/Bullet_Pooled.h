@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BulletHellPattern.h"
 #include "GameFramework/Actor.h"
 #include "Bullet_Pooled.generated.h"
 
@@ -58,6 +59,38 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BulletHP")
 	int bulletHP;
+
+	//////// 추가
+	// 총알의 패턴 타입 설정 함수 
+	void SetPatternType(EPatternType Type);
+
+	// 총알의 패턴 타입 반환 함수
+	EPatternType GetPatternType() const;
+
+	// 총알을 이동시키는 함수
+	void MoveBullet(float DeltaTime);
+
+	float TimeSinceSpawned; // 생성된 이후 경과 시간
+	int32 FrameCounter; //  프레임 카운터
+	
+	// 민들레 패턴에 필요한 변수들
+	FVector InitialDirection; // 초기 방향
+	bool bShouldSpread; // 퍼지기 시작할지 여부
+	float SpreadDelay; // 퍼지기 시작하는 시간
+	float TimeSinceFired; // 발사된 후 경과 시간
+	FRotator SpreadRotation; // 퍼질 때 사용할 회전 각도
+
+	void SetSpreadParams(bool bSpread, float Delay, FRotator Rotation, EPatternType Type);
+	void CheckAndSpread(); // 퍼지는 로직을 처리하는 함수
+
+	// 원형 이동 패턴에 필요한 변수들
+	FVector CircularCenter; // 원형 이동의 중심
+	float CircularRadius; // 원형 반지름
+	float CircularSpeed; // 원형 이동 속도
+	float CurrentAngle; // 현재 각도
+	FVector ForwardDirection; // 총알의 전진 방향
+
+	void SetCircularParams(const FVector& Center, float Radius, float Speed, const FVector& InitialDir);
 	
 protected:
 	// 총알의 활성화 상태
@@ -72,6 +105,20 @@ protected:
 	// 총알 수명 타이머 핸들
 	FTimerHandle LifespanTimer;
 
+	////////추가
+	// 총알의 초기 위치
+	FVector InitialLocation;
+
+	// 총알의 패턴 타입
+	EPatternType PatternType;
+
+	UPROPERTY(EditAnywhere)
+	float DistanceTraveled = 0.0f; // 이동 거리
+	float ElapsedTime; // 경과 시간을 저장하는 변수
+
+
+
+
 private:
 	// 움직임 패턴 관련 변수 초기화
 	UPROPERTY(EditAnywhere)
@@ -82,5 +129,4 @@ private:
 	class URotatingMovementComponent* movement;
 
 	
-
 };
