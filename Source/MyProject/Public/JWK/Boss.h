@@ -74,6 +74,22 @@ struct FFinalPatternData
 	}
 };
 
+// 음악 분석 데이터를 저장하는 구조체 
+USTRUCT(BlueprintType)
+struct FMusicAnalysisData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Music Analysis")
+	float Tempo;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Music Analysis")
+	TArray<FFinalPatternData> FinalPatternDataArray;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Music Analysis")
+	float TotalDuration;  // 노래의 전체 길이 (초 단위)
+};
+
 UCLASS()
 class MYPROJECT_API ABoss : public ACharacter
 {
@@ -178,8 +194,7 @@ public:
 	void UpdatePatternConditions();
 
 	// 미리 분석된 결과를 저장하는 TMap
-	//TMap<FString, TArray<FPatternConditions>> AnalyzedDataMap;
-	TMap<FString, TPair<float, TArray<FFinalPatternData>>> AnalyzedDataMap; // 템포값까지 저장
+	TMap<FString, FMusicAnalysisData> AnalyzedDataMap; // 분석된 데이터를 저장할 맵
 
 	// PreAnalyzeMusicData 함수에서 저장된 최종 패턴 데이터를 저장할 변수
 	TArray<FFinalPatternData> FinalPatternData;
@@ -192,6 +207,31 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class ABullet_Pooled* bullet;
+
+	// 노래의 전체 길이를 반환하는 함수 0613
+	UFUNCTION(BlueprintCallable, Category = "Music Analysis")
+	float GetTotalDuration(const FString& MusicTitle) const;
+
+	// 노래가 끝났음을 감지하는 변수 0613
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	bool bIsMusicFinished;
+
+	// 노래가 끝났음을 감지하는 함수 0613
+	UFUNCTION()
+	void OnMusicFinished();
+
+	/////////// 재생 되고 있는 노래 조절할 수 있는 
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void SetMusicVolume(float Volume);
+
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void SetMusicSpeed(float Speed);
+
+	UFUNCTION(BlueprintCallable, Category = "Music")
+	void PlayMusic();
+
+	// 게임 내에서 음악과 탄막 발사를 중지할 필요가 있을 때 호출할 함수~
+	void StopMusic();
 
 	void ThrowBaton();
 	
@@ -240,6 +280,25 @@ private:
 	// 천사
 	void FireAngelPattern(const FBulletHellPattern& Pattern);
 
+
+	//// 추가 한 패턴들
+	// 하트
+	void FireHeartPattern(const FBulletHellPattern& Pattern); 
+	// 하트 모양 정의
+	void DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize);
+
+	//민들레
+	void FireDandelionPattern(const FBulletHellPattern& Pattern);
+
+	//HA
+	void FireHAPattern(const FBulletHellPattern& Pattern);
+
+	// 움직이는 원
+	void FireCircularMovingPattern(const FBulletHellPattern& Pattern);
+
+	// 바람개비
+	void FirePinwheelPattern(const FBulletHellPattern& Pattern); 
+
 	
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
@@ -268,6 +327,17 @@ private:
 	TArray<FPatternConditions> PatternConditions;
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
+
+	////////////////////////////////////노래 재생관련 추가추가
+	UPROPERTY(EditAnywhere, Category = "Music")
+	USoundBase* Music;
+
+	UPROPERTY(VisibleAnywhere, Category = "Music")
+	UAudioComponent* MusicAudioComponent;
+
+	//////////////////////탄막 효과음 추가
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundWave* HaSound;
 
 
 	FTimerHandle TimerHandle;
