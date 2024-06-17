@@ -2,27 +2,66 @@
 
 
 #include "SEB/LeftUI.h"
+
+#include "CJW/PlayerPawnCPP.h"
 #include "Components/TextBlock.h"
+#include "Components/WidgetComponent.h"
+#include "JWK/Boss.h"
 #include "Kismet/GameplayStatics.h"
+#include "SEB/SpawnWidget.h"
+
+class UWidgetComponent;
+class ABoss;
 
 void ULeftUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	
 	// 시간 변수 초기화
 	TimeElapsed = 0.0f;
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	Player = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+}
 
-	// 타이머 설정: 1초마다 UpdateTimer 함수를 호출
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ULeftUI::UpdateTImer, 0.01f, true);
-
-
-	
+void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	if(Boss->bIsAttackStart && Boss)
+	{
+		TimeElapsed += InDeltaTime;
+		
+		if(TimeElapsed >= TimeCheck)
+		{
+			UpdateTImer();
+			
+		}
+	}
+	if(Boss->bIsMusicFinished)
+	{
+		Boss->bIsAttackStart = false;
+		
+		UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
+		WidgetComponent->SetWidgetClass(GameClearUIClass);
+		Boss->bIsMusicFinished = false;
+	}
+	int32 hp = Player->HP;
+	if(hp <= 0)
+	{
+		Boss->bIsAttackStart = false;
+		if(SpawnWidget)
+		{
+			UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
+			WidgetComponent->SetWidgetClass(GameOverUIClass);
+		}
+	}
 }
 
 void ULeftUI::UpdateTImer()
 {
 	// 시간 증가
-	TimeElapsed += 0.01f;
+	TimeCheck += 0.01f;
 
 	// 타이머 업데이트 로직
 	if (PlayTime)
@@ -41,4 +80,6 @@ FString ULeftUI::GetFormattedTime() const
 
 	return FString::Printf(TEXT("%02d:%02d:%02d"), Minutes, Seconds, Centiseconds);
 }
+
+
 
