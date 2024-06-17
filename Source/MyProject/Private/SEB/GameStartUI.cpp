@@ -8,7 +8,7 @@
 #include "SEB/SpawnWidget.h"
 #include "Components/WidgetComponent.h"
 #include "JWK/Boss.h"
-
+#include "CJW/PlayerPawnCPP.h"
 void UGameStartUI::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -18,6 +18,7 @@ void UGameStartUI::NativeConstruct()
 	TutorialBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnTutorialBtnClicked);
 
 	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
 }
 
 void UGameStartUI::OnStartBtnClicked()
@@ -40,9 +41,5 @@ void UGameStartUI::OnQuitBtnClicked()
 
 void UGameStartUI::OnTutorialBtnClicked()
 {
-	// 원하는 맵 이름을 문자열로 지정
-	FString LevelName = TEXT("TutorialTestMap");
-
-	// 월드를 가져와서 맵 변경 함수 호출
-	UGameplayStatics::OpenLevel(this, FName(*LevelName));
+	PlayerInfo->StartTutorialStageCpp();
 }
