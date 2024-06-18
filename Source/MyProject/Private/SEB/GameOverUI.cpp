@@ -52,6 +52,8 @@ void UGameOverUI::NativeConstruct()
 	PlayTime->SetText(SpawnLeftWidget->FinalPlayTime);	
 	//Set Count
 	CurrentCount = 0;
+	Player->UpdateMaxScore();
+	Player->UpdateMaxScoreCpp();
 
 	SetMyScore(Player->SCORE);
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.0001f, true);
@@ -99,6 +101,7 @@ void UGameOverUI::UpdateCountText()
 void UGameOverUI::SetMyScore(int32 score)
 {
 	MyScoreCount = score;
+	//최신화 
 }
 
 

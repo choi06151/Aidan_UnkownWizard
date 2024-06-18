@@ -46,4 +46,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartGamePlayStageCpp();
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateMaxScoreCpp();
+
 };
