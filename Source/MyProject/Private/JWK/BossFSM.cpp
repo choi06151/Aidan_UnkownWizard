@@ -90,12 +90,16 @@ void UBossFSM::TickCommand()
 	if (me->bIsPhase)
 		SetState(EBossState::PHASE_2);
 
+	if(me->bGameOver)
+		SetState(EBossState::IDLE);
 	// UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
 //////////////////////////////////////// Phase_2 ////////////////////////////////////////
 void UBossFSM::TickPhase_2()
 {
+	if(me->bGameOver)
+		SetState(EBossState::IDLE);
 	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 

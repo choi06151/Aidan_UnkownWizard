@@ -243,7 +243,6 @@ public:
 
 	void ThrowBaton();
 	
-private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
 	void StartFiring();
