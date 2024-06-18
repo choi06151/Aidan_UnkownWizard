@@ -1,48 +1,41 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Bullet_Pooled.h"
 #include "Components/ActorComponent.h"
+#include "Bullet_Pooled.h"
 #include "Spawn_Bullet.generated.h"
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MYPROJECT_API USpawn_Bullet : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	USpawn_Bullet();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// Pool에서 Bullet Spawn
+	// Bullet을 Pool에서 Spawn하는 함수
 	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed);
 
-	// 풀에 사용할 bullet subClass
-	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
-	TSubclassOf<class ABullet_Pooled> PooledBulletSubclass;
-
-	// pool의 크기
-	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
-	int PoolSize = 20;
-
-	// bullet의 수명
-	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
-	float PooledBulletLifeSpan = 15.0f;
-
-	class ABoss* boss;
-protected:
-	// Bullet의 pool array
-	TArray<ABullet_Pooled*> BulletPool;
-
-	// Spawn된 Bullet index array
-	TArray<int> SpawnedPoolIndexes;
-
-	// Bullet이 비활성화일 때 호출되는 함수
+	// Bullet이 비활성화될 때 호출되는 함수
+	UFUNCTION()
 	void OnPooledBulletDespawn(ABullet_Pooled* Bullet);
+
+private:
+	UPROPERTY(EditAnywhere, Category="Bullet Pool")
+	TSubclassOf<ABullet_Pooled> PooledBulletSubclass;
+
+	UPROPERTY(EditAnywhere, Category="Bullet Pool")
+	int32 PoolSize;
+
+	UPROPERTY(EditAnywhere, Category="Bullet Pool")
+	float PooledBulletLifeSpan;
+
+	TArray<ABullet_Pooled*> BulletPool;
+	TArray<int32> SpawnedPoolIndexes;
 };
