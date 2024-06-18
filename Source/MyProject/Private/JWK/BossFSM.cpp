@@ -66,7 +66,7 @@ void UBossFSM::TickIdle()
 //////////////////////////////////////// Walk ////////////////////////////////////////
 void UBossFSM::TickWalk()
 {
-	ai->MoveToLocation(FVector(1480.000000, 650.000000, 169.999991), 0.1f);
+	ai->MoveToLocation(FVector(1480.000000, 650.000000, 170), 0.1f);
 	if(me->bIsArrive)
 		SetState(EBossState::IDLE);
 	
@@ -99,17 +99,12 @@ void UBossFSM::TickPhase_2()
 	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 
-//////////////////////////////////////// Damaged ////////////////////////////////////////
-void UBossFSM::TakeDamaged(int damage)
+//////////////////////////////////////// GmaeClear ////////////////////////////////////////
+void UBossFSM::GameEnd()
 {
-	bossHP -= damage;
-
-	if(bossHP <=0)
-	{
-		me->bIsStageEnd = true;
-		/* 죽음 Montage, Sound 추가 */
-		me->PlayAnimMontage(deadMontage, 1, FName("Dead"));
-	}
+	me->bClearGame = false;
+	/* 죽음 Montage, Sound 추가 */
+	me->PlayAnimMontage(deadMontage, 1, FName("Dead"));
 }
 
 void UBossFSM::SetState(EBossState next)
