@@ -171,6 +171,7 @@ void ABoss::BeginPlay()
 
 	// StartFiring();
 	// FireBullet();
+
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -559,7 +560,31 @@ void ABoss::StartFiring()
 
 void ABoss::StopFiring()
 {
-	GetWorldTimerManager().ClearTimer(FireRateTimerHandle);
+	/////////////////////////0618
+	bIsMusicFinished = true;
+	GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle);
+}
+
+void ABoss::PlayMusicOnly(const FString& MusicFilePath)
+{
+	// 음악 설정 및 재생
+	if (USoundBase* LoadedMusic = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+	{
+		// 노래 시작 시 변수 초기화
+		bIsMusicFinished = false;
+
+		// 음악을 AudioComponent에 설정
+		MusicAudioComponent->SetSound(LoadedMusic);
+
+		// 음악 재생 시작
+		PlayMusic();
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::PlayMusicOnly: Playing music: %s"), *MusicFilePath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::PlayMusicOnly: Failed to load music: %s"), *MusicFilePath);
+	}
 }
 
 void ABoss::ChangePattern()
@@ -1283,7 +1308,7 @@ void ABoss::InitializeDefaultPatterns()
 	PinwheelPattern.OrbitRadii = { 0.0f, 100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f,100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f }; // 궤도 반지름 배열
 	PinwheelPattern.OrbitSpeeds = { 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f }; // 궤도 속도 배열
 	//PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 90.0f, 90.0f, 90.0f, 180.0f, 180.0f, 180.0f, 180.0f, 270.0f, 270.0f, 270.0f, 270.0f }; // 초기 각도 배열
-	PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 10.0f, 20.0f, 30.0f, 90.0f, 100.0f, 110.0f, 120.0f, 180.0f, 190.0f, 200.0f, 210.0f, 270.0f, 280.0f, 290.0f, 300.0f }; // 초기 각도 배열
+	PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 10.0f, 20.0f, 30.0f, 90.0f, 100.0f, 110.0f, 120.0f, 180.0f, 190.0f, 200.0f, 210.0f, 270.0f, 280.0f, 290.0f, 300.0f };//멋 부림
 
 	BulletPatterns.Add(PinwheelPattern);
 }

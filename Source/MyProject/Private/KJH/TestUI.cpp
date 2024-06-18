@@ -64,11 +64,13 @@ void UTestUI::OnMusic3Clicked()
 {
 	if (Boss)
 	{
-		Boss->StopMusic();
-		FString MusicTitle = TEXT("Requiem - Lacrimosa");
+		//Boss->StopMusic();
+		//FString MusicTitle = TEXT("Requiem - Lacrimosa");
 		FString MusicFilePath = TEXT("/Game/Music/Lacrimosa.Lacrimosa");
-		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
+		//Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic3Clicked"));
+		Boss->PlayMusicOnly(MusicFilePath);
+
 	}
 }
 
