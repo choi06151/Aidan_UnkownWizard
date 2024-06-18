@@ -22,6 +22,6 @@ void ASpawnLeftWidget::BeginPlay()
 void ASpawnLeftWidget::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 

@@ -93,5 +93,5 @@ public:
 	FText MusicInfo;
 	
 	void SetSelectUIColor(int32 ScrollCount,  const FColor& ClickColor);
-	
+	ABoss* Boss;
 };
