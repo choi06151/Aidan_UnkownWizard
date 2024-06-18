@@ -164,8 +164,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 페이즈 진입 후 지휘봉을 던지는가?
 	bool bThrowBaton = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 체력이 0이 되었는가??
-	bool bIsStageEnd = false;
+
+	//////////////////////////////////////// 게임 진행 관련 ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 플레이어가 Clear하지 못하고 중간에 GameOver 했는가??
+	bool bGameOver = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 노래가 모두 끝나서 클리어를 했는가??
+	bool bClearGame = false;
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
@@ -238,7 +243,6 @@ public:
 
 	void ThrowBaton();
 	
-private:
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
 	void StartFiring();

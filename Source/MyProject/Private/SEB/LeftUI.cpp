@@ -56,7 +56,7 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if(Player->HP > 0 && Boss->bIsMusicFinished) // Game Clear
 	{
 		Boss->bIsAttackStart = false;
-		//Boss->bClearGame = true;
+		Boss->bClearGame = true;
 		SpawnLeftWidget->FinalPlayTime = PlayTime->GetText();
 		FString ScoreStr = Score->GetText().ToString();
 		SpawnLeftWidget->FinalScore = FCString::Atoi(*ScoreStr);
@@ -68,8 +68,16 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if(Player->HP <= 0 && Boss->bIsAttackStart) //Game Over
 	{
 		Boss->bIsAttackStart = false;
-		//Boss->bGameOver = true;
-		Boss->OnMusicFinished();
+		Boss->bGameOver = true;
+		// Boss->OnMusicFinished();
+
+		
+		Boss->bIsMusicFinished = true;
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::OnMusicFinished: Music has finished."));
+
+		// 노래가 끝나면 탄막 발사 중지 
+		Boss->StopFiring();
+		Boss->StopMusic();
 		if(SpawnWidget)
 		{
 			SpawnLeftWidget->FinalPlayTime = PlayTime->GetText();

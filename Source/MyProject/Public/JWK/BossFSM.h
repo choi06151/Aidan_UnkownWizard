@@ -14,30 +14,25 @@ enum class EBossState : uint8
 	COMMANDWAIT		UMETA(DisplayName = "COMMANDWAIT"),
 	COMMAND			UMETA(DisplayName = "COMMAND"),
 	PHASE_2			UMETA(DisplayName = "PHASE_2")
-	
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MYPROJECT_API UBossFSM : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UBossFSM();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// boss
 	UPROPERTY(EditAnywhere, Category = "Boss")
 	class ABoss* me;
-
-	// Animation
-	UPROPERTY(EditAnywhere, Category = "Boss")
-	class UAnimMontage* commandWait;
 
 	// Boss의 State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss")
@@ -51,26 +46,26 @@ public:
 
 	// UPROPERTY(EditAnywhere, Category = "Boss")
 	// float commandTime  = 0;
-	
+
 	////////////////////////////////////// Boss HP 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int bossMaxHP = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int bossHP = bossMaxHP;
-	
-	UFUNCTION(BlueprintCallable)
-	void TakeDamaged(int damage);
 
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* deadMontage;
 
-	
+
 	void SetState(EBossState next);
-	
+
 	void TickIdle();
 	void TickWalk();
 	void TickCommandWait();
 	void TickCommand();
 	void TickPhase_2();
+
+	UFUNCTION()
+	void GameEnd();
 };

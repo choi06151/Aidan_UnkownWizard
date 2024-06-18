@@ -19,10 +19,11 @@ public:
 	UPROPERTY()
 	class UBossFSM* bossFSM;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere , BlueprintReadWrite, Category = "Boss")
 	class ABoss* me;
-	
-	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+
+	// º¸½ºÀÇ state
+	UPROPERTY(EditAnywhere , BlueprintReadWrite, Category = "FSM")
 	EBossState state;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn_Widget")
