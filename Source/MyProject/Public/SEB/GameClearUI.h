@@ -26,6 +26,8 @@ private:
 	class UTextBlock* BestScore;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MyScore;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PlayTime;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;  
@@ -38,6 +40,7 @@ private:
 	void OnRestartClicked();
 
 	class ASpawnWidget* SpawnWidget;
+	class ASpawnLeftWidget* SpawnLeftWidget;
 	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> SelectStageUIClass;

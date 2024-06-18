@@ -114,22 +114,21 @@ void USelectStageUI::OnBackClicked()
 
 void USelectStageUI::OnPlayClicked()
 {
+	
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 
 	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
 	PlayerInfo->StartGamePlayStageCpp();
-
-	ABoss* Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if (Boss)
 	{
+		
 		Boss->bIsGameStart = true;
+		//Boss->StopMusic();
 		Boss->MusicStart();
 		
 	}
-	//우선은 GameOverUI로 넘어가도록 함. 
-	/*UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
-	WidgetComponent->SetWidgetClass(GameOverUIClass);*/
 }
 
 
@@ -151,8 +150,8 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
 
+	//	Boss->StopMusic();
 	//SpawnWidget->MusicPlay();
-	
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
 	

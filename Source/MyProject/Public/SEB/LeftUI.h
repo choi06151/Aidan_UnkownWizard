@@ -18,10 +18,7 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 private:
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UTextBlock* PlayTime;
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UTextBlock* Score;
+	
 
 	// 타이머 핸들
 	FTimerHandle TimerHandle;
@@ -32,6 +29,11 @@ private:
 	FString GetFormattedTime() const;
 
 public:
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* PlayTime;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* Score;
 	void StartTimer();
 
 	class ABoss* Boss;
@@ -39,8 +41,11 @@ public:
 	bool isCheck = false;
 
 	class ASpawnWidget* SpawnWidget;
+	class ASpawnLeftWidget* SpawnLeftWidget;
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> GameClearUIClass;
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> GameOverUIClass;
+
+	
 };

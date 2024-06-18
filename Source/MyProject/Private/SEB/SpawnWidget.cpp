@@ -53,6 +53,7 @@ void ASpawnWidget::Tick(float DeltaTime)
 
 void ASpawnWidget::MusicPlay()
 {
+	
 	FString MusicFilePath = SpecificRow->MusicFilePath;
 	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
 	FString MusicTitle = SpecificRow->MusicName;
