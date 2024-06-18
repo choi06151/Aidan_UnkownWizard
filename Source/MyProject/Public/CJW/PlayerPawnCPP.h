@@ -31,9 +31,19 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HP;
+	float HP=100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SCORE;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MAXSCORE;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateMaxScore();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartTutorialStageCpp();
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartGamePlayStageCpp();
 	
 };
