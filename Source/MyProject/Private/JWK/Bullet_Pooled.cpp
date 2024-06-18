@@ -113,8 +113,8 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 	if (PatternType == EPatternType::Pinwheel || PatternType == EPatternType::CircularMoving)
 	{
 		// 각도 업데이트
-		CurrentAngle += CircularSpeed * DeltaTime;
-		float Radian = FMath::DegreesToRadians(CurrentAngle);
+		CurrentAngle += CircularSpeed * DeltaTime; // 각도를 CircularSpeed에 따라 증가
+		float Radian = FMath::DegreesToRadians(CurrentAngle); // 각도를 라디안으로 변환
 
 		// 원형 궤도 이동 계산
 		FVector CircularOffset = FVector(0.0f, FMath::Cos(Radian) * CircularRadius, FMath::Sin(Radian) * CircularRadius);

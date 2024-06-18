@@ -516,6 +516,7 @@ void ABoss::SetMusicSpeed(float Speed)
 {
 	if (MusicAudioComponent)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::SetMusicSpeed: Setting speed to: %f"), Speed);
 		MusicAudioComponent->SetPitchMultiplier(Speed);
 	}
 }
@@ -1101,45 +1102,24 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 	BossLocation.Z = 300.0f;
 
-	// 궤도 속도와 반지름 배열의 유효성을 확인
-	if (Pattern.OrbitSpeeds.Num() == 0 || Pattern.OrbitRadii.Num() == 0)
-	{
-		UE_LOG(LogTemp, Error, TEXT("OrbitSpeeds or OrbitRadii arrays are empty!"));
-		return;
-	}
+	int32 NumBullets = Pattern.NumberOfBullets;
 
-	// 궤도 속도와 반지름 배열의 크기가 동일한지 확인
-	if (Pattern.OrbitSpeeds.Num() != Pattern.OrbitRadii.Num())
+	for (int32 i = 0; i < NumBullets; ++i)
 	{
-		UE_LOG(LogTemp, Error, TEXT("OrbitSpeeds and OrbitRadii size mismatch!"));
-		return;
-	}
+		float InitialAngle = Pattern.InitialAngles.IsValidIndex(i) ? Pattern.InitialAngles[i] : 0.0f; // 초기 각도 설정
 
-	int32 OrbitIndex = 0;
-	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
-	{
-		FVector InitialOffset = Pattern.InitialPositions.IsValidIndex(i) ? Pattern.InitialPositions[i] : FVector::ZeroVector;
+		FVector InitialOffset = FVector(Pattern.OrbitRadii[i] * FMath::Cos(FMath::DegreesToRadians(InitialAngle)), Pattern.OrbitRadii[i] * FMath::Sin(FMath::DegreesToRadians(InitialAngle)), 0.0f); // 각 총알의 궤도 반지름 및 초기 각도 설정
 		FVector SpawnLocation = BossLocation + InitialOffset;
 
 		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, GetActorRotation(), Pattern.BulletSpeed);
 		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
-
-			// 궤도 속도와 반지름 설정
-			if (i % 4 == 0 && i != 0) // 4개의 총알마다 다음 궤도 속도와 반지름을 사용
-			{
-				OrbitIndex++;
-			}
-
-			if (Pattern.OrbitSpeeds.IsValidIndex(OrbitIndex) && Pattern.OrbitRadii.IsValidIndex(OrbitIndex))
-			{
-				Bullet->SetCircularParams(BossLocation, Pattern.OrbitRadii[OrbitIndex], Pattern.OrbitSpeeds[OrbitIndex], GetActorForwardVector());
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Invalid OrbitIndex: %d"), OrbitIndex);
-			}
+			Bullet->CircularCenter = BossLocation; // 중심점 설정
+			Bullet->CircularRadius = Pattern.OrbitRadii[i];
+			Bullet->CircularSpeed = Pattern.OrbitSpeeds[i]; // 각 총알의 궤도 속도 설정
+			Bullet->CurrentAngle = InitialAngle;
+			Bullet->ForwardDirection = GetActorForwardVector();
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Pinwheel"));
@@ -1296,35 +1276,14 @@ void ABoss::InitializeDefaultPatterns()
 	// 바람개비 패턴
 	FBulletHellPattern PinwheelPattern;
 	PinwheelPattern.PatternType = EPatternType::Pinwheel;
-	PinwheelPattern.NumberOfBullets = 13;
-	PinwheelPattern.BulletSpeed = 200.0f;
-	PinwheelPattern.PatternSize = 300.0f;
-	PinwheelPattern.InitialPositions = {
-		FVector(0.0f, 0.0f, 0.0f),
-		FVector(0.0f, -100.0f, 0.0f),
-		FVector(0.0f, 100.0f, 0.0f),
-		FVector(0.0f, 0.0f, 100.0f),
-		FVector(0.0f, 0.0f, -100.0f),
-		FVector(0.0f, -200.0f, 0.0f),
-		FVector(0.0f, 200.0f, 0.0f),
-		FVector(0.0f, 0.0f, 200.0f),
-		FVector(0.0f, 0.0f, -200.0f),
-		FVector(0.0f, -300.0f, 0.0f),
-		FVector(0.0f, 300.0f, 0.0f),
-		FVector(0.0f, 0.0f, 300.0f),
-		FVector(0.0f, 0.0f, -300.0f)
-	};
-	PinwheelPattern.OrbitSpeeds = {
-		0.0f,   // 중심 총알은 움직이지 않음
-		0.0f,  // 첫 번째 궤도 속도
-		0.0f,  // 두 번째 궤도 속도
-		0.0f   // 세 번째 궤도 속도
-	};
-	PinwheelPattern.OrbitRadii = {
-		0.0f,   // 중심 총알 반지름
-		100.0f, // 첫 번째 궤도 반지름
-		200.0f, // 두 번째 궤도 반지름
-		300.0f  // 세 번째 궤도 반지름
-	};
+	PinwheelPattern.NumberOfBullets = 17;
+	PinwheelPattern.BulletSpeed = 200.0f; // 앞으로 전진하는 속도
+
+	// 각 총알의 궤도 반지름과 속도를 배열로 설정 (양수 및 음수 값 추가)
+	PinwheelPattern.OrbitRadii = { 0.0f, 100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f,100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f }; // 궤도 반지름 배열
+	PinwheelPattern.OrbitSpeeds = { 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f }; // 궤도 속도 배열
+	//PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 90.0f, 90.0f, 90.0f, 180.0f, 180.0f, 180.0f, 180.0f, 270.0f, 270.0f, 270.0f, 270.0f }; // 초기 각도 배열
+	PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 10.0f, 20.0f, 30.0f, 90.0f, 100.0f, 110.0f, 120.0f, 180.0f, 190.0f, 200.0f, 210.0f, 270.0f, 280.0f, 290.0f, 300.0f }; // 초기 각도 배열
+
 	BulletPatterns.Add(PinwheelPattern);
 }

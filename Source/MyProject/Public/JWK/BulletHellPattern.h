@@ -69,4 +69,7 @@ public:
 
 	// 원을 그리는 속도를 위한 멤버 변수 추가 0617
 	float OrbitSpeed;
+	// 추가: 초기 각도 배열
+	TArray<float> InitialAngles; // 초기 각도 배열
+
 };
