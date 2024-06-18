@@ -3,18 +3,26 @@
 
 #include "SEB/GameOverUI.h"
 
+#include "CJW/PlayerPawnCPP.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
+#include "JWK/Boss.h"
 #include "Kismet/GameplayStatics.h"
+#include "SEB/LeftUI.h"
 #include "SEB/SpawnWidget.h"
 #include "SEB/SelectStageUI.h"
+#include "SEB/SpawnLeftWidget.h"
+
 void UGameOverUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+	SpawnLeftWidget = Cast<ASpawnLeftWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLeftWidget::StaticClass()));
+	APlayerPawnCPP* Player = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if(nullptr==SpawnWidget)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SpawnWidget is Null"));
@@ -33,31 +41,46 @@ void UGameOverUI::NativeConstruct()
 		Thumbnail->SetBrush(NewBrush);
 	}
 	BestScore->SetText(FText::AsNumber(SpecificRow->BestScore));
+
 	
 	//Button
 	SelectStageBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnSelectStageClicked);
 	RestartBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnRestartClicked);
-
-
-	//MusicPlay Test => 나중에 이런식으로 끌어서 쓰면 됨. 
-	SpawnWidget->MusicPlay();
 	
+
+	/*PlayTime->SetText(FText::FromString(SpawnLeftWidget->FinalPlayTime.ToString()));*/
+	PlayTime->SetText(SpawnLeftWidget->FinalPlayTime);	
 	//Set Count
 	CurrentCount = 0;
-	//플레이 결과를 여기에 넣어주면 됨. 
-	SetMyScore(SpecificRow->BestScore);
+	Player->UpdateMaxScore();
+	Player->UpdateMaxScoreCpp();
 
+	SetMyScore(Player->SCORE);
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.0001f, true);
 }
 
 void UGameOverUI::OnSelectStageClicked()
 {
+	SpawnLeftWidget->isRestart = true;
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
 }
 
 void UGameOverUI::OnRestartClicked()
 {
+	// UI 숨김
+	SetVisibility(ESlateVisibility::Hidden);
+	SpawnLeftWidget->isRestart = true;
+	// 게임 시작 
+	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+	PlayerInfo->StartGamePlayStageCpp();
+	if (Boss)
+	{
+		//여기서 게임 리셋, , 노래 다시 시작, 보스 공격 다시 시작
+		Boss->bIsGameStart = true;
+		Boss->MusicStart();
+		
+	}
 }
 
 void UGameOverUI::UpdateCountText()
@@ -78,6 +101,7 @@ void UGameOverUI::UpdateCountText()
 void UGameOverUI::SetMyScore(int32 score)
 {
 	MyScoreCount = score;
+	//최신화 
 }
 
 

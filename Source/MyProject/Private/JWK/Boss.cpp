@@ -14,8 +14,7 @@ ABoss::ABoss()
 	movementComp = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movementComp"));
 
 	// 보스
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss/Mesh/SK_skltnGent.SK_skltnGent'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/JWK/Asset/00_Boss/Boss/SK_skltnGent.SK_skltnGent'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -23,6 +22,7 @@ ABoss::ABoss()
 		GetMesh()->SetWorldScale3D(FVector(1.6f));
 	}
 
+	// 보스 눈
 	bossEyeMesh_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_L"));
 	bossEyeMesh_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bossEyeMesh_R"));
 	bossEyeMesh_L->SetupAttachment(GetMesh(), TEXT("BossEye_L"));
@@ -55,6 +55,8 @@ ABoss::ABoss()
 		batonMesh->SetWorldScale3D(FVector(1.5f));
 	}
 
+
+	
 	bossFSM = CreateDefaultSubobject<UBossFSM>(TEXT("bossFSM"));
 
 	BulletSpawner = CreateDefaultSubobject<USpawn_Bullet>(TEXT("BulletSpawner"));
@@ -164,10 +166,7 @@ void ABoss::BeginPlay()
 
 	/////////////음악 재생을 위해
 	if (Music)
-	{
 		MusicAudioComponent->SetSound(Music);
-
-	}
 
 	// StartFiring();
 	// FireBullet();
@@ -177,15 +176,32 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 음악 재생 시작
 	if(bIsMusicStart)
 	{
 		bIsMusicStart = false;	
 		SpawnWidget->MusicPlay();
 	}
 
+	// Phase 진입하고 지휘봉 던지는 함수 호출
 	if(bThrowBaton)
 		ThrowBaton();
 
+	// 중간에 GameOver시 보스 원위치
+	if(bGameOver)
+	{
+		bGameOver = false;
+		// boss 위치 초기화
+		this->SetActorLocation(FVector(-190, 650, 1250));
+		// 노래 및 총알 발사 중지
+		StopFiring();
+		StopMusic();
+	}
+	
+	// 게임을 완전히 클리어
+	if(bClearGame)
+		bossFSM->GameEnd();
+		
 	//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
 	FloatingTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
 	
@@ -221,6 +237,8 @@ void ABoss::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ABoss::HandleFloatProgress(float Value)
 {
 	FVector NewBossLocation = InitialLocation;
+	float Time = GetWorld()->GetTimeSeconds();
+	float CurveValue = FMath::Sin(Time) * 100.0f;
 	NewBossLocation.Z += Value * 20.0f; // Adjust the multiplier to control the float height
 	SetActorLocation(NewBossLocation);
 }
@@ -309,19 +327,17 @@ void ABoss::LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString
 
 			// 음악 재생 시작
 			PlayMusic();
-
-			// 탄막 발사 시작
-			FireBullet();
+			
+			if(bIsGameStart)
+				FireBullet();// 탄막 발사 시작
 		}
+		
 		else
-		{
 			UE_LOG(LogTemp, Warning, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load music: %s"), *MusicFilePath);
-		}
 	}
+	
 	else
-	{
 		UE_LOG(LogTemp, Error, TEXT("ABoss::LoadMusicDataAndSetPatterns: Failed to load pre-analyzed data for: %s"), *MusicTitle);
-	}
 }
 
 // 패턴 조건을 업데이트하는 함수
@@ -405,21 +421,21 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (LowMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighMidArray[i]->AsNumber() > 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (HighArray[i]->AsNumber() > 0.2f)
@@ -501,6 +517,7 @@ void ABoss::OnMusicFinished()
 	StopMusic();
 
 	// 여기 함수에 보스 죽는 bool값 넣으면 될 듯?
+	bClearGame = true;
 }
 
 void ABoss::SetMusicVolume(float Volume)
@@ -558,7 +575,8 @@ void ABoss::StartFiring()
 
 void ABoss::StopFiring()
 {
-	GetWorldTimerManager().ClearTimer(FireRateTimerHandle);
+	bIsMusicFinished = true;
+	GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle);
 }
 
 void ABoss::ChangePattern()

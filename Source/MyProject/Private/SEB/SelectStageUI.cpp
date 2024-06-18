@@ -13,7 +13,7 @@
 #include "Components/WidgetComponent.h"
 #include "JWK/Boss.h"
 #include "SEB/GameOverUI.h"
-
+#include "CJW/PlayerPawnCPP.h"
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
@@ -114,19 +114,21 @@ void USelectStageUI::OnBackClicked()
 
 void USelectStageUI::OnPlayClicked()
 {
+	
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 
-	ABoss* Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+	PlayerInfo->StartGamePlayStageCpp();
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if (Boss)
 	{
+		UE_LOG(LogTemp, Error, TEXT("SelectStageUI::OnPlayClicked"));
 		Boss->bIsGameStart = true;
+		//Boss->StopMusic();
 		Boss->MusicStart();
 		
 	}
-	//우선은 GameOverUI로 넘어가도록 함. 
-	/*UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
-	WidgetComponent->SetWidgetClass(GameOverUIClass);*/
 }
 
 
@@ -148,8 +150,8 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
 
+	//	Boss->StopMusic();
 	//SpawnWidget->MusicPlay();
-	
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
 	

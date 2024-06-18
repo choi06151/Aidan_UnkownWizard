@@ -32,3 +32,8 @@ void APlayerPawnCPP::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void APlayerPawnCPP::UpdateMaxScore()
+{
+	if (SCORE > MAXSCORE)
+		SCORE = MAXSCORE;
+}

@@ -23,4 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	FText FinalPlayTime = FText::FromString(TEXT("00:00:00"));
+	int32 FinalScore = 0;
+
+	bool isRestart = false;
 };
