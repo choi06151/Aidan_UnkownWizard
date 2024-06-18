@@ -26,6 +26,8 @@ private:
 	class UTextBlock* BestScore;
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* MyScore;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PlayTime;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SelectStageBtn;  
@@ -38,16 +40,28 @@ private:
 	void OnRestartClicked();
 
 	class ASpawnWidget* SpawnWidget;
-	
+	class ASpawnLeftWidget* SpawnLeftWidget;
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> SelectStageUIClass;
+	TSubclassOf<class USelectStageUI> SelectStageUIClass;
 
+	
+	
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;
 
+	
+	
 	FText* ThumbnailPath;
 
 public:
+
+	// LeftUI 인스턴스를 저장할 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class ULeftUI> LeftUIClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	class ULeftUI* LeftUIInstance;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* PlayDataTable;
 
@@ -59,6 +73,6 @@ private:
 	int32 CurrentCount;
 	int32 MyScoreCount;
 	FTimerHandle CountTimerHandle;
-	
+	class ABoss* Boss;
 
 };
