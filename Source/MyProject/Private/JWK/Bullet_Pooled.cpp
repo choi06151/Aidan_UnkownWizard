@@ -218,6 +218,7 @@ void ABullet_Pooled::SetLifeSpan(float LifeTime)
 void ABullet_Pooled::SetBulletSpeed(float Speed)
 {
 	movementComp->InitialSpeed = Speed;
+	UE_LOG(LogTemp, Warning, TEXT("SetBulletSpeed: Speed set to %f"), Speed);
 }
 
 // pool에서의 index 설정
