@@ -22,6 +22,8 @@ void UGameClearUI::NativeConstruct()
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	SpawnLeftWidget = Cast<ASpawnLeftWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLeftWidget::StaticClass()));
+	APlayerPawnCPP* Player = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if(!SpawnWidget)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SpawnWidget is Null"));
@@ -48,17 +50,18 @@ void UGameClearUI::NativeConstruct()
 	
 
 	// PlayTime
-	PlayTime->SetText(SpawnLeftWidget->FinalPlayTime);
-	
+	//PlayTime->SetText(SpawnLeftWidget->FinalPlayTime);
+	PlayTime->SetText(FText::FromString(SpawnLeftWidget->FinalPlayTime.ToString()));
 	//Set Count
 	CurrentCount = 0;
 	
-	SetMyScore(SpawnLeftWidget->FinalScore);
+	SetMyScore(Player->SCORE);
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.0001f, true);
 }
 
 void UGameClearUI::OnSelectStageClicked()
 {
+	SpawnLeftWidget->isRestart = true;
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
 }
@@ -67,11 +70,12 @@ void UGameClearUI::OnRestartClicked()
 {
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
+	SpawnLeftWidget->isRestart = true;
 	// 게임 시작 
 	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
 	PlayerInfo->StartGamePlayStageCpp();
 
-	ABoss* Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
+	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if (Boss)
 	{
 		Boss->bIsGameStart = true;

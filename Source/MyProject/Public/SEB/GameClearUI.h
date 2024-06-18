@@ -61,4 +61,6 @@ private:
 	int32 CurrentCount;
 	int32 MyScoreCount;
 	FTimerHandle CountTimerHandle;
+
+	class ABoss* Boss;
 };

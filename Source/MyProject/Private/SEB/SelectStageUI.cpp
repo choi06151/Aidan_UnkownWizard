@@ -123,7 +123,7 @@ void USelectStageUI::OnPlayClicked()
 	Boss = Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	if (Boss)
 	{
-		
+		UE_LOG(LogTemp, Error, TEXT("SelectStageUI::OnPlayClicked"));
 		Boss->bIsGameStart = true;
 		//Boss->StopMusic();
 		Boss->MusicStart();

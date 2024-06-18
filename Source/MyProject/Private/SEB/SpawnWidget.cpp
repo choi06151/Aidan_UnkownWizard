@@ -58,6 +58,7 @@ void ASpawnWidget::MusicPlay()
 	FString JsonFilePath = UKismetSystemLibrary::GetProjectDirectory() + SpecificRow->JsonFilePath;
 	FString MusicTitle = SpecificRow->MusicName;
 	Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
+	UE_LOG(LogTemp, Error, TEXT("ASpawnWidget::MusicPlay"));
 }
 
 void ASpawnWidget::CurtainOpenAnim()

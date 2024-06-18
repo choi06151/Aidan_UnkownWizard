@@ -53,10 +53,10 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			
 		}
 	}
-	if(Player->HP > 0 && Boss->bIsMusicFinished)
+	if(Player->HP > 0 && Boss->bIsMusicFinished) // Game Clear
 	{
 		Boss->bIsAttackStart = false;
-
+		//Boss->bClearGame = true;
 		SpawnLeftWidget->FinalPlayTime = PlayTime->GetText();
 		FString ScoreStr = Score->GetText().ToString();
 		SpawnLeftWidget->FinalScore = FCString::Atoi(*ScoreStr);
@@ -65,9 +65,10 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		Boss->bIsMusicFinished = false;
 		Boss->OnMusicFinished();
 	}
-	if(Player->HP <= 0 && Boss->bIsAttackStart)
+	/*if(Player->HP <= 0 && Boss->bIsAttackStart) //Game Over
 	{
 		Boss->bIsAttackStart = false;
+		//Boss->bGameOver = true;
 		Boss->OnMusicFinished();
 		if(SpawnWidget)
 		{
@@ -78,7 +79,7 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			WidgetComponent->SetWidgetClass(GameOverUIClass);
 			
 		}
-	}
+	}*/
 }
 
 void ULeftUI::UpdateTImer()

@@ -48,8 +48,8 @@ void UGameOverUI::NativeConstruct()
 	RestartBtn->OnPressed.AddDynamic(this, &UGameOverUI::OnRestartClicked);
 	
 
-	PlayTime->SetText(FText::FromString(SpawnLeftWidget->FinalPlayTime.ToString()));
-	
+	/*PlayTime->SetText(FText::FromString(SpawnLeftWidget->FinalPlayTime.ToString()));*/
+	PlayTime->SetText(SpawnLeftWidget->FinalPlayTime);	
 	//Set Count
 	CurrentCount = 0;
 
@@ -75,7 +75,8 @@ void UGameOverUI::OnRestartClicked()
 	if (Boss)
 	{
 		//여기서 게임 리셋, , 노래 다시 시작, 보스 공격 다시 시작
-		Boss->PlayMusic();
+		Boss->bIsGameStart = true;
+		Boss->MusicStart();
 		
 	}
 }
