@@ -79,6 +79,7 @@ void ABullet_Pooled::Tick(float DeltaTime)
 // 총알 상태 활성화 or 비활성화
 void ABullet_Pooled::SetActive(bool IsActive)
 {
+	boxComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Active = IsActive;
 	SetActorHiddenInGame(!IsActive);
 	GetWorldTimerManager().SetTimer(LifespanTimer, this, &ABullet_Pooled::Deactivate, LifeSpan, false);

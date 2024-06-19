@@ -239,6 +239,7 @@ public:
 	void PlayMusic();
 
 	// 게임 내에서 음악과 탄막 발사를 중지할 필요가 있을 때 호출할 함수~
+	void StopMusicAndFiringGameOver();
 	void StopMusic();
 
 	void ThrowBaton();

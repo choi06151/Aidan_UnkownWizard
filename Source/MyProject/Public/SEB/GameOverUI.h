@@ -69,6 +69,7 @@ public:
 	void UpdateCountText();
 	// 최종 Score 설정
 	void SetMyScore(int32 score);
+
 private:
 	int32 CurrentCount;
 	int32 MyScoreCount;

@@ -68,6 +68,7 @@ void UGameOverUI::OnRestartClicked()
 {
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
+	UE_LOG(LogTemp, Error, TEXT("Hidden!!Hidden!!Hidden!!Hidden!!Hidden!!"));
 	SpawnLeftWidget->isRestart = true;
 	// 게임 시작 
 	APlayerPawnCPP* PlayerInfo = Cast<APlayerPawnCPP>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerPawnCPP::StaticClass()));
