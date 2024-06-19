@@ -47,5 +47,5 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> GameOverUIClass;
 
-	
+	class USpawn_Bullet* BulletSpawner;
 };

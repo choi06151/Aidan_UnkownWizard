@@ -45,6 +45,11 @@ void UBossFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		break;
 	}
 
+	if(me->bGameOver)
+	{
+		me->bGameOver = false;
+		SetState(EBossState::IDLE);
+	}
 	// if(me->bIsArrive)
 	// 	commandTime += DeltaTime;
 }
@@ -89,17 +94,13 @@ void UBossFSM::TickCommand()
 	// 일정 조건일 때 Phase2 진입
 	if (me->bIsPhase)
 		SetState(EBossState::PHASE_2);
-
-	if(me->bGameOver)
-		SetState(EBossState::IDLE);
+	
 	// UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
 //////////////////////////////////////// Phase_2 ////////////////////////////////////////
 void UBossFSM::TickPhase_2()
 {
-	if(me->bGameOver)
-		SetState(EBossState::IDLE);
 	// UE_LOG(LogTemp, Warning, TEXT("Phase"));
 }
 

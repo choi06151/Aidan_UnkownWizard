@@ -1,5 +1,6 @@
 #include "JWK/Boss.h"
 
+#include "CJW/PlayerPawnCPP.h"
 #include "Components/AudioComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -179,7 +180,7 @@ void ABoss::Tick(float DeltaTime)
 	// 음악 재생 시작
 	if(bIsMusicStart)
 	{
-		bIsMusicStart = false;	
+		bIsMusicStart = false;
 		SpawnWidget->MusicPlay();
 	}
 
@@ -190,15 +191,15 @@ void ABoss::Tick(float DeltaTime)
 	// 중간에 GameOver시 보스 원위치
 	if(bGameOver)
 	{
-		bGameOver = false;
 		// boss 위치 초기화
 		this->SetActorLocation(FVector(-190, 650, 1250));
+		bGameOver = false;
 		// 노래 및 총알 발사 중지
 		StopFiring();
 		StopMusic();
 	}
 	
-	// 게임을 완전히 클리어
+	// 게임을 완전히 클리어 시 Boss의 Dead Montage 재생
 	if(bClearGame)
 		bossFSM->GameEnd();
 		
@@ -545,6 +546,15 @@ void ABoss::PlayMusic()
 	}
 }
 
+void ABoss::StopMusicAndFiringGameOver()
+{
+	if (MusicAudioComponent && MusicAudioComponent->IsPlaying())
+	{
+		MusicAudioComponent->Stop();
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle);	// StopFiring
+	}
+}
+
 void ABoss::StopMusic()
 {
 	if (MusicAudioComponent && MusicAudioComponent->IsPlaying())
@@ -635,9 +645,6 @@ void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-
-	UE_LOG(LogTemp, Warning, TEXT("RandomStraight"));
-	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
 
@@ -658,8 +665,6 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 
 		BulletSpawner->SpawnPooledBullet(BossLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Fan"));
-	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
 
@@ -703,9 +708,6 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-
-	UE_LOG(LogTemp, Warning, TEXT("Circle"));
-	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
 
@@ -752,8 +754,6 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
 
-	UE_LOG(LogTemp, Warning, TEXT("TargetCircle"));
-	UE_LOG(LogTemp, Warning, TEXT("---"));
 }
 
 // 소용돌이 패턴 정의
@@ -822,9 +822,6 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 ////////////////////////////////////////
-
-	UE_LOG(LogTemp, Warning, TEXT("Cross"));
-	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
 
@@ -898,9 +895,6 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-
-	UE_LOG(LogTemp, Warning, TEXT("Wall"));
-	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
 
@@ -958,9 +952,6 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 	// 	GetWorld()->GetTimerManager().ClearTimer(BulletTimer);
 	// }), BulletTime, false);
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
-
-	UE_LOG(LogTemp, Warning, TEXT("Octagon"));
-	UE_LOG(LogTemp, Warning, TEXT("------------"));
 }
 
 
@@ -983,9 +974,6 @@ void ABoss::FireHeartPattern(const FBulletHellPattern& Pattern)
 
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Heart"));
-	UE_LOG(LogTemp, Warning, TEXT("-----"));
 }
 
 void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize)
@@ -1040,9 +1028,6 @@ void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 			}
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Dandelion"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
 void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
