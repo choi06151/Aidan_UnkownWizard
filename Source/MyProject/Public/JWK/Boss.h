@@ -228,6 +228,9 @@ public:
 	UFUNCTION()
 	void OnMusicFinished();
 
+	// 노래만 재생하는 함수
+	void PlayMusicOnly(const FString& MusicFilePath);
+	
 	/////////// 재생 되고 있는 노래 조절할 수 있는 
 	UFUNCTION(BlueprintCallable, Category = "Music")
 	void SetMusicVolume(float Volume);
@@ -239,6 +242,7 @@ public:
 	void PlayMusic();
 
 	// 게임 내에서 음악과 탄막 발사를 중지할 필요가 있을 때 호출할 함수~
+	void StopMusicAndFiringGameOver();
 	void StopMusic();
 
 	void ThrowBaton();
@@ -335,7 +339,7 @@ public:
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
 
-	////////////////////////////////////노래 재생관련 추가추가
+	////////////////////////////////////노래 재생관련 추가추가 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, Category = "Music")
 	USoundBase* Music;
 

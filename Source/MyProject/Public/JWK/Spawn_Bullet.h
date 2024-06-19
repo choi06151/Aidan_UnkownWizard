@@ -26,6 +26,9 @@ public:
 	UFUNCTION()
 	void OnPooledBulletDespawn(ABullet_Pooled* Bullet);
 
+	// 모든 활성화된 Bullet 비활성화
+	void DeactivateAllBullets();
+
 private:
 	UPROPERTY(EditAnywhere, Category="Bullet Pool")
 	TSubclassOf<ABullet_Pooled> PooledBulletSubclass;

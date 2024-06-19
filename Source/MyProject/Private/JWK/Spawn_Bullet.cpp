@@ -37,18 +37,9 @@ void USpawn_Bullet::BeginPlay()
                     PoolableBullet->OnPooledBulletDespawn.AddDynamic(this, &USpawn_Bullet::OnPooledBulletDespawn);
                     BulletPool.Add(PoolableBullet);
                 }
-                
-                else
-                    UE_LOG(LogTemp, Warning, TEXT("Failed to spawn bullet at index %d"), i);
             }
         }
-        
-        else
-            UE_LOG(LogTemp, Warning, TEXT("World is null in BeginPlay"));
     }
-    
-    else
-        UE_LOG(LogTemp, Warning, TEXT("PooledBulletSubclass is null in BeginPlay"));
 }
 
 void USpawn_Bullet::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -69,8 +60,6 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
             PoolableBullet->SetBulletSpeed(BulletSpeed); // 이동 속도 설정
             PoolableBullet->SetActive(true);
             SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
-
-            UE_LOG(LogTemp, Log, TEXT("Spawned bullet from pool at index %d"), PoolableBullet->GetPoolIndex());
 
             return PoolableBullet;
         }
@@ -97,17 +86,9 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
             BulletPool.Add(NewBullet);
             SpawnedPoolIndexes.Add(NewIndex);
 
-            UE_LOG(LogTemp, Log, TEXT("Spawned new bullet at index %d"), NewIndex);
-
             return NewBullet;
         }
-        
-        else
-            UE_LOG(LogTemp, Warning, TEXT("Failed to spawn new bullet"));
     }
-    
-    else
-        UE_LOG(LogTemp, Warning, TEXT("World is null in SpawnPooledBullet"));
 
     return nullptr; // 사용 가능한 Bullet이 없는 경우 null 반환
 }
@@ -119,9 +100,14 @@ void USpawn_Bullet::OnPooledBulletDespawn(ABullet_Pooled* Bullet)
     {
         SpawnedPoolIndexes.Remove(Bullet->GetPoolIndex());  // 비활성화된 Bullet의 인덱스 제거
         Bullet->SetActive(false);
-        UE_LOG(LogTemp, Log, TEXT("Despawned bullet at index %d"), Bullet->GetPoolIndex());
     }
-    
-    else
-        UE_LOG(LogTemp, Warning, TEXT("Bullet is null in OnPooledBulletDespawn"));
+}
+
+void USpawn_Bullet::DeactivateAllBullets()
+{
+    for(ABullet_Pooled* Bullet : BulletPool)
+    {
+        if(nullptr != Bullet && Bullet->IsActive())
+            Bullet->Deactivate();
+    }
 }
