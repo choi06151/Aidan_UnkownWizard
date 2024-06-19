@@ -49,7 +49,7 @@ void ABullet_Pooled::BeginPlay()
 	InitialLocation = GetActorLocation(); // 초기 위치 설정
 	TimeSinceSpawned = 0.0f; // 생성된 이후 경과 시간 초기화
 
-	InitialZ = GetActorLocation().Z;  // 초기 Z 위치 저장///////////0619
+	InitialZ = InitialLocation.Z;  // 초기 Z 위치 저장///////////0619
 }
 
 void ABullet_Pooled::Tick(float DeltaTime)
@@ -103,6 +103,8 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	movementComp->Velocity = InitialDirection * movementComp->InitialSpeed;
 
 	InitialZ = GetActorLocation().Z; // 활성화 시 초기 Z 위치 설정
+	// 강도에 따라 둥실거림 주파수와 진폭 설정을 바로 적용
+	SetFloatIntensity(FloatIntensity);
 }
 
 // 총알 비활성화
@@ -154,10 +156,10 @@ void ABullet_Pooled::MoveBullet(float DeltaTime)
 		// 새로운 위치로 총알 이동
 		SetActorLocation(NewLocation);
 
-		// meshComponent 회전 로직 추가
-		FRotator CurrentRotation = meshComp->GetComponentRotation();
-		FRotator DeltaRotation(0, DeltaTime * 100, 0);  // Y축을 기준으로 회전 속도 설정
-		meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
+		//// meshComponent 회전 로직 추가
+		//FRotator CurrentRotation = meshComp->GetComponentRotation();
+		//FRotator DeltaRotation(0, DeltaTime * 100, 0);  // Y축을 기준으로 회전 속도 설정
+		//meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
 
 
 		// 이동 거리 계산
@@ -223,19 +225,19 @@ void ABullet_Pooled::SetFloatIntensity(int Intensity)
 	{
 	case 1:
 		FloatFrequency = 5.0f; // 둥실거림의 빈도
-		FloatAmplitude = 10.0f; // 둥실거림(흔들림)의 진폭을 나타내는 변수
+		FloatAmplitude = 20.0f; // 둥실거림(흔들림)의 진폭을 나타내는 변수
 		break;
 	case 2:
 		FloatFrequency = 5.0f;
-		FloatAmplitude = 30.0f;
+		FloatAmplitude = 50.0f;
 		break;
 	case 3:
 		FloatFrequency = 5.0f;
-		FloatAmplitude = 50.0f;
+		FloatAmplitude = 80.0f;
 		break;
 	case 4:
 		FloatFrequency = 5.0f;
-		FloatAmplitude = 80.0f;
+		FloatAmplitude = 100.0f;
 		break;
 	default:
 		FloatFrequency = 5.0f;

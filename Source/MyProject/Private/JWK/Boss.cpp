@@ -517,11 +517,46 @@ void ABoss::PreAnalyzeAllMusicData()
 	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
 	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
 	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
+	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_Backlight.json");
+	FString NOTEJsonPath = ProjectDir + TEXT("Content/Data/AI_NOTE.json");
+	FString UnrealJsonPath = ProjectDir + TEXT("Content/Data/AI_Unreal.json");
+	FString NewWorldJsonPath = ProjectDir + TEXT("Content/Data/Antonín Dvořák_ Symphony No_9.json");
+	FString WaitingForLoveJsonPath = ProjectDir + TEXT("Content/Data/Avicii_WaitingForLove.json");
+	FString PonytailJsonPath = ProjectDir + TEXT("Content/Data/Badanamu_Ponytail.json");
+	FString SymphonyNo_5JsonPath = ProjectDir + TEXT("Content/Data/Beethoven_Symphony No_5.json");
+	FString RabelJsonPath = ProjectDir + TEXT("Content/Data/Boléro_Rabel.json");
+	FString FantaisieImpromptuJsonPath = ProjectDir + TEXT("Content/Data/Frédéric Chopin_Fantaisie Impromptu.json");
+	FString OrpheusintheUnderworldJsonPath = ProjectDir + TEXT("Content/Data/Jacques Offenbach_Orpheus in the Underworld.json");
+	FString NachtmusikJsonPath = ProjectDir + TEXT("Content/Data/Mozart_Eine Kleine Nachtmusik.json");
+	FString SymphonyNo_25JsonPath = ProjectDir + TEXT("Content/Data/Mozart_Symphony No.json");
+	FString TurkishMarchPath = ProjectDir + TEXT("Content/Data/Mozart_Turkish March.json");
+	FString ETAJsonPath = ProjectDir + TEXT("Content/Data/NewJeans_ETA.json");
+	FString HowSweetJsonPath = ProjectDir + TEXT("Content/Data/NewJeans_How Sweet.json");
+	FString MelongtoyouJsonPath = ProjectDir + TEXT("Content/Data/Tenko Shibuki_Melong to you.json");
+	FString AirplaneJsonPath = ProjectDir + TEXT("Content/Data/Turtles_Airplane.json");
+	
 
 	// 각 음악에 대해 미리 분석 수행
 	PreAnalyzeMusicData(TEXT("Butter-Fly"), ButterflyJsonPath);
 	PreAnalyzeMusicData(TEXT("Fur Elise"), EliseJsonPath);
 	PreAnalyzeMusicData(TEXT("Requiem – Lacrimosa"), LacrimosaJsonPath);
+	PreAnalyzeMusicData(TEXT("Backlight"), BacklightJsonPath);
+	PreAnalyzeMusicData(TEXT("NOTE"), NOTEJsonPath);
+	PreAnalyzeMusicData(TEXT("Unreal"), UnrealJsonPath);
+	PreAnalyzeMusicData(TEXT("Symphony No_9 From the New World"), NewWorldJsonPath);
+	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
+	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
+	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
+	PreAnalyzeMusicData(TEXT("Rabel"), RabelJsonPath);
+	PreAnalyzeMusicData(TEXT("Fantaisie Impromptu"), FantaisieImpromptuJsonPath);
+	PreAnalyzeMusicData(TEXT("Orpheus in the Underworld"), OrpheusintheUnderworldJsonPath);
+	PreAnalyzeMusicData(TEXT("Eine Kleine Nachtmusik"), NachtmusikJsonPath);
+	PreAnalyzeMusicData(TEXT("Symphony No_25 In G Minor K"), SymphonyNo_25JsonPath);
+	PreAnalyzeMusicData(TEXT("Turkish March"), TurkishMarchPath);
+	PreAnalyzeMusicData(TEXT("ETA"), ETAJsonPath);
+	PreAnalyzeMusicData(TEXT("How Sweet"), HowSweetJsonPath);
+	PreAnalyzeMusicData(TEXT("Melong to you"), MelongtoyouJsonPath);
+	PreAnalyzeMusicData(TEXT("Airplane"), AirplaneJsonPath);
 }
 
 float ABoss::GetTotalDuration(const FString& MusicTitle) const
