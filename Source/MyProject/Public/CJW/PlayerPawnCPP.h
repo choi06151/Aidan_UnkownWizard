@@ -49,5 +49,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateMaxScoreCpp();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateCurrentScoreToCpp();
 	class ABoss* Boss;
 };
