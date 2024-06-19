@@ -21,7 +21,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Pool에서 Bullet Spawn
-	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed);
+	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed, int FloatIntensity); ///0619
 
 	// 풀에 사용할 bullet subClass
 	UPROPERTY(EditAnywhere, Category = "Bullet_Pooled")
@@ -36,6 +36,9 @@ public:
 	float PooledBulletLifeSpan = 15.0f;
 
 	class ABoss* boss;
+
+	// Bullet Pool을 반환하는 함수 추가////0619
+	const TArray<ABullet_Pooled*>& GetBulletPool() const;
 protected:
 	// Bullet의 pool array
 	TArray<ABullet_Pooled*> BulletPool;

@@ -72,4 +72,6 @@ public:
 	// 추가: 초기 각도 배열
 	TArray<float> InitialAngles; // 초기 각도 배열
 
+	int32 FloatIntensity; // 둥실거림 강도 0619
+
 };

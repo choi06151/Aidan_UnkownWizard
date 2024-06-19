@@ -26,12 +26,18 @@ ABullet_Pooled::ABullet_Pooled()
 	movementComp->MaxSpeed = 3000.0f;
 	movementComp->bShouldBounce = false;
 
-	// 추가된 변수들
 	// 민들레 패턴을 위한 변수 초기화
 	bShouldSpread = false;
 	SpreadDelay = 0.0f;
 	TimeSinceFired = 0.0f;
 	SpreadRotation = FRotator::ZeroRotator;
+
+	////////////////0619
+	// 기본 둥실거림 값 초기화
+	FloatIntensity = 1;
+	FloatFrequency = 1.0f;
+	FloatAmplitude = 10.0f;
+	InitialZ = 0.0f;
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -42,37 +48,35 @@ void ABullet_Pooled::BeginPlay()
 	//추가
 	InitialLocation = GetActorLocation(); // 초기 위치 설정
 	TimeSinceSpawned = 0.0f; // 생성된 이후 경과 시간 초기화
+
+	InitialZ = GetActorLocation().Z;  // 초기 Z 위치 저장///////////0619
 }
 
 void ABullet_Pooled::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	//// 현재 총알의 속도를 계산
-	//FVector BulletVelocity = GetActorForwardVector() * movementComp->InitialSpeed;
 
-	//// 현재 시간을 기반으로한 진동 운동 계산
-	//float OscillationDeltaX = FMath::Sin(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
-	//float OscillationDeltaY = FMath::Cos(GetGameTimeSinceCreation() * OscillationFrequency) * OscillationRadius;
+	//if (Active)
+	//{
+	//	TimeSinceFired += DeltaTime;
+	//	MoveBullet(DeltaTime); // 총알 이동
+	//}
 
-	//// 진동 운동을 적용한 이동 벡터 계산
-	//FVector MoveDelta = BulletVelocity * DeltaTime + (GetActorForwardVector() * OscillationDeltaX) + (GetActorUpVector() * OscillationDeltaY);
-
-	//// 현재 위치에서 이동 벡터를 더하여 새로운 위치 계산
-	//FVector NewLocation = GetActorLocation() + MoveDelta;
-
-	//// 새로운 위치로 총알 이동
-	//SetActorLocation(NewLocation);
-
-	//// meshComponent 회전 로직 추가
-	//FRotator CurrentRotation = meshComp->GetComponentRotation();
-	//FRotator DeltaRotation(0, DeltaTime * 100, 0);  // Y축을 기준으로 회전 속도 설정
-	//meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
-
+	///0619
 	if (Active)
 	{
 		TimeSinceFired += DeltaTime;
-		MoveBullet(DeltaTime); // 총알 이동
+
+		if (PatternType != EPatternType::Pinwheel && PatternType != EPatternType::CircularMoving && PatternType != EPatternType::Dandelion)
+		{
+			// 둥실거림을 적용한 새로운 위치 계산
+			FVector CurrentLocation = GetActorLocation();
+			float NewZOffset = FloatAmplitude * FMath::Sin(GetWorld()->GetTimeSeconds() * FloatFrequency);
+			CurrentLocation.Z = InitialZ + NewZOffset;
+			SetActorLocation(CurrentLocation);
+		}
+
+		MoveBullet(DeltaTime);  // 기존 이동 로직 호출
 	}
 }
 
@@ -97,6 +101,8 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	InitialDirection = GetActorForwardVector();
 	// 이동 속도 초기화
 	movementComp->Velocity = InitialDirection * movementComp->InitialSpeed;
+
+	InitialZ = GetActorLocation().Z; // 활성화 시 초기 Z 위치 설정
 }
 
 // 총알 비활성화
@@ -207,6 +213,37 @@ void ABullet_Pooled::SetCircularParams(const FVector& Center, float Radius, floa
 	InitialDirection = InitialDir;
 	CurrentAngle = 0.0f;
 }
+
+void ABullet_Pooled::SetFloatIntensity(int Intensity)
+{
+	FloatIntensity = Intensity;
+
+	// 강도에 따라 둥실거림 주파수와 진폭 설정
+	switch (Intensity)
+	{
+	case 1:
+		FloatFrequency = 5.0f; // 둥실거림의 빈도
+		FloatAmplitude = 10.0f; // 둥실거림(흔들림)의 진폭을 나타내는 변수
+		break;
+	case 2:
+		FloatFrequency = 5.0f;
+		FloatAmplitude = 30.0f;
+		break;
+	case 3:
+		FloatFrequency = 5.0f;
+		FloatAmplitude = 50.0f;
+		break;
+	case 4:
+		FloatFrequency = 5.0f;
+		FloatAmplitude = 80.0f;
+		break;
+	default:
+		FloatFrequency = 5.0f;
+		FloatAmplitude = 5.0f;
+		break;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // bullet의 수명을 set
 void ABullet_Pooled::SetLifeSpan(float LifeTime)

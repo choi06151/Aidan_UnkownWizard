@@ -94,6 +94,9 @@ public:
 
 	// 0617
 	float OrbitSpeed; // 궤도 속도를 나타내는 새로운 변수
+	//0619
+	// 둥실거림 강도 설정 함수
+	void SetFloatIntensity(int Intensity);
 
 
 protected:
@@ -132,5 +135,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class URotatingMovementComponent* movement;
 
-	
+	// 둥실거림 0619
+	int FloatIntensity;  // 둥실거림 강도
+	float FloatFrequency;  // 둥실거림 주파수
+	float FloatAmplitude;  // 둥실거림 진폭
+	float InitialZ;  // 초기 Z 위치
 };

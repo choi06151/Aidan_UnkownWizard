@@ -43,7 +43,7 @@ void USpawn_Bullet::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 }
 
 // pool에서 Bullet을 Spawn하는 함수
-ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed)
+ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed, int FloatIntensity)
 {
 	for (ABullet_Pooled* PoolableBullet : BulletPool)
 	{
@@ -55,8 +55,11 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 			PoolableBullet->SetBulletSpeed(BulletSpeed); // 이동 속도 설정
 			PoolableBullet->SetActive(true);
 			SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
+			PoolableBullet->SetFloatIntensity(FloatIntensity); // 둥실거림 강도 설정 0619
+			
 
 			return PoolableBullet;
+
 		}
 	}
 
@@ -75,12 +78,18 @@ ABullet_Pooled* USpawn_Bullet::SpawnPooledBullet(FVector SpawnLocation, FRotator
 			PoolableBullet->SetLifeSpan(PooledBulletLifeSpan);
 			PoolableBullet->SetBulletSpeed(BulletSpeed); // 이동 속도 설정
 			PoolableBullet->SetActive(true);
+			PoolableBullet->SetFloatIntensity(FloatIntensity); // 둥실거림 강도 설정 0619
 			SpawnedPoolIndexes.Add(PoolableBullet->GetPoolIndex());
 
 			return PoolableBullet;
 		}
 	}
 	return  nullptr; // 사용 가능한 Bullet이 없는 경우 null 반환
+}
+
+const TArray<ABullet_Pooled*>& USpawn_Bullet::GetBulletPool() const
+{
+	return BulletPool;
 }
 
 // Bullet이 비활성화될 때 호출되는 함수

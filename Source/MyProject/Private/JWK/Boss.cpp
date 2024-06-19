@@ -330,134 +330,153 @@ void ABoss::UpdatePatternConditions()
 {
 	if (FinalPatternData.IsValidIndex(CurrentTimeIndex))
 	{
-		// 현재 시간 인덱스에 해당하는 패턴 데이터를 가져옴
 		FFinalPatternData CurrentData = FinalPatternData[CurrentTimeIndex];
-
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Checking conditions at time index %d"), CurrentTimeIndex);
-
-		// 패턴 인덱스를 설정
 		CurrentPatternIndex = CurrentData.PatternIndex;
 
-		//// 모든 탄막 패턴의 속도를 현재 데이터의 속도로 설정
-		//for (auto& Pattern : BulletPatterns)
-		//{
-		//	Pattern.BulletSpeed = CurrentData.BulletSpeed;
-		//}
+		float LowEnergy = CurrentData.LowFrequencyEnergy;
+		float LowMidEnergy = CurrentData.LowMidFrequencyEnergy;
+		float HighMidEnergy = CurrentData.HighMidFrequencyEnergy;
+		float HighEnergy = CurrentData.HighFrequencyEnergy;
 
-		// 패턴 델리게이트가 존재하는지 확인하고, 존재하면 실행
+		float MaxEnergy = FMath::Max(FMath::Max3(LowEnergy, LowMidEnergy, HighMidEnergy), HighEnergy);
+		int FloatIntensity = 1;
+
+		if (MaxEnergy == LowEnergy)
+		{
+			FloatIntensity = 1;
+		}
+		else if (MaxEnergy == LowMidEnergy)
+		{
+			FloatIntensity = 2;
+		}
+		else if (MaxEnergy == HighMidEnergy)
+		{
+			FloatIntensity = 3;
+		}
+		else if (MaxEnergy == HighEnergy)
+		{
+			FloatIntensity = 4;
+		}
+
+		// 둥실거림 강도를 각 총알에 적용
+		for (auto& Bullet : BulletSpawner->GetBulletPool())
+		{
+			if (Bullet && Bullet->IsActive())
+			{
+				Bullet->SetFloatIntensity(FloatIntensity);
+			}
+		}
+
 		if (PatternDelegates.Contains(BulletPatterns[CurrentPatternIndex].PatternType))
 		{
 			PatternDelegates[BulletPatterns[CurrentPatternIndex].PatternType].Execute(BulletPatterns[CurrentPatternIndex]);
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: Applying pattern index %d with bullet speed %f at time index %d"), CurrentData.PatternIndex, CurrentData.BulletSpeed, CurrentTimeIndex);
-
-		// 4/4 박자 단위로 인덱스를 증가시켜 다음 조건을 확인하도록 함
-		CurrentTimeIndex++; 
+		CurrentTimeIndex++;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ABoss::UpdatePatternConditions: No more conditions to process."));
-		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle); // 타이머를 중지하여 패턴 업데이트를 멈춤
+		GetWorldTimerManager().ClearTimer(PatternUpdateTimerHandle);
 	}
 }
 
 // JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
 void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFilePath)
 {
-	// JSON 파일을 문자열로 로드
 	FString JsonString;
 	if (FFileHelper::LoadFileToString(JsonString, *JsonFilePath))
 	{
-		// JSON 파서를 위한 객체 생성
 		TSharedPtr<FJsonObject> JsonObject;
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 
-		// JSON 문자열을 파싱하여 JsonObject로 변환
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			// 최종 패턴 데이터를 저장할 배열
 			TArray<FFinalPatternData> FinalPatternDataArray;
-
-			// JSON 객체에서 템포, 비트, 강도, 주파수 대역별 데이터 값을 가져옴
 			float Tempo = JsonObject->GetNumberField(TEXT("tempo"));
-			float TotalDuration = JsonObject->GetNumberField(TEXT("total_duration"));  // 전체 길이 (초 단위)
+			float TotalDuration = JsonObject->GetNumberField(TEXT("total_duration"));
 
 			const TArray<TSharedPtr<FJsonValue>> BeatsArray = JsonObject->GetArrayField(TEXT("beats"));
 			const TArray<TSharedPtr<FJsonValue>> IntensityArray = JsonObject->GetArrayField(TEXT("intensity"));
+			const TArray<TSharedPtr<FJsonValue>> LowArray = JsonObject->GetArrayField(TEXT("low"));
+			const TArray<TSharedPtr<FJsonValue>> LowMidArray = JsonObject->GetArrayField(TEXT("low_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighMidArray = JsonObject->GetArrayField(TEXT("high_mid"));
+			const TArray<TSharedPtr<FJsonValue>> HighArray = JsonObject->GetArrayField(TEXT("high"));
 
-			// 각 강도 값에 대해 반복하여 패턴 데이터를 생성
 			for (int32 i = 0; i < IntensityArray.Num(); ++i)
 			{
 				FFinalPatternData FinalData;
 
-				float Intensity = IntensityArray[i]->AsNumber();
+				FinalData.Intensity = IntensityArray[i]->AsNumber();
+				FinalData.LowFrequencyEnergy = LowArray[i]->AsNumber();
+				FinalData.LowMidFrequencyEnergy = LowMidArray[i]->AsNumber();
+				FinalData.HighMidFrequencyEnergy = HighMidArray[i]->AsNumber();
+				FinalData.HighFrequencyEnergy = HighArray[i]->AsNumber();
 
-				// 강도 값에 따른 패턴 인덱스 설정
-				if (Intensity >= 1.0f)
+				if (FinalData.Intensity >= 1.0f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
-				else if (Intensity >= 0.9f)
+				else if (FinalData.Intensity >= 0.9f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
-				else if (Intensity >= 0.8f)
+				else if (FinalData.Intensity >= 0.8f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
-				else if (Intensity >= 0.7f)
+				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::CircularMoving;
 						});
 				}
-				else if (Intensity >= 0.6f)
+				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
-				else if (Intensity >= 0.5f)
+				else if (FinalData.Intensity >= 0.5f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Octagon;
 						});
 				}
-				else if (Intensity >= 0.4f)
+				else if (FinalData.Intensity >= 0.4f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::TargetCircle;
 						});
 				}
-				else if (Intensity >= 0.3f)
+				else if (FinalData.Intensity >= 0.3f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Swirl;
 						});
 				}
-				else if (Intensity >= 0.2f)
+				else if (FinalData.Intensity >= 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
 							return Pattern.PatternType == EPatternType::Wall;
 						});
 				}
-				else if (Intensity >= 0.1f)
+				else if (FinalData.Intensity >= 0.1f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
@@ -472,23 +491,9 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 						});
 				}
 
-				// 비트 시간과 현재 인덱스가 가까운 경우 탄막 속도를 감소시킴
-				for (const auto& BeatValue : BeatsArray)
-				{
-					float BeatTime = BeatValue->AsNumber();
-					if (FMath::Abs(i * 4 * (60.0 / Tempo) - BeatTime) < 0.1f)
-					{
-						// 현재 인덱스가 비트 시간과 매우 가까운 경우 탄막 속도를 감소시킴
-						FinalData.BulletSpeed = FMath::Max(0.1f, FinalData.BulletSpeed - 0.1f);
-						break;
-					}
-				}
-
-				// 패턴 데이터를 배열에 추가
 				FinalPatternDataArray.Add(FinalData);
 			}
 
-			// 분석된 데이터 구조체 생성 및 저장
 			FMusicAnalysisData AnalysisData;
 			AnalysisData.Tempo = Tempo;
 			AnalysisData.FinalPatternDataArray = FinalPatternDataArray;
@@ -667,7 +672,7 @@ void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 		FVector SpawnLocation = FVector(BossLocation.X, BossLocation.Y + RandomY, BossLocation.Z + RandomZ);
 		FRotator SpawnRotation = GetActorRotation();
 
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -705,7 +710,7 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 		FRotator SpawnRotation = BossRotation;
 		SpawnRotation.Yaw += AngleOffset;
 
-		BulletSpawner->SpawnPooledBullet(BossLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(BossLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Fan"));
 	UE_LOG(LogTemp, Warning, TEXT("---"));
@@ -735,7 +740,7 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 		FRotator SpawnRotation = Direction.Rotation();
 
 		// 총알 스폰
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -783,7 +788,7 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 		FRotator SpawnRotation = GetActorForwardVector().Rotation();
 
 		// 총알을 생성
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -853,7 +858,7 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 			// 플레이어를 향한 방향 계산
 			FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
 			FRotator SpawnRotation = Direction.Rotation();
-			BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+			BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 		}
 	}
 
@@ -926,7 +931,7 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 		{
 			FVector SpawnLocation = BossLocation + GetActorForwardVector() * Wall[i].X + GetActorRightVector() * Wall[i].Y + GetActorUpVector() * Wall[i].Z;
 
-			BulletSpawner->SpawnPooledBullet(SpawnLocation, BossRotation, Pattern.BulletSpeed);
+			BulletSpawner->SpawnPooledBullet(SpawnLocation, BossRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 		}
 	}
 
@@ -990,7 +995,7 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 
 		FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
 		FRotator SpawnRotation = Direction.Rotation();
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -1030,7 +1035,7 @@ void ABoss::FireHeartPattern(const FBulletHellPattern& Pattern)
 		FVector SpawnLocation = BossLocation + Offset;
 		FRotator SpawnRotation = GetActorRotation();
 
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Heart"));
@@ -1075,7 +1080,7 @@ void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 			if (BulletIndex >= Pattern.NumberOfBullets)
 				break;
 
-			ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+			ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 			if (Bullet)
 			{
 				Bullet->InitialDirection = GetActorForwardVector(); // 올바른 방향 설정
@@ -1125,7 +1130,7 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 		// 보스의 정면을 향하는 방향으로 설정
 		FRotator SpawnRotation = GetActorRotation();
 
-		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed);
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
 
 	// 웃음 효과음 재생
@@ -1148,7 +1153,7 @@ void ABoss::FireCircularMovingPattern(const FBulletHellPattern& Pattern)
 		FVector InitialOffset = Pattern.InitialPositions.IsValidIndex(i) ? Pattern.InitialPositions[i] : FVector::ZeroVector;
 		FVector SpawnLocation = BossLocation + InitialOffset;
 
-		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, GetActorRotation(), Pattern.BulletSpeed);
+		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, GetActorRotation(), Pattern.BulletSpeed, Pattern.FloatIntensity);
 		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
@@ -1182,7 +1187,7 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 
 		FVector SpawnLocation = BossLocation + InitialOffset;
 
-		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, GetActorRotation(), Pattern.BulletSpeed);
+		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, GetActorRotation(), Pattern.BulletSpeed, Pattern.FloatIntensity);
 		if (Bullet)
 		{
 			Bullet->SetPatternType(Pattern.PatternType);
@@ -1242,7 +1247,7 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern RandomStraightPattern;
 	RandomStraightPattern.PatternType = EPatternType::RandomStraight;
 	RandomStraightPattern.NumberOfBullets = 6;
-	RandomStraightPattern.BulletSpeed = 800.0f;
+	RandomStraightPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(RandomStraightPattern);
 
 	// 부채꼴
@@ -1250,7 +1255,7 @@ void ABoss::InitializeDefaultPatterns()
 	FanPattern.PatternType = EPatternType::Fan;
 	FanPattern.FanAngle = 90.0f; // 부채꼴 패턴의 각도 설정
 	FanPattern.NumberOfBullets = 20; // 부채꼴 패턴에서 발사할 총알 수
-	FanPattern.BulletSpeed = 800.0f;
+	FanPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(FanPattern);
 
 	// 원형 패턴
@@ -1258,7 +1263,7 @@ void ABoss::InitializeDefaultPatterns()
 	TargetCirclePattern.PatternType = EPatternType::TargetCircle;
 	TargetCirclePattern.PatternSize = 300.0f; // 원형 패턴의 크기 설정
 	TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
-	TargetCirclePattern.BulletSpeed = 800.0f;
+	TargetCirclePattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(TargetCirclePattern);
 
 	// 소용돌이(십자가) 
@@ -1266,28 +1271,28 @@ void ABoss::InitializeDefaultPatterns()
 	SwirlPattern.PatternType = EPatternType::Swirl;
 	SwirlPattern.PatternSize = 150.0f; // 원형 패턴의 크기 설정
 	SwirlPattern.NumberOfBullets = 4; // 총알의 수
-	SwirlPattern.BulletSpeed = 800.0f;
+	SwirlPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(SwirlPattern);
 
 	// 유도 십자가
 	FBulletHellPattern TargetCrossPattern;
 	TargetCrossPattern.PatternType = EPatternType::TargetCross;
 	TargetCrossPattern.NumberOfBullets = 20;
-	TargetCrossPattern.BulletSpeed = 800.0f;
+	TargetCrossPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(TargetCrossPattern);
 
 	// 벽 패턴
 	FBulletHellPattern WallPatter;
 	WallPatter.PatternType = EPatternType::Wall;
 	WallPatter.NumberOfBullets = 30;
-	WallPatter.BulletSpeed = 800.0f;
+	WallPatter.BulletSpeed = 300.0f;
 	BulletPatterns.Add(WallPatter);
 
 	// 유도 오각형
 	FBulletHellPattern OctagonPattern;
 	OctagonPattern.PatternType = EPatternType::Octagon;
 	OctagonPattern.NumberOfBullets = 30;
-	OctagonPattern.BulletSpeed = 800.0f;
+	OctagonPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(OctagonPattern);
 
 	// // 천사 패턴
@@ -1302,14 +1307,14 @@ void ABoss::InitializeDefaultPatterns()
 	HeartPattern.PatternType = EPatternType::Heart;
 	HeartPattern.PatternSize = 100.0f; // 하트 모양 패턴의 크기 설정
 	HeartPattern.NumberOfBullets = 30; // 총알의 수
-	HeartPattern.BulletSpeed = 800.0f;
+	HeartPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(HeartPattern);
 
 	// 민들레 패턴 
 	FBulletHellPattern DandelionPattern;
 	DandelionPattern.PatternType = EPatternType::Dandelion;
 	DandelionPattern.NumberOfBullets = 30;
-	DandelionPattern.BulletSpeed = 800.0f;
+	DandelionPattern.BulletSpeed = 300.0f;
 	DandelionPattern.SpreadDelay = 1.0f; // 몇 초 후에 퍼짐
 	BulletPatterns.Add(DandelionPattern);
 
@@ -1317,15 +1322,15 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern HAPattern;
 	HAPattern.PatternType = EPatternType::HA;
 	HAPattern.NumberOfBullets = 23;
-	HAPattern.BulletSpeed = 800.0f;
+	HAPattern.BulletSpeed = 300.0f;
 	BulletPatterns.Add(HAPattern);
 
 	// CircularMoving 패턴 추가
 	FBulletHellPattern CircularMovingPattern;
 	CircularMovingPattern.PatternType = EPatternType::CircularMoving;
 	CircularMovingPattern.NumberOfBullets = 12; 
-	CircularMovingPattern.BulletSpeed = 800.0f; // 앞으로 전진하는 속도
-	CircularMovingPattern.OrbitSpeed = 100.0f; // 원을 그리는 속도
+	CircularMovingPattern.BulletSpeed = 300.0f; // 앞으로 전진하는 속도
+	CircularMovingPattern.OrbitSpeed = 200.0f; // 원을 그리는 속도
 	CircularMovingPattern.PatternSize = 200.0f; // 원형 반지름
 	// 초기 위치 설정
 	CircularMovingPattern.InitialPositions = {
