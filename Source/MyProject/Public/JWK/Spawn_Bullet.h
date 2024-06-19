@@ -20,7 +20,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Bullet을 Pool에서 Spawn하는 함수
-	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed);
+	ABullet_Pooled* SpawnPooledBullet(FVector SpawnLocation, FRotator SpawnRotation, float BulletSpeed, int FloatIntensity);
 
 	// Bullet이 비활성화될 때 호출되는 함수
 	UFUNCTION()
@@ -28,6 +28,9 @@ public:
 
 	// 모든 활성화된 Bullet 비활성화
 	void DeactivateAllBullets();
+
+	// Bullet Pool을 반환하는 함수 추가////0619
+	const TArray<ABullet_Pooled*>& GetBulletPool() const;
 
 private:
 	UPROPERTY(EditAnywhere, Category="Bullet Pool")

@@ -49,6 +49,8 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		{
 			UpdateTImer();
 		}
+		FString scoreupdate = Score->GetText().ToString();
+		SpawnLeftWidget->FinalScore = FCString::Atoi(*scoreupdate);
 	}
 
 	////////////////////////////////////////////////// Game Clear //////////////////////////////////////////////////
@@ -65,6 +67,7 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		WidgetComponent->SetWidgetClass(GameClearUIClass);
 		Boss->bIsMusicFinished = false; // 음악재생이 다 되었는가??
 		Boss->OnMusicFinished();
+		SpawnWidget->isFirst = true;
 	}
 
 	////////////////////////////////////////////////// Game Over //////////////////////////////////////////////////
@@ -101,7 +104,7 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			SpawnLeftWidget->FinalPlayTime = PlayTime->GetText();
 			FString ScoreStr = Score->GetText().ToString();
 			SpawnLeftWidget->FinalScore = FCString::Atoi(*ScoreStr);
-			
+			SpawnWidget->isFirst = true;
 			UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 			WidgetComponent->SetWidgetClass(GameOverUIClass);
 			UUserWidget* UserWidget = WidgetComponent->GetUserWidgetObject();
