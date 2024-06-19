@@ -54,8 +54,8 @@ void UGameOverUI::NativeConstruct()
 	CurrentCount = 0;
 	Player->UpdateMaxScore();
 	Player->UpdateMaxScoreCpp();
-
-	SetMyScore(Player->SCORE);
+	
+	SetMyScore(SpawnLeftWidget->FinalScore);
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.0001f, true);
 }
 

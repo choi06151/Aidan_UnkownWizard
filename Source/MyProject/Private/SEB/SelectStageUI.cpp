@@ -14,6 +14,8 @@
 #include "JWK/Boss.h"
 #include "SEB/GameOverUI.h"
 #include "CJW/PlayerPawnCPP.h"
+#include "Components/AudioComponent.h"
+
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
@@ -65,9 +67,13 @@ void USelectStageUI::NativePreConstruct()
 		SpawnWidget->SpecificRow = FirstRow;
 		
 	}
-	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+	
 	
 	if(SpawnWidget){
+		ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+
+		
+
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
 		int32 ScrollCount = SpawnWidget->CurrentStage;
 		FColor ClickColor = FColor(255, 100, 22, 255);
@@ -125,7 +131,7 @@ void USelectStageUI::OnPlayClicked()
 	{
 		UE_LOG(LogTemp, Error, TEXT("SelectStageUI::OnPlayClicked"));
 		Boss->bIsGameStart = true;
-		//Boss->StopMusic();
+		Boss->MusicAudioComponent->Stop();
 		Boss->MusicStart();
 		
 	}
@@ -141,6 +147,7 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	SetSelectUIColor(ScrollCount, ClickColor);
 	
 	//NewText라는 ArtistName열을 가진 행 탐색
+	
 	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString(), "MusicName", NewInfoText.ToString());
 	if (!SpecificRow)
 	{
@@ -150,8 +157,11 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
 
-	//	Boss->StopMusic();
+	//Boss->StopMusic();
 	//SpawnWidget->MusicPlay();
+	//Boss->PlayMusicOnly(SpecificRow->MusicFilePath, SpecificRow->MusicName);
+	if(!SpawnWidget->isFirst)
+		SpawnWidget->MusicPlayOnly();
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
 	
