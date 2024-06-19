@@ -521,6 +521,27 @@ void ABoss::OnMusicFinished()
 	bClearGame = true;
 }
 
+void ABoss::PlayMusicOnly(const FString& MusicFilePath)
+{
+	// 음악 설정 및 재생
+	if (USoundBase* LoadedMusic = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), nullptr, *MusicFilePath)))
+	{
+		// 노래 시작 시 변수 초기화
+		bIsMusicFinished = false;
+
+		// 음악을 AudioComponent에 설정
+		MusicAudioComponent->SetSound(LoadedMusic);
+
+		// 음악 재생 시작
+		PlayMusic();
+
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::PlayMusicOnly: Playing music: %s"), *MusicFilePath);
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("ABoss::PlayMusicOnly: Failed to load music: %s"), *MusicFilePath);
+
+}
+
 void ABoss::SetMusicVolume(float Volume)
 {
 	if (MusicAudioComponent)
