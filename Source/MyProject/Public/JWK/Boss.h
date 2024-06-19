@@ -55,7 +55,7 @@ struct FPatternConditions
 	{
 	}
 };
-// 각 시간 인덱스에서 사용할 탄막 패턴의 정보를 저장하는 구조체
+// 각 시간 인덱스에서 사용할 탄막 패턴의 정보를 저장하는 구조체 //////////0619
 USTRUCT(BlueprintType)
 struct FFinalPatternData
 {
@@ -67,9 +67,29 @@ struct FFinalPatternData
 	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
 	float BulletSpeed; // 탄막의 총알 속도
 
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float Intensity; // 탄막의 강도
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float LowFrequencyEnergy; // 저주파 대역 에너지
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float LowMidFrequencyEnergy; // 저중간주파 대역 에너지
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float HighMidFrequencyEnergy; // 고중간주파 대역 에너지
+
+	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
+	float HighFrequencyEnergy; // 고주파 대역 에너지
+
 	FFinalPatternData()
 		: PatternIndex(0)
 		, BulletSpeed(300.0f) // 기본 속도 값
+		, Intensity(0.0f)
+		, LowFrequencyEnergy(0.0f)
+		, LowMidFrequencyEnergy(0.0f)
+		, HighMidFrequencyEnergy(0.0f)
+		, HighFrequencyEnergy(0.0f)
 	{
 	}
 };
@@ -246,6 +266,9 @@ public:
 	void StopMusic();
 
 	void ThrowBaton();
+	//////////////////////////0618
+	// 노래만 재생하는 함수
+	void PlayMusicOnly(const FString& MusicFilePath); 
 	
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
@@ -359,4 +382,5 @@ public:
 	//////////////////////////////////////// 탄막 테스트 변수 ////////////////////////////////////////
 	bool bTestFire = false;
 	float TimeElapsed;
+
 };
