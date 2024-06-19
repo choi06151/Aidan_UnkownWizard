@@ -436,14 +436,14 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.9f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Dandelion;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.8f)
@@ -457,56 +457,56 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Octagon;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.4f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::TargetCircle;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.3f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Swirl;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Wall;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.1f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::RandomStraight;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Fan;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 
@@ -566,7 +566,7 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
 	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
 	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
-	PreAnalyzeMusicData(TEXT("Rabel"), RabelJsonPath);
+	PreAnalyzeMusicData(TEXT("Bolero"), RabelJsonPath);
 	PreAnalyzeMusicData(TEXT("Fantaisie Impromptu"), FantaisieImpromptuJsonPath);
 	PreAnalyzeMusicData(TEXT("Orpheus in the Underworld"), OrpheusintheUnderworldJsonPath);
 	PreAnalyzeMusicData(TEXT("Eine Kleine Nachtmusik"), NachtmusikJsonPath);
