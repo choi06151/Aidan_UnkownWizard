@@ -3,6 +3,9 @@
 
 #include "CJW/PlayerPawnCPP.h"
 
+#include "JWK/Boss.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 APlayerPawnCPP::APlayerPawnCPP()
 {
@@ -15,6 +18,7 @@ APlayerPawnCPP::APlayerPawnCPP()
 void APlayerPawnCPP::BeginPlay()
 {
 	Super::BeginPlay();
+	Boss =  Cast<ABoss>(UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass()));
 	
 }
 
@@ -23,6 +27,11 @@ void APlayerPawnCPP::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(SCORE >= 300000)
+	{
+		if(Boss)
+			Boss->bIsPhase = true;
+	}
 }
 
 // Called to bind functionality to input
