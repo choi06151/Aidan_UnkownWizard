@@ -450,21 +450,21 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Pinwheel;
+							return Pattern.PatternType == EPatternType::CircularMoving;
 						});
 				}
 				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::Octagon;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
@@ -566,7 +566,7 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
 	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
 	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
-	PreAnalyzeMusicData(TEXT("Rabel"), RabelJsonPath);
+	PreAnalyzeMusicData(TEXT("Bolero"), RabelJsonPath);
 	PreAnalyzeMusicData(TEXT("Fantaisie Impromptu"), FantaisieImpromptuJsonPath);
 	PreAnalyzeMusicData(TEXT("Orpheus in the Underworld"), OrpheusintheUnderworldJsonPath);
 	PreAnalyzeMusicData(TEXT("Eine Kleine Nachtmusik"), NachtmusikJsonPath);
