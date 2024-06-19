@@ -249,7 +249,7 @@ public:
 	void OnMusicFinished();
 
 	// 노래만 재생하는 함수
-	void PlayMusicOnly(const FString& MusicFilePath);
+	void PlayMusicOnly(const FString& MusicFilePath, const FString& MusicTitle);
 	
 	/////////// 재생 되고 있는 노래 조절할 수 있는 
 	UFUNCTION(BlueprintCallable, Category = "Music")
