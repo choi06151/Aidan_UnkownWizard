@@ -103,8 +103,9 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		if (SpawnWidget)
 		{
 			SpawnLeftWidget->FinalPlayTime = PlayTime->GetText();
-			
-			SpawnLeftWidget->FinalScore = Player->SCORE;
+			Player->UpdateCurrentScoreToCpp();
+			UE_LOG(LogTemp, Error, TEXT("Gameover ::::  %d"), SpawnLeftWidget->FinalScore);
+			//SpawnLeftWidget->FinalScore = Player->SCORE;
 			SpawnWidget->isFirst = true;
 			UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 			WidgetComponent->SetWidgetClass(GameOverUIClass);
