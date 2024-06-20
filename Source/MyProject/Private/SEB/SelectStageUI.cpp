@@ -95,6 +95,7 @@ void USelectStageUI::NativeConstruct()
 
 void USelectStageUI::OnUPArrowClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	if (MainScroll)
 	{
 		float CurrentOffset = MainScroll->GetScrollOffset();
@@ -104,6 +105,7 @@ void USelectStageUI::OnUPArrowClicked()
 
 void USelectStageUI::OnDownArrowClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	if (MainScroll)
 	{
 		float CurrentOffset = MainScroll->GetScrollOffset();
@@ -113,6 +115,7 @@ void USelectStageUI::OnDownArrowClicked()
 
 void USelectStageUI::OnBackClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// SpawnWidget의 WidgetClass를 변경
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(GameStartUIClass);
@@ -120,7 +123,7 @@ void USelectStageUI::OnBackClicked()
 
 void USelectStageUI::OnPlayClicked()
 {
-	
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 
@@ -161,7 +164,10 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	//SpawnWidget->MusicPlay();
 	//Boss->PlayMusicOnly(SpecificRow->MusicFilePath, SpecificRow->MusicName);
 	if(!SpawnWidget->isFirst)
+	{
+		UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 		SpawnWidget->MusicPlayOnly();
+	}
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
 	

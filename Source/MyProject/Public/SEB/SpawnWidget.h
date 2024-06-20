@@ -42,6 +42,9 @@ public:
 	int32 CurrentStage = 1;
 
 	bool isFirst = true;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class USoundBase> SFX_Button;
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;
