@@ -39,4 +39,9 @@ private:
 	class ABoss* Boss;
 	UPROPERTY()
 	class APlayerPawnCPP* PlayerInfo;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class USoundBase> SFX_Start;
+
+	class UAudioComponent* AudioComponent;
 };

@@ -115,6 +115,7 @@ void USelectStageUI::OnDownArrowClicked()
 
 void USelectStageUI::OnBackClicked()
 {
+	Boss->StopMusic();
 	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// SpawnWidget의 WidgetClass를 변경
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
