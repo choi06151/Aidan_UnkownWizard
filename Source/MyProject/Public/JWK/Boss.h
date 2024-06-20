@@ -62,7 +62,7 @@ struct FFinalPatternData
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
-	int32 PatternIndex; // 탄막 패턴의 인덱스
+	EPatternType PatternIndex; // 탄막 패턴의 인덱스를 EPatternType으로 변경
 
 	UPROPERTY(BlueprintReadWrite, Category = "Pattern Data")
 	float BulletSpeed; // 탄막의 총알 속도
@@ -83,7 +83,7 @@ struct FFinalPatternData
 	float HighFrequencyEnergy; // 고주파 대역 에너지
 
 	FFinalPatternData()
-		: PatternIndex(0)
+		: PatternIndex(EPatternType::RandomStraight) // 기본값 설정
 		, BulletSpeed(300.0f) // 기본 속도 값
 		, Intensity(0.0f)
 		, LowFrequencyEnergy(0.0f)
@@ -139,10 +139,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBossFSM* bossFSM;
-	
+
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* batonMesh;
-	
+
 private:
 	FVector InitialLocation;
 
@@ -155,42 +155,42 @@ public:
 
 	UFUNCTION()
 	void HandleFloatProgress(float Value);
-	
+
 	////////////////////////////////////// Boss Play 관련 bool //////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되었는가?
-	bool bIsGameStart = false;
-	
+		bool bIsGameStart = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 포탈이 열렸는가??
-	bool bIsPortalCurtainOpned = false;
+		bool bIsPortalCurtainOpned = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 보스가 앞으로 움직이는가?
-	bool bIsWalk = false;
+		bool bIsWalk = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 게임이 시작되고 목적지에 도달했는가?
-	bool bIsArrive = false;
+		bool bIsArrive = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격준비를 시작했는가?
-	bool bIsCommandWait = false;
-	
+		bool bIsCommandWait = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") //목적지에 도달하고 공격을 시작했는가?
-	bool bIsAttackStart = false;
+		bool bIsAttackStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "music")	// 공격과 동시에 음악이 시작되었는가??
-	bool bIsMusicStart = false;
+		bool bIsMusicStart = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 일정 조건 달성 시   다음 페이즈로 진입했는가?
-	bool bIsPhase = false;
-	
+		bool bIsPhase = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 페이즈 진입 후 지휘봉을 던지는가?
-	bool bThrowBaton = false;
+		bool bThrowBaton = false;
 
 
 	//////////////////////////////////////// 게임 진행 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 플레이어가 Clear하지 못하고 중간에 GameOver 했는가??
-	bool bGameOver = false;
+		bool bGameOver = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "bool_State") // 노래가 모두 끝나서 클리어를 했는가??
-	bool bClearGame = false;
+		bool bClearGame = false;
 
 
 	//////////////////////////////////////// Play UI 관련 ////////////////////////////////////////
@@ -202,18 +202,18 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Spawn_Widget")
 	class ASpawnWidget* SpawnWidget;
-	
+
 	//////////////////////////////////////// BulletHell 발사 관련 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 한 번에 발사되는 총알의 수
-	int32 NumberOfBullets = 5;
+		int32 NumberOfBullets = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat") // 총알의 각도
-	float AngleStep = 360.0f / NumberOfBullets;
+		float AngleStep = 360.0f / NumberOfBullets;
 
-	
+
 	//////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
-	
-    // JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
+
+	// JSON 데이터를 로드하고 패턴 조건을 설정하는 함수
 	UFUNCTION(BlueprintCallable, Category = "Pattern Analysis")
 	void LoadMusicDataAndSetPatterns(const FString& MusicTitle, const FString& MusicFilePath);
 
@@ -250,7 +250,7 @@ public:
 
 	// 노래만 재생하는 함수
 	void PlayMusicOnly(const FString& MusicFilePath, const FString& MusicTitle);
-	
+
 	/////////// 재생 되고 있는 노래 조절할 수 있는 
 	UFUNCTION(BlueprintCallable, Category = "Music")
 	void SetMusicVolume(float Volume);
@@ -268,8 +268,8 @@ public:
 	void ThrowBaton();
 	//////////////////////////0618
 	// 노래만 재생하는 함수
-	void PlayMusicOnly(const FString& MusicFilePath); 
-	
+	void PlayMusicOnly(const FString& MusicFilePath);
+
 	//////////////////////////////////////// 총알 발사 관련 함수 ////////////////////////////////////////
 	void FireBullet();
 	void StartFiring();
@@ -277,47 +277,47 @@ public:
 	void ChangePattern();
 	void InitializeDefaultPatterns();
 
-	
+
 	//////////////////////////////////////// BulletHell 패턴 관련 ////////////////////////////////////////
 	UPROPERTY()
 	class AActor* player;
 	// 랜덤 직선
 	void FireRandomStraightPattern(const FBulletHellPattern& Pattern);
 
-	
+
 	// 부채꼴
 	void FireFanPattern(const FBulletHellPattern& Pattern);
 
-	
+
 	// 원
 	void FireTargetCirclePattern(const FBulletHellPattern& Pattern);
 
-	
+
 	// 소용돌이
 	void FireSwirlPattern(const FBulletHellPattern& Pattern);
 	void DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float Radius, float RotationOffset);
 
-	
+
 	// 유도 십자가
 	void FireTargetCrossPattern(const FBulletHellPattern& Pattern);
 
-	
+
 	// 벽
 	void FireWallPattern(const FBulletHellPattern& Pattern);
 	int CurrentEmptyLine = 3;
 
-	
+
 	// 나팔꽃
 	void FireTargetOctagonPattern(const FBulletHellPattern& Pattern);
 
-	
+
 	// 천사
 	void FireAngelPattern(const FBulletHellPattern& Pattern);
 
 
 	//// 추가 한 패턴들
 	// 하트
-	void FireHeartPattern(const FBulletHellPattern& Pattern); 
+	void FireHeartPattern(const FBulletHellPattern& Pattern);
 	// 하트 모양 정의
 	void DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize);
 
@@ -331,24 +331,24 @@ public:
 	void FireCircularMovingPattern(const FBulletHellPattern& Pattern);
 
 	// 바람개비
-	void FirePinwheelPattern(const FBulletHellPattern& Pattern); 
+	void FirePinwheelPattern(const FBulletHellPattern& Pattern);
 
-	
+
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
 	USpawn_Baton* BatonSpawner;
 
 	UPROPERTY(EditAnywhere, Category = "Combat") // 총알 생성
-	USpawn_Bullet* BulletSpawner;
+		USpawn_Bullet* BulletSpawner;
 
 	UPROPERTY(EditAnywhere, Category = "Combat") // 패턴 종류 저장소
-	TArray<FBulletHellPattern> BulletPatterns;
+		TArray<FBulletHellPattern> BulletPatterns;
 
 	UPROPERTY(EditAnywhere, Category = "Combat") // 발사 주기
-	float FireRate;
+		float FireRate;
 
 	UPROPERTY(EditAnywhere, Category = "Combat") // 현재 패턴 인덱스
-	int32 CurrentPatternIndex;
+		EPatternType CurrentPatternIndex;
 
 	FTimerHandle FireRateTimerHandle;
 
@@ -383,4 +383,26 @@ public:
 	bool bTestFire = false;
 	float TimeElapsed;
 
+private:
+	// 시퀀스 리스트와 인덱스 변수
+	TArray<EPatternType> SequenceForIntensity0;
+	TArray<EPatternType> SequenceForIntensity0_1;
+	TArray<EPatternType> SequenceForIntensity0_5;
+	TArray<EPatternType> SequenceForIntensity0_6;
+	TArray<EPatternType> SequenceForIntensity0_7;
+	TArray<EPatternType> SequenceForIntensity0_8;
+	TArray<EPatternType> SequenceForIntensity0_9;
+	TArray<EPatternType> SequenceForIntensity1;
+
+	int32 CurrentIndexForIntensity0;
+	int32 CurrentIndexForIntensity0_1;
+	int32 CurrentIndexForIntensity0_5;
+	int32 CurrentIndexForIntensity0_6;
+	int32 CurrentIndexForIntensity0_7;
+	int32 CurrentIndexForIntensity0_8;
+	int32 CurrentIndexForIntensity0_9;
+	int32 CurrentIndexForIntensity1;
+
+	// 패턴 시퀀스를 초기화하는 함수
+	void InitializePatternSequences();
 };
