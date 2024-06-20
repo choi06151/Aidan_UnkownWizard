@@ -739,12 +739,12 @@ GetActorRightVector() * FMath::RandRange(-200, 200);
 // 랜덤 직선 : YZ 평면 랜덤좌표에서 총알들이 발사됨
 void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -550;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
 
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
 		float RandomY = FMath::FRandRange(-400.0f, 400.0f);
-		float RandomZ = FMath::FRandRange(0, 150.0f);
+		float RandomZ = FMath::FRandRange(-300, -200.0f);
 		FVector SpawnLocation = FVector(BossLocation.X, BossLocation.Y + RandomY, BossLocation.Z + RandomZ);
 		FRotator SpawnRotation = GetActorRotation();
 
@@ -771,8 +771,8 @@ void ABoss::FireRandomStraightPattern(const FBulletHellPattern& Pattern)
 // 부채꼴 : 부채꼴 모양으로 퍼지며 발사됨
 void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -200;
+	// BossLocation.Z = 500.0f;
 	FRotator BossRotation = GetActorRotation();
 
 	// 두 가지 다른 최대 각도 설정
@@ -802,8 +802,8 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 {
 	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(-200, 200) + GetActorUpVector() *
-		FMath::RandRange(-150, 150);
-	BossLocation.Z = 500.0f;
+		FMath::RandRange(-150, 150) /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 	float Radius = Pattern.PatternSize / 3.0f; // 패턴 크기에 따른 반지름
 
 	/////////////// 플레이어 위치 ///////////////
@@ -846,9 +846,9 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 // 소용돌이? : 한 번만 호출될 경우 그냥 +(십자) 모양임. 발사 횟수가 누적될 때 마다 시계방향으로 조금씩 회전되어 발사됨
 void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorUpVector() * -200;
 	TArray<FVector> CircleShape;
-	BossLocation.Z = 500.0f;
+	// BossLocation.Z = 500.0f;
 
 	// 시계방향 회전을 위한 현재 시간
 	float CurrentTime = GetWorld()->GetTimeSeconds();
@@ -910,8 +910,8 @@ void ABoss::DefineSwirlShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 // 유도 십자가 : + 모양의 탄막이 플레이어의 위치로 모임
 void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(0, 400) + GetActorUpVector() * FMath::RandRange(0, 400);
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(0, 400) + GetActorUpVector() * FMath::RandRange(0, 400) /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 	// 보스의 전방 벡터
 	FVector Forward = GetActorForwardVector();
 
@@ -964,9 +964,9 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 // 벽 : 3 X 9 (가로 X 세로)의 벽 중에서 세로 2줄의 빈 공간이 생기고 발사. 누적될 때 마다 빈 공간(세로 2줄)이 옆으로 이동함
 void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
 	FRotator BossRotation = GetActorRotation();
-	BossLocation.Z = 500.0f;
+	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Wall[] = {
 		FVector(0, 200, -300),
@@ -1037,9 +1037,9 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
 	FRotator BossRotation = GetActorRotation();
-	BossLocation.Z = 500.0f;
+	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Octagon[] = {
 		FVector(0.0f, 0.0f, 250.0f),
@@ -1099,8 +1099,8 @@ void ABoss::FireAngelPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireHeartPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 
 	TArray<FVector> HeartShape;
 	DefineHeartShape(HeartShape, Pattern.NumberOfBullets, Pattern.PatternSize);
@@ -1134,8 +1134,8 @@ void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 
 void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 
 	// 각도 지정 
 	TArray<float> VerticalAngles = { -30.0f, -15.0f, 0.0f, 15.0f, 30.0f }; // 세로 각도
@@ -1175,8 +1175,8 @@ void ABoss::FireDandelionPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 
 
 	TArray<FVector> HAPatternShape = {
@@ -1219,8 +1219,8 @@ void ABoss::FireHAPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FireCircularMovingPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
@@ -1244,8 +1244,8 @@ void ABoss::FireCircularMovingPattern(const FBulletHellPattern& Pattern)
 
 void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f;
-	BossLocation.Z = 500.0f;
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
 
 	int32 NumBullets = Pattern.NumberOfBullets;
 
