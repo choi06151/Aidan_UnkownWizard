@@ -232,8 +232,8 @@ void ABullet_Pooled::SetFloatIntensity(int Intensity)
 		FloatAmplitude = 80.0f;
 		break;
 	case 4:
-		FloatFrequency = 5.0f;
-		FloatAmplitude = 100.0f;
+		FloatFrequency = 6.0f;
+		FloatAmplitude = 150.0f;
 		break;
 	default:
 		FloatFrequency = 5.0f;
@@ -253,7 +253,7 @@ void ABullet_Pooled::SetLifeSpan(float LifeTime)
 void ABullet_Pooled::SetBulletSpeed(float Speed)
 {
 	movementComp->InitialSpeed = Speed;
-	UE_LOG(LogTemp, Warning, TEXT("SetBulletSpeed: Speed set to %f"), Speed);
+	//UE_LOG(LogTemp, Warning, TEXT("SetBulletSpeed: Speed set to %f"), Speed);
 }
 
 // pool에서의 index 설정
