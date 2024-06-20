@@ -18,6 +18,8 @@
 void UGameOverUI::NativeConstruct()
 {
 	Super::NativeConstruct();
+	UGameplayStatics::PlaySound2D(this, SFX_GameOver);
+	UGameplayStatics::PlaySound2D(this, SFX_HAHA);
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	SpawnLeftWidget = Cast<ASpawnLeftWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLeftWidget::StaticClass()));
@@ -61,6 +63,7 @@ void UGameOverUI::NativeConstruct()
 
 void UGameOverUI::OnSelectStageClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	SpawnLeftWidget->isRestart = true;
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
@@ -68,6 +71,7 @@ void UGameOverUI::OnSelectStageClicked()
 
 void UGameOverUI::OnRestartClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	UE_LOG(LogTemp, Error, TEXT("Hidden!!Hidden!!Hidden!!Hidden!!Hidden!!"));

@@ -23,6 +23,7 @@ void UGameStartUI::NativeConstruct()
 
 void UGameStartUI::OnStartBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	if (Boss)
 	{
 		Boss->PreAnalyzeAllMusicData();
@@ -35,11 +36,13 @@ void UGameStartUI::OnStartBtnClicked()
 
 void UGameStartUI::OnQuitBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
 }
 
 void UGameStartUI::OnTutorialBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	PlayerInfo->StartTutorialStageCpp();
 }
