@@ -19,6 +19,8 @@
 void UGameClearUI::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	UGameplayStatics::PlaySound2D(this, SFX_GameClear);
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	SpawnLeftWidget = Cast<ASpawnLeftWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLeftWidget::StaticClass()));
@@ -62,6 +64,7 @@ void UGameClearUI::NativeConstruct()
 
 void UGameClearUI::OnSelectStageClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	SpawnLeftWidget->isRestart = true;
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
@@ -69,6 +72,7 @@ void UGameClearUI::OnSelectStageClicked()
 
 void UGameClearUI::OnRestartClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	SpawnLeftWidget->isRestart = true;

@@ -63,4 +63,7 @@ private:
 	FTimerHandle CountTimerHandle;
 
 	class ABoss* Boss;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class USoundBase> SFX_GameClear;
 };
