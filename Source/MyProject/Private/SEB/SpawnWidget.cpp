@@ -61,6 +61,17 @@ void ASpawnWidget::MusicPlay()
 	UE_LOG(LogTemp, Error, TEXT("ASpawnWidget::MusicPlay"));
 }
 
+void ASpawnWidget::MusicPlayOnly()
+{
+	
+	FString MusicFilePath = SpecificRow->MusicFilePath;
+	FString MusicTitle = SpecificRow->MusicName;
+	Boss->PlayMusicOnly(MusicFilePath, MusicTitle);
+	UE_LOG(LogTemp, Error, TEXT("sssssssssssssssssssssssssssss"));
+	
+}
+
+
 void ASpawnWidget::CurtainOpenAnim()
 {
 	

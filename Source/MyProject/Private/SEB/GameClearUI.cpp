@@ -54,8 +54,9 @@ void UGameClearUI::NativeConstruct()
 	PlayTime->SetText(FText::FromString(SpawnLeftWidget->FinalPlayTime.ToString()));
 	//Set Count
 	CurrentCount = 0;
-	
-	SetMyScore(Player->SCORE);
+	Player->UpdateMaxScore();
+	Player->UpdateMaxScoreCpp();
+	SetMyScore(SpawnLeftWidget->FinalScore);
 	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.0001f, true);
 }
 
