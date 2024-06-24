@@ -807,8 +807,6 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 
 		BulletSpawner->SpawnPooledBullet(BossLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Fan"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
 
@@ -838,8 +836,7 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 		// 총알 스폰
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("TargetCircle"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// FTimerHandle BulletTimer;
 	// float BulletTime = 5.0f;
@@ -885,8 +882,7 @@ void ABoss::FireSwirlPattern(const FBulletHellPattern& Pattern)
 		// 총알을 생성
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Swirl"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// FTimerHandle BulletTimer;
 	// float BulletTime = 5.0f;
@@ -956,8 +952,7 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 			BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("TargetCross"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// FTimerHandle BulletTimer;
 	// float BulletTime = 5.0f;
@@ -1030,8 +1025,7 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 
 	// 비어있는 열을 오른쪽으로 이동
 	CurrentEmptyLine = (CurrentEmptyLine + 1) % WallWidth;
-	UE_LOG(LogTemp, Warning, TEXT("Wall"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// FTimerHandle BulletTimer;
 	// float BulletTime = 5.0f;
@@ -1088,8 +1082,7 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 		FRotator SpawnRotation = Direction.Rotation();
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Octagon"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
 	// FTimerHandle BulletTimer;
 	// float BulletTime = 5.0f;
@@ -1126,8 +1119,7 @@ void ABoss::FireHeartPattern(const FBulletHellPattern& Pattern)
 
 		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Heart"));
-	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
+
 }
 
 void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, float PatternSize)
