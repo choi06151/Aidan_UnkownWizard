@@ -59,7 +59,7 @@ void UGameClearUI::NativeConstruct()
 	Player->UpdateMaxScore();
 	Player->UpdateMaxScoreCpp();
 	SetMyScore(SpawnLeftWidget->FinalScore);
-	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.0001f, true);
+	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameClearUI::UpdateCountText, 0.00001f, true);
 }
 
 void UGameClearUI::OnSelectStageClicked()
