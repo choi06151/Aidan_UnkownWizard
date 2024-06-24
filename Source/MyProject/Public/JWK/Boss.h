@@ -362,14 +362,14 @@ public:
 	// 패턴 업데이트를 위한 인덱스
 	int32 CurrentTimeIndex;
 
-	////////////////////////////////////노래 재생관련 추가추가 ////////////////////////////////////////
+	//////////////////////////////////// 노래 재생관련 추가추가 ////////////////////////////////////////
 	UPROPERTY(EditAnywhere, Category = "Music")
 	USoundBase* Music;
 
 	UPROPERTY(VisibleAnywhere, Category = "Music")
 	UAudioComponent* MusicAudioComponent;
 
-	//////////////////////탄막 효과음 추가
+	//////////////////////////////////// 탄막 효과음 추가 ////////////////////////////////////
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundWave* HaSound;
 
@@ -383,4 +383,7 @@ public:
 	bool bTestFire = false;
 	float TimeElapsed;
 
+	//////////////////////////////////////// Boss Bone Sound ////////////////////////////////////////
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundWave* BoneSound;
 };
