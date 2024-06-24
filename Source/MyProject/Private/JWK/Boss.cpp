@@ -82,6 +82,13 @@ ABoss::ABoss()
 		HaSound = HaSoundAsset.Object;
 	}
 
+	// Boss 뼈 효과음
+	static ConstructorHelpers::FObjectFinder<USoundWave> BoneSoundAsset(TEXT("/Script/Engine.SoundWave'/Game/JWK/Sound/Boss_Bone_Sound.Boss_Bone_Sound'"));
+	if(BoneSoundAsset.Succeeded())
+	{
+		BoneSound = BoneSoundAsset.Object;
+	}
+	
 	// DELEGATE Map 초기화
 	/* 랜덤직선 */
 	PatternDelegates.Add(EPatternType::RandomStraight,
@@ -262,6 +269,13 @@ void ABoss::HandleState()
 	case 0:		// 목적지까지 이동
 		bIsWalk = true;
 		cnt++;
+		
+		if (BoneSound != nullptr)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), BoneSound);
+			UE_LOG(LogTemp, Error, TEXT("BoneSound!!BoneSound!!BoneSound!!BoneSound!!BoneSound!!"));
+		}
+
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.2f, false);
 		break;
 
