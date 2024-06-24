@@ -38,6 +38,10 @@ ABullet_Pooled::ABullet_Pooled()
 	FloatFrequency = 1.0f;
 	FloatAmplitude = 10.0f;
 	InitialZ = 0.0f;
+
+	// 탄막의 움직임을 제어하는 ProjectileMovement 컴포넌트 초기화
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ProjectileMovement->bAutoActivate = false;
 }
 
 void ABullet_Pooled::BeginPlay()
@@ -70,8 +74,15 @@ void ABullet_Pooled::Tick(float DeltaTime)
 		if (PatternType != EPatternType::Pinwheel && PatternType != EPatternType::CircularMoving && PatternType != EPatternType::Dandelion)
 		{
 			// 둥실거림을 적용한 새로운 위치 계산
-			FVector CurrentLocation = GetActorLocation();
+			/*FVector CurrentLocation = GetActorLocation();
 			float NewZOffset = FloatAmplitude * FMath::Sin(GetWorld()->GetTimeSeconds() * FloatFrequency);
+			CurrentLocation.Z = InitialZ + NewZOffset;
+			SetActorLocation(CurrentLocation);*/
+
+			// 전역 시간을 기반으로 한 둥실거림 계산////////0624
+			float GlobalTime = GetWorld()->GetTimeSeconds();
+			FVector CurrentLocation = GetActorLocation();
+			float NewZOffset = FloatAmplitude * FMath::Sin(GlobalTime * FloatFrequency);
 			CurrentLocation.Z = InitialZ + NewZOffset;
 			SetActorLocation(CurrentLocation);
 		}
@@ -106,6 +117,8 @@ void ABullet_Pooled::SetActive(bool IsActive)
 	InitialZ = GetActorLocation().Z; // 활성화 시 초기 Z 위치 설정
 	// 강도에 따라 둥실거림 주파수와 진폭 설정을 바로 적용
 	SetFloatIntensity(FloatIntensity);
+
+	Velocity = FVector::ZeroVector;////0624
 }
 
 // 총알 비활성화
@@ -214,32 +227,43 @@ void ABullet_Pooled::SetCircularParams(const FVector& Center, float Radius, floa
 
 void ABullet_Pooled::SetFloatIntensity(int Intensity)
 {
-	FloatIntensity = Intensity;
-
-	// 강도에 따라 둥실거림 주파수와 진폭 설정
-	switch (Intensity)
+	if (!bIsFloatIntensitySet)  // 이미 설정된 경우 다시 설정하지 않음
 	{
-	case 1:
-		FloatFrequency = 5.0f; // 둥실거림의 빈도
-		FloatAmplitude = 20.0f; // 둥실거림(흔들림)의 진폭을 나타내는 변수
-		break;
-	case 2:
-		FloatFrequency = 5.0f;
-		FloatAmplitude = 50.0f;
-		break;
-	case 3:
-		FloatFrequency = 5.0f;
-		FloatAmplitude = 80.0f;
-		break;
-	case 4:
-		FloatFrequency = 6.0f;
-		FloatAmplitude = 150.0f;
-		break;
-	default:
-		FloatFrequency = 5.0f;
-		FloatAmplitude = 5.0f;
-		break;
+		FloatIntensity = Intensity;
+
+		// 강도에 따라 둥실거림 주파수와 진폭 설정
+		switch (Intensity)
+		{
+		case 1:
+			FloatFrequency = 5.0f; // 둥실거림의 빈도
+			FloatAmplitude = 20.0f; // 둥실거림(흔들림)의 진폭을 나타내는 변수
+			break;
+		case 2:
+			FloatFrequency = 7.0f;
+			FloatAmplitude = 50.0f;
+			break;
+		case 3:
+			FloatFrequency = 8.0f;
+			FloatAmplitude = 100.0f;
+			break;
+		case 4:
+			FloatFrequency = 10.0f;
+			FloatAmplitude = 160.0f;
+			break;
+		default:
+			FloatFrequency = 5.0f;
+			FloatAmplitude = 5.0f;
+			break;
+		}
+
+		bIsFloatIntensitySet = true;  // 둥실거림 설정 완료
 	}
+}
+
+void ABullet_Pooled::SetVelocity(const FVector& NewVelocity)
+{
+	Velocity = NewVelocity;
+	Speed = NewVelocity.Size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

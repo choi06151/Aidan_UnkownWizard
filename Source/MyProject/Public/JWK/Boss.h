@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "BulletHellPattern.h"
 #include "Spawn_Baton.h"
+#include "KJH/OlderSister.h"
 #include "Boss.generated.h"
 
 DECLARE_DELEGATE_OneParam(FPatternDelegate, const FBulletHellPattern&);
@@ -333,7 +334,8 @@ public:
 	// 바람개비
 	void FirePinwheelPattern(const FBulletHellPattern& Pattern); 
 
-	
+	// 별똥별 0624
+	void FireMeteorShowerPattern(const FBulletHellPattern& Pattern);
 
 	UPROPERTY(EditAnywhere, Category = "Combeat")
 	USpawn_Baton* BatonSpawner;
@@ -382,5 +384,7 @@ public:
 	//////////////////////////////////////// 탄막 테스트 변수 ////////////////////////////////////////
 	bool bTestFire = false;
 	float TimeElapsed;
+
+
 
 };
