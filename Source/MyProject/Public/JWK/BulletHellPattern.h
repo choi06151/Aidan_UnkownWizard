@@ -31,9 +31,7 @@ enum class EPatternType : uint8
 	// 원형 이동
 	CircularMoving,  
 	// 바람개비
-	Pinwheel,
-	// 별똥별
-	MeteorShower // 0624
+	Pinwheel
 };
 
 USTRUCT(BlueprintType)

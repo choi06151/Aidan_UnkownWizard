@@ -127,9 +127,6 @@ ABoss::ABoss()
 	/* 바람개비 */
 	PatternDelegates.Add(EPatternType::Pinwheel, FPatternDelegate::CreateUObject(this, &ABoss::FirePinwheelPattern));
 
-	/* 별똥별 */
-	PatternDelegates.Add(EPatternType::MeteorShower, FPatternDelegate::CreateUObject(this, &ABoss::FireMeteorShowerPattern));
-
 	//////////////////////////////////////// 보스 둥둥 효과 관련 ////////////////////////////////////////
 	FloatingTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("FloatingTimeline"));
 }
@@ -442,77 +439,77 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.9f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.8f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.4f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.3f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else if (FinalData.Intensity >= 0.1f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 				else
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::MeteorShower;
+							return Pattern.PatternType == EPatternType::HA;
 						});
 				}
 
@@ -1262,36 +1259,7 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 }
 
-void ABoss::FireMeteorShowerPattern(const FBulletHellPattern& Pattern)
-{
-	if (!player)
-		return;
 
-	FVector PlayerLocation = player->GetActorLocation();
-	FVector BossLocation = GetActorLocation();
-
-	// 보스 머리 위 약간 더 앞에서 시작 (높이를 적절히 조정)
-	FVector StartLocation = BossLocation + FVector(800.0f, 0.0f, 800.0f); // 보스의 머리 위에서 더 앞쪽
-
-	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
-	{
-		// 각 탄막의 위치를 랜덤하게 조정하여 퍼짐 효과를 줌
-		float RandomOffsetY = FMath::FRandRange(-300.0f, 300.0f);
-		float RandomOffsetX = FMath::FRandRange(-300.0f, 300.0f);
-		FVector SpawnLocation = StartLocation + FVector(RandomOffsetX, RandomOffsetY, 0.0f);
-
-		// 탄막이 플레이어를 향해 아래로 내리꽂히도록 방향 설정
-		FVector Direction = (PlayerLocation - SpawnLocation).GetSafeNormal();
-		FRotator SpawnRotation = Direction.Rotation();
-
-		// 탄막 생성 및 방향 설정
-		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
-		if (Bullet)
-		{
-			Bullet->SetVelocity(Direction * Pattern.BulletSpeed); // 방향 설정
-		}
-	}
-}
 
 
 //////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
@@ -1455,10 +1423,4 @@ void ABoss::InitializeDefaultPatterns()
 
 	BulletPatterns.Add(PinwheelPattern);
 
-	// 별똥별 패턴
-	FBulletHellPattern MeteorShowerPattern;
-	MeteorShowerPattern.PatternType = EPatternType::MeteorShower;
-	MeteorShowerPattern.NumberOfBullets = 20;
-	MeteorShowerPattern.BulletSpeed = 800.0f; // 탄막 속도 조정
-	BulletPatterns.Add(MeteorShowerPattern); 
 }

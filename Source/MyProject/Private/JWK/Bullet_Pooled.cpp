@@ -38,10 +38,6 @@ ABullet_Pooled::ABullet_Pooled()
 	FloatFrequency = 1.0f;
 	FloatAmplitude = 10.0f;
 	InitialZ = 0.0f;
-
-	// 탄막의 움직임을 제어하는 ProjectileMovement 컴포넌트 초기화
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->bAutoActivate = false;
 }
 
 void ABullet_Pooled::BeginPlay()
