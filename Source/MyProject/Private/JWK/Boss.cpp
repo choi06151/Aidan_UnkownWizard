@@ -533,19 +533,18 @@ void ABoss::PreAnalyzeAllMusicData()
 {
 	// 각 음악에 대한 JSON 파일 경로 설정
 	FString ProjectDir = UKismetSystemLibrary::GetProjectDirectory();
-	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
-	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
-	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
-	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_Backlight.json");
+	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_backlight.json");
 	FString NOTEJsonPath = ProjectDir + TEXT("Content/Data/AI_NOTE.json");
 	FString UnrealJsonPath = ProjectDir + TEXT("Content/Data/AI_Unreal.json");
-	FString NewWorldJsonPath = ProjectDir + TEXT("Content/Data/Antonín Dvořák_ Symphony No_9.json");
 	FString WaitingForLoveJsonPath = ProjectDir + TEXT("Content/Data/Avicii_WaitingForLove.json");
 	FString PonytailJsonPath = ProjectDir + TEXT("Content/Data/Badanamu_Ponytail.json");
 	FString SymphonyNo_5JsonPath = ProjectDir + TEXT("Content/Data/Beethoven_Symphony No_5.json");
 	FString RabelJsonPath = ProjectDir + TEXT("Content/Data/Boléro_Rabel.json");
+	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
+	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
 	FString FantaisieImpromptuJsonPath = ProjectDir + TEXT("Content/Data/Frédéric Chopin_Fantaisie Impromptu.json");
 	FString OrpheusintheUnderworldJsonPath = ProjectDir + TEXT("Content/Data/Jacques Offenbach_Orpheus in the Underworld.json");
+	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 	FString NachtmusikJsonPath = ProjectDir + TEXT("Content/Data/Mozart_Eine Kleine Nachtmusik.json");
 	FString SymphonyNo_25JsonPath = ProjectDir + TEXT("Content/Data/Mozart_Symphony No.json");
 	FString TurkishMarchPath = ProjectDir + TEXT("Content/Data/Mozart_Turkish March.json");
@@ -562,7 +561,6 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Backlight"), BacklightJsonPath);
 	PreAnalyzeMusicData(TEXT("NOTE"), NOTEJsonPath);
 	PreAnalyzeMusicData(TEXT("Unreal"), UnrealJsonPath);
-	PreAnalyzeMusicData(TEXT("Symphony No_9 From the New World"), NewWorldJsonPath);
 	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
 	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
 	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
@@ -1429,7 +1427,7 @@ void ABoss::InitializeDefaultPatterns()
 	PinwheelPattern.NumberOfBullets = 17;
 	PinwheelPattern.BulletSpeed = 1000.0f; // 앞으로 전진하는 속도
 
-	// 각 총알의 궤도 반지름과 속도를 배열로 설정 (양수 및 음수 값 추가)
+	// 각 총알의 궤도 반지름과 속도를 배열로 설정
 	PinwheelPattern.OrbitRadii = { 0.0f, 100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f,100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f }; // 궤도 반지름 배열
 	PinwheelPattern.OrbitSpeeds = { 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f }; // 궤도 속도 배열
 	//PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 90.0f, 90.0f, 90.0f, 180.0f, 180.0f, 180.0f, 180.0f, 270.0f, 270.0f, 270.0f, 270.0f }; // 초기 각도 배열
