@@ -33,12 +33,18 @@ public:
 	FMusicInfoDT* SpecificRow;
 	void MusicPlay();
 
+	void MusicPlayOnly();
 	TArray<AActor*> Curtains;
 	void CurtainOpenAnim();
 	void CurtainCloseAnim();
 	void CurtainShakeAnim();
 
 	int32 CurrentStage = 1;
+
+	bool isFirst = true;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<class USoundBase> SFX_Button;
 private:
 	UPROPERTY()
 	class UWidgetComponent* WidgetComponent;
@@ -48,4 +54,6 @@ private:
 
 	UPROPERTY()
 	class ABoss* Boss;
+
+	
 };

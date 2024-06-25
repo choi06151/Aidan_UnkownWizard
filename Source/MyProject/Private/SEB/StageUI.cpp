@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/UniformGridPanel.h"
+#include "Kismet/GameplayStatics.h"
 #include "SEB/SelectStageUI.h"
 
 void UStageUI::NativePreConstruct()
@@ -71,7 +72,11 @@ void UStageUI::OnSelectStageClicked()
 {
 	if (ParentSelectStageUI)
 	{
+		
+		ASpawnWidget *SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
+		SpawnWidget->isFirst = false;
 		ParentSelectStageUI->ChangeStageName(ArtistName->GetText(), MusicName->GetText());
+		
 	}
 	else
 	{

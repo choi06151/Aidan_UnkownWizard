@@ -9,9 +9,13 @@
 #include "Components/WidgetComponent.h"
 #include "JWK/Boss.h"
 #include "CJW/PlayerPawnCPP.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+
 void UGameStartUI::NativeConstruct()
 {
 	Super::NativeConstruct();
+	AudioComponent = UGameplayStatics::SpawnSound2D(this, SFX_Start);
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	StartBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnStartBtnClicked);
 	QuitBtn->OnPressed.AddDynamic(this, &UGameStartUI::OnQuitBtnClicked);
@@ -23,6 +27,11 @@ void UGameStartUI::NativeConstruct()
 
 void UGameStartUI::OnStartBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
+	if(AudioComponent)
+	{
+		AudioComponent->Stop();
+	}
 	if (Boss)
 	{
 		Boss->PreAnalyzeAllMusicData();
@@ -35,11 +44,13 @@ void UGameStartUI::OnStartBtnClicked()
 
 void UGameStartUI::OnQuitBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
 }
 
 void UGameStartUI::OnTutorialBtnClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	PlayerInfo->StartTutorialStageCpp();
 }

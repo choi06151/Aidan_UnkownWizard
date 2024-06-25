@@ -14,6 +14,8 @@
 #include "JWK/Boss.h"
 #include "SEB/GameOverUI.h"
 #include "CJW/PlayerPawnCPP.h"
+#include "Components/AudioComponent.h"
+
 void USelectStageUI::NativePreConstruct()
 {
 	Super::NativePreConstruct();
@@ -65,9 +67,13 @@ void USelectStageUI::NativePreConstruct()
 		SpawnWidget->SpecificRow = FirstRow;
 		
 	}
-	ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+	
 	
 	if(SpawnWidget){
+		ChangeStageName(FText::FromString(SpawnWidget->SpecificRow->ArtistName), FText::FromString(SpawnWidget->SpecificRow->MusicName));
+
+		
+
 		SpawnWidget->SpecificRow = FindRowByColumnValue("ArtistName", FirstRow->ArtistName, "MusicName", FirstRow->MusicName);
 		int32 ScrollCount = SpawnWidget->CurrentStage;
 		FColor ClickColor = FColor(255, 100, 22, 255);
@@ -89,6 +95,7 @@ void USelectStageUI::NativeConstruct()
 
 void USelectStageUI::OnUPArrowClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	if (MainScroll)
 	{
 		float CurrentOffset = MainScroll->GetScrollOffset();
@@ -98,6 +105,7 @@ void USelectStageUI::OnUPArrowClicked()
 
 void USelectStageUI::OnDownArrowClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	if (MainScroll)
 	{
 		float CurrentOffset = MainScroll->GetScrollOffset();
@@ -107,6 +115,8 @@ void USelectStageUI::OnDownArrowClicked()
 
 void USelectStageUI::OnBackClicked()
 {
+	Boss->StopMusic();
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// SpawnWidget의 WidgetClass를 변경
 	UWidgetComponent* WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(GameStartUIClass);
@@ -114,7 +124,7 @@ void USelectStageUI::OnBackClicked()
 
 void USelectStageUI::OnPlayClicked()
 {
-	
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	// 게임 시작 
@@ -125,7 +135,7 @@ void USelectStageUI::OnPlayClicked()
 	{
 		UE_LOG(LogTemp, Error, TEXT("SelectStageUI::OnPlayClicked"));
 		Boss->bIsGameStart = true;
-		//Boss->StopMusic();
+		Boss->MusicAudioComponent->Stop();
 		Boss->MusicStart();
 		
 	}
@@ -141,6 +151,7 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	SetSelectUIColor(ScrollCount, ClickColor);
 	
 	//NewText라는 ArtistName열을 가진 행 탐색
+	
 	FMusicInfoDT* SpecificRow = FindRowByColumnValue("ArtistName", NewText.ToString(), "MusicName", NewInfoText.ToString());
 	if (!SpecificRow)
 	{
@@ -150,8 +161,14 @@ void USelectStageUI::ChangeStageName(const FText& NewText, const FText& NewInfoT
 	if(SpawnWidget)
 		SpawnWidget->SpecificRow = SpecificRow;
 
-	//	Boss->StopMusic();
+	//Boss->StopMusic();
 	//SpawnWidget->MusicPlay();
+	//Boss->PlayMusicOnly(SpecificRow->MusicFilePath, SpecificRow->MusicName);
+	if(!SpawnWidget->isFirst)
+	{
+		UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
+		SpawnWidget->MusicPlayOnly();
+	}
 	ArtistName->SetText(NewText);
 	MusicName->SetText(NewInfoText);
 	

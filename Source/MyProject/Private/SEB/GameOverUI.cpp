@@ -18,6 +18,8 @@
 void UGameOverUI::NativeConstruct()
 {
 	Super::NativeConstruct();
+	UGameplayStatics::PlaySound2D(this, SFX_GameOver);
+	UGameplayStatics::PlaySound2D(this, SFX_HAHA);
 	//Set UI
 	SpawnWidget = Cast<ASpawnWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnWidget::StaticClass()));
 	SpawnLeftWidget = Cast<ASpawnLeftWidget>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpawnLeftWidget::StaticClass()));
@@ -54,13 +56,14 @@ void UGameOverUI::NativeConstruct()
 	CurrentCount = 0;
 	Player->UpdateMaxScore();
 	Player->UpdateMaxScoreCpp();
-
-	SetMyScore(Player->SCORE);
-	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.0001f, true);
+	UE_LOG(LogTemp, Error, TEXT("GameOverUI : %d"), SpawnLeftWidget->FinalScore);
+	SetMyScore(SpawnLeftWidget->FinalScore);
+	GetWorld()->GetTimerManager().SetTimer(CountTimerHandle, this, &UGameOverUI::UpdateCountText, 0.00001f, true);
 }
 
 void UGameOverUI::OnSelectStageClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	SpawnLeftWidget->isRestart = true;
 	WidgetComponent = SpawnWidget->FindComponentByClass<UWidgetComponent>();
 	WidgetComponent->SetWidgetClass(SelectStageUIClass);
@@ -68,6 +71,7 @@ void UGameOverUI::OnSelectStageClicked()
 
 void UGameOverUI::OnRestartClicked()
 {
+	UGameplayStatics::PlaySound2D(this, SpawnWidget->SFX_Button);
 	// UI 숨김
 	SetVisibility(ESlateVisibility::Hidden);
 	UE_LOG(LogTemp, Error, TEXT("Hidden!!Hidden!!Hidden!!Hidden!!Hidden!!"));

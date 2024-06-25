@@ -45,11 +45,6 @@ void ABaton_Pooled::Tick(float DeltaTime)
 	
 	// 새로운 위치로 총알 이동
 	SetActorLocation(NewLocation);
-
-	// // meshComponent 회전 로직 추가
-	// FRotator CurrentRotation = meshComp->GetComponentRotation();
-	// FRotator DeltaRotation(0, DeltaTime * 500, 0);  // Y축을 기준으로 회전 속도 설정
-	// meshComp->SetWorldRotation(CurrentRotation + DeltaRotation);
 }
 
 // Baton 상태 활성화 or 비활성화
