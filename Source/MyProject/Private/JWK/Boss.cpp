@@ -82,7 +82,13 @@ ABoss::ABoss()
 		HaSound = HaSoundAsset.Object;
 	}
 
-
+	// Boss 뼈 효과음
+	static ConstructorHelpers::FObjectFinder<USoundWave> BoneSoundAsset(TEXT("/Script/Engine.SoundWave'/Game/JWK/Sound/Boss_Bone_Sound.Boss_Bone_Sound'"));
+	if(BoneSoundAsset.Succeeded())
+	{
+		BoneSound = BoneSoundAsset.Object;
+	}
+	
 	// DELEGATE Map 초기화
 	/* 랜덤직선 */
 	PatternDelegates.Add(EPatternType::RandomStraight,
@@ -172,7 +178,6 @@ void ABoss::BeginPlay()
 
 	// StartFiring();
 	// FireBullet();
-	
 }
 
 void ABoss::Tick(float DeltaTime)
@@ -264,6 +269,13 @@ void ABoss::HandleState()
 	case 0:		// 목적지까지 이동
 		bIsWalk = true;
 		cnt++;
+		
+		if (BoneSound != nullptr)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), BoneSound);
+			UE_LOG(LogTemp, Error, TEXT("BoneSound!!BoneSound!!BoneSound!!BoneSound!!BoneSound!!"));
+		}
+
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABoss::HandleState, 2.2f, false);
 		break;
 
@@ -293,7 +305,6 @@ void ABoss::HandleState()
 		break;
 	}
 }
-
 
 
 //////////////////////////////////////// 음악분석 관련 ////////////////////////////////////////
@@ -453,21 +464,21 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Pinwheel;
+							return Pattern.PatternType == EPatternType::CircularMoving;
 						});
 				}
 				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::Octagon;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
@@ -536,18 +547,19 @@ void ABoss::PreAnalyzeAllMusicData()
 {
 	// 각 음악에 대한 JSON 파일 경로 설정
 	FString ProjectDir = UKismetSystemLibrary::GetProjectDirectory();
-	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_backlight.json");
+	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
+	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
+	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
+	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_Backlight.json");
 	FString NOTEJsonPath = ProjectDir + TEXT("Content/Data/AI_NOTE.json");
 	FString UnrealJsonPath = ProjectDir + TEXT("Content/Data/AI_Unreal.json");
+	FString NewWorldJsonPath = ProjectDir + TEXT("Content/Data/Antonín Dvořák_ Symphony No_9.json");
 	FString WaitingForLoveJsonPath = ProjectDir + TEXT("Content/Data/Avicii_WaitingForLove.json");
 	FString PonytailJsonPath = ProjectDir + TEXT("Content/Data/Badanamu_Ponytail.json");
 	FString SymphonyNo_5JsonPath = ProjectDir + TEXT("Content/Data/Beethoven_Symphony No_5.json");
 	FString RabelJsonPath = ProjectDir + TEXT("Content/Data/Boléro_Rabel.json");
-	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
-	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
 	FString FantaisieImpromptuJsonPath = ProjectDir + TEXT("Content/Data/Frédéric Chopin_Fantaisie Impromptu.json");
 	FString OrpheusintheUnderworldJsonPath = ProjectDir + TEXT("Content/Data/Jacques Offenbach_Orpheus in the Underworld.json");
-	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 	FString NachtmusikJsonPath = ProjectDir + TEXT("Content/Data/Mozart_Eine Kleine Nachtmusik.json");
 	FString SymphonyNo_25JsonPath = ProjectDir + TEXT("Content/Data/Mozart_Symphony No.json");
 	FString TurkishMarchPath = ProjectDir + TEXT("Content/Data/Mozart_Turkish March.json");
@@ -564,6 +576,7 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Backlight"), BacklightJsonPath);
 	PreAnalyzeMusicData(TEXT("NOTE"), NOTEJsonPath);
 	PreAnalyzeMusicData(TEXT("Unreal"), UnrealJsonPath);
+	PreAnalyzeMusicData(TEXT("Symphony No_9 From the New World"), NewWorldJsonPath);
 	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
 	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
 	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
@@ -799,19 +812,21 @@ void ABoss::FireFanPattern(const FBulletHellPattern& Pattern)
 }
 
 
-// 유도 원형 : 발사될 때는 원형이다가 Player에게 다가올 때 쯤에는 한 점으로 모임 /////////////0624
+// 유도 원형 : 발사될 때는 원형이다가 Player에게 다가올 때 쯤에는 한 점으로 모임
 void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 {
-	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(-200, 200) + GetActorUpVector() * FMath::RandRange(-150, 150);
-	float Radius = Pattern.CircleRadius; // 반지름을 Pattern.CircleRadius로 설정
+	FVector BossLocation = GetActorLocation() + GetActorForwardVector() * 100.0f + GetActorRightVector() * FMath::RandRange(-200, 200) + GetActorUpVector() *
+		FMath::RandRange(-150, 150) /*+ GetActorUpVector() * 100*/;
+	// BossLocation.Z = 500.0f;
+	float Radius = Pattern.PatternSize / 3.0f; // 패턴 크기에 따른 반지름
 
-	// 플레이어 위치
+	/////////////// 플레이어 위치 ///////////////
 	FVector PlayerLocation = player->GetActorLocation();
 
 	for (int32 i = 0; i < Pattern.NumberOfBullets; ++i)
 	{
-		// YZ 평면에서 균일한 위치 생성
-		float Angle = (360.0f / Pattern.NumberOfBullets) * i;
+		// YZ 평면에서 랜덤 위치 생성
+		float Angle = FMath::FRandRange(0.0f, 360.0f);
 		float Rad = FMath::DegreesToRadians(Angle);
 		FVector Offset = FVector(0.0f, FMath::Cos(Rad) * Radius, FMath::Sin(Rad) * Radius);
 		FVector SpawnLocation = BossLocation + Offset;
@@ -821,14 +836,8 @@ void ABoss::FireTargetCirclePattern(const FBulletHellPattern& Pattern)
 		FRotator SpawnRotation = Direction.Rotation();
 
 		// 총알 스폰
-		ABullet_Pooled* Bullet = BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
-		if (Bullet != nullptr)
-		{
-			Bullet->SetVelocity(Direction * Pattern.BulletSpeed);
-			Bullet->SetBulletSpeed(Pattern.BulletSpeed);
-		}
+		BulletSpawner->SpawnPooledBullet(SpawnLocation, SpawnRotation, Pattern.BulletSpeed, Pattern.FloatIntensity);
 	}
-
 	UE_LOG(LogTemp, Warning, TEXT("TargetCircle"));
 	UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 	// //////////////////////////////////////// 탄막 테스트용 코드 //////////////////////////////////////// 
@@ -925,15 +934,15 @@ void ABoss::FireTargetCrossPattern(const FBulletHellPattern& Pattern)
 
 	// 탄환 발사 위치 설정
 	FVector CrossOffsets[] = {
-        FVector(0, 0, 0), // 중심
-        FVector(0, 200, 0), // 위쪽 중간
-        FVector(0, 400, 0), // 위쪽
-        FVector(0, -200, 0), // 아래쪽 중간
-        FVector(0, -400, 0), // 아래쪽
-        FVector(0, 0, 200), // 앞쪽 중간
-        FVector(0, 0, 400), // 앞쪽
-        FVector(0, 0, -200), // 뒤쪽 중간
-        FVector(0, 0, -400) // 뒤쪽
+		FVector(0, 0, 0), // 중심
+		FVector(0, 100, 0), // 위쪽 중간
+		FVector(0, 200, 0), // 위쪽
+		FVector(0, -100, 0), // 아래쪽 중간
+		FVector(0, -200, 0), // 아래쪽
+		FVector(0, 0, 100), // 앞쪽 중간
+		FVector(0, 0, 200), // 앞쪽
+		FVector(0, 0, -100), // 뒤쪽 중간
+		FVector(0, 0, -200) // 뒤쪽
 	};
 
 	for (int32 j = 0; j < 2; j++)
@@ -974,10 +983,36 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Wall[] = {
-		FVector(0, 400, -600), FVector(0, 300, -600), FVector(0, 200, -600), FVector(0, 100, -600), FVector(0, 0, -600), FVector(0, -100, -600), FVector(0, -200, -600), FVector(0, -300, -600), FVector(0, -400, -600),
-        FVector(0, 400, -400), FVector(0, 300, -400), FVector(0, 200, -400), FVector(0, 100, -400), FVector(0, 0, -400), FVector(0, -100, -400), FVector(0, -200, -400), FVector(0, -300, -400), FVector(0, -400, -400),
-        FVector(0, 400, -200), FVector(0, 300, -200), FVector(0, 200, -200), FVector(0, 100, -200), FVector(0, 0, -200), FVector(0, -100, -200), FVector(0, -200, -200), FVector(0, -300, -200), FVector(0, -400, -200),
-    };
+		FVector(0, 200, -300),
+		FVector(0, 150, -300),
+		FVector(0, 100, -300),
+		FVector(0, 50, -300),
+		FVector(0, 0, -300),
+		FVector(0, -50, -300),
+		FVector(0, -100, -300),
+		FVector(0, -150, -300),
+		FVector(0, -200, -300),
+
+		FVector(0, 200, -200),
+		FVector(0, 150, -200),
+		FVector(0, 100, -200),
+		FVector(0, 50, -200),
+		FVector(0, 0, -200),
+		FVector(0, -50, -200),
+		FVector(0, -100, -200),
+		FVector(0, -150, -200),
+		FVector(0, -200, -200),
+
+		FVector(0, 200, -100),
+		FVector(0, 150, -100),
+		FVector(0, 100, -100),
+		FVector(0, 50, -100),
+		FVector(0, 0, -100),
+		FVector(0, -50, -100),
+		FVector(0, -100, -100),
+		FVector(0, -150, -100),
+		FVector(0, -200, -100),
+	};
 
 	int WallSize = sizeof(Wall) / sizeof(Wall[0]); // 배열의 크기
 	int WallWidth = 9; // YZ 평면에서 한 줄의 벽 개수
@@ -1021,22 +1056,22 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Octagon[] = {
-		FVector(0.0f, 0.0f, 700.0f),
-		FVector(0.0f, -158.51f * 2, 269.67f * 2),  // 간격을 두 배로 늘림 0624
-		FVector(0.0f, -317.02f * 2, 169.67f * 2),
-		FVector(0.0f, -475.53f * 2, 77.26f * 2),
-		FVector(0.0f, -414.98f * 2, -31.83f * 2),
-		FVector(0.0f, -354.44f * 2, -119.17f * 2),
-		FVector(0.0f, -293.89f * 2, -202.26f * 2),
-		FVector(0.0f, -97.96f * 2, -202.26f * 2),
-		FVector(0.0f, 97.96f * 2, -202.26f * 2),
-		FVector(0.0f, 293.89f * 2, -202.26f * 2),
-		FVector(0.0f, 354.44f * 2, -119.17f * 2),
-		FVector(0.0f, 414.98f * 2, -31.83f * 2),
-		FVector(0.0f, 475.53f * 2, 77.26f * 2),
-		FVector(0.0f, 317.02f * 2, 169.67f * 2),
-		FVector(0.0f, 158.51f * 2, 269.67f * 2),
-		FVector(0.0f, 0.0f, 700.0f)
+		FVector(0.0f, 0.0f, 250.0f),
+		FVector(0.0f, -79.255f, 192.42f),
+		FVector(0.0f, -158.51f, 134.835f),
+		FVector(0.0f, -237.765f, 77.255f),
+		FVector(0.0f, -207.49f, -15.915f),
+		FVector(0.0f, -177.22f, -109.085f),
+		FVector(0.0f, -146.945f, -202.255f),
+		FVector(0.0f, -48.98f, -202.255f),
+		FVector(0.0f, 48.98f, -202.255f),
+		FVector(0.0f, 146.945f, -202.255f),
+		FVector(0.0f, 177.22f, -109.085f),
+		FVector(0.0f, 207.49f, -15.915f),
+		FVector(0.0f, 237.765f, 77.255f),
+		FVector(0.0f, 158.51f, 134.835f),
+		FVector(0.0f, 79.255f, 192.42f),
+		FVector(0.0f, 0.0f, 250.0f)
 	};
 
 
@@ -1107,11 +1142,7 @@ void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 		float y = 13 * FMath::Cos(t) - 5 * FMath::Cos(2 * t) - 2 * FMath::Cos(3 * t) - FMath::Cos(4 * t);
 
 		// 여기서 하트 크기 조정 가능 같은 비율로 x랑y 나누는 수 변경해주기~
-		//OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
-		//OutShape.Add(FVector(0.0f, x * PatternSize / 6.0f, y * PatternSize / 5.5f));
-		//OutShape.Add(FVector(0.0f, x * PatternSize / 4.0f, y * PatternSize / 3.5f));
-		OutShape.Add(FVector(0.0f, x * PatternSize / 5.0f, y * PatternSize / 4.0f));
-	
+		OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
 	}
 }
 
@@ -1260,8 +1291,6 @@ void ABoss::FirePinwheelPattern(const FBulletHellPattern& Pattern)
 }
 
 
-
-
 //////////////////////////////////////// AnimNotify에서 페이즈 2일 때 호출 ////////////////////////////////////////
 void ABoss::ThrowBaton()
 {
@@ -1321,7 +1350,6 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern TargetCirclePattern;
 	TargetCirclePattern.PatternType = EPatternType::TargetCircle;
 	TargetCirclePattern.PatternSize = 300.0f; // 원형 패턴의 크기 설정
-	TargetCirclePattern.CircleRadius = 500.0f; // 원형 패턴의 반지름 설정 (예: 500.0f)
 	TargetCirclePattern.NumberOfBullets = 12; // 총알의 수
 	TargetCirclePattern.BulletSpeed = 600.0f;
 	BulletPatterns.Add(TargetCirclePattern);
@@ -1375,7 +1403,7 @@ void ABoss::InitializeDefaultPatterns()
 	DandelionPattern.PatternType = EPatternType::Dandelion;
 	DandelionPattern.NumberOfBullets = 30;
 	DandelionPattern.BulletSpeed = 600.0f;
-	DandelionPattern.SpreadDelay = 2.0f; // 몇 초 후에 퍼짐
+	DandelionPattern.SpreadDelay = 1.0f; // 몇 초 후에 퍼짐
 	BulletPatterns.Add(DandelionPattern);
 
 	// HA 패턴
@@ -1389,8 +1417,8 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern CircularMovingPattern;
 	CircularMovingPattern.PatternType = EPatternType::CircularMoving;
 	CircularMovingPattern.NumberOfBullets = 12;
-	CircularMovingPattern.BulletSpeed = 700.0f; // 앞으로 전진하는 속도
-	CircularMovingPattern.OrbitSpeed = 150.0f; // 원을 그리는 속도
+	CircularMovingPattern.BulletSpeed = 600.0f; // 앞으로 전진하는 속도
+	CircularMovingPattern.OrbitSpeed = 300.0f; // 원을 그리는 속도
 	CircularMovingPattern.PatternSize = 300.0f; // 원형 반지름
 	// 초기 위치 설정
 	CircularMovingPattern.InitialPositions = {
@@ -1415,12 +1443,11 @@ void ABoss::InitializeDefaultPatterns()
 	PinwheelPattern.NumberOfBullets = 17;
 	PinwheelPattern.BulletSpeed = 1000.0f; // 앞으로 전진하는 속도
 
-	// 각 총알의 궤도 반지름과 속도를 배열로 설정
+	// 각 총알의 궤도 반지름과 속도를 배열로 설정 (양수 및 음수 값 추가)
 	PinwheelPattern.OrbitRadii = { 0.0f, 100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f,100.0f, 200.0f, 300.0f, 400.0f, -100.0f, -200.0f, -300.0f, -400.0f }; // 궤도 반지름 배열
 	PinwheelPattern.OrbitSpeeds = { 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f, 80.0f }; // 궤도 속도 배열
 	//PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f, 90.0f, 90.0f, 90.0f, 180.0f, 180.0f, 180.0f, 180.0f, 270.0f, 270.0f, 270.0f, 270.0f }; // 초기 각도 배열
 	PinwheelPattern.InitialAngles = { 0.0f, 0.0f, 10.0f, 20.0f, 30.0f, 90.0f, 100.0f, 110.0f, 120.0f, 180.0f, 190.0f, 200.0f, 210.0f, 270.0f, 280.0f, 290.0f, 300.0f };//멋 부림
 
 	BulletPatterns.Add(PinwheelPattern);
-
 }
