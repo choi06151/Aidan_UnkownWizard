@@ -446,70 +446,70 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Dandelion;
 						});
 				}
 				else if (FinalData.Intensity >= 0.8f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::CircularMoving;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Octagon;
 						});
 				}
 				else if (FinalData.Intensity >= 0.4f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::TargetCircle;
 						});
 				}
 				else if (FinalData.Intensity >= 0.3f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Swirl;
 						});
 				}
 				else if (FinalData.Intensity >= 0.2f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Wall;
 						});
 				}
 				else if (FinalData.Intensity >= 0.1f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::RandomStraight;
 						});
 				}
 				else
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::HA;
+							return Pattern.PatternType == EPatternType::Fan;
 						});
 				}
 
