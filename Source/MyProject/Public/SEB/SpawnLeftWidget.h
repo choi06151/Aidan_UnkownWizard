@@ -28,5 +28,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 FinalScore;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool isRestart = false;
 };

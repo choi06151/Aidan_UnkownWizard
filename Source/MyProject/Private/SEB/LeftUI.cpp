@@ -34,12 +34,12 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (SpawnLeftWidget->isRestart)
+	/*if (SpawnLeftWidget->isRestart)
 	{
-		PlayTime->SetText(FText::FromString(TEXT("00:00:00")));
-		Score->SetText(FText::AsNumber(0));
-		SpawnLeftWidget->isRestart = false;
-	}
+		//PlayTime->SetText(FText::FromString(TEXT("00:00:00")));
+		//Score->SetText(FText::AsNumber(0));
+		//SpawnLeftWidget->isRestart = false;
+	}*/
 
 	if (Boss->bIsAttackStart && Boss)
 	{
@@ -69,6 +69,7 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		Boss->bIsMusicFinished = false; // 음악재생이 다 되었는가??
 		Boss->OnMusicFinished();
 		SpawnWidget->isFirst = true;
+		PlayTime->SetText(FText::FromString(TEXT("00:00:00")));
 	}
 
 	////////////////////////////////////////////////// Game Over //////////////////////////////////////////////////
@@ -118,6 +119,8 @@ void ULeftUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 			}
 			
 			UE_LOG(LogTemp, Error, TEXT("Restart Widget Open"));
+
+			PlayTime->SetText(FText::FromString(TEXT("00:00:00")));
 		}
 	}
 	// UE_LOG(LogTemp, Warning, TEXT("Player HP : %f"), Player->HP);
