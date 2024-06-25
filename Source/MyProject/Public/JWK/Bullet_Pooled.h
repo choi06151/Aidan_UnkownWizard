@@ -143,13 +143,9 @@ private:
 
 	bool bIsFloatIntensitySet;  // 둥실거림 설정이 완료되었는지 여부////0624
 
-public:
-	void SetVelocity(const FVector& NewVelocity);/////////0624
-
-
 private:
 	FVector Velocity;
-	float Speed;
+	
 
 
 };

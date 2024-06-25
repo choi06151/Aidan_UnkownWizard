@@ -256,11 +256,6 @@ void ABullet_Pooled::SetFloatIntensity(int Intensity)
 	}
 }
 
-void ABullet_Pooled::SetVelocity(const FVector& NewVelocity)
-{
-	Velocity = NewVelocity;
-	Speed = NewVelocity.Size();
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // bullet의 수명을 set
