@@ -12,14 +12,14 @@ UCLASS()
 class MYPROJECT_API ABullet_Pooled : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	ABullet_Pooled();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
 	//Component
@@ -35,22 +35,22 @@ public:
 	// 총알이 비활성화될 때 호출되는 Event
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Events")
 	FOnPooledBulletDespawn OnPooledBulletDespawn;
-	
+
 	// 총알을 활성화 또는 비활성화하는 함수
 	void SetActive(bool IsActive);
-	
+
 	// bullet의 수명을 set하는 함수
 	void SetLifeSpan(float LifeTime);
 
 	// Bullet의 Speed를 set하는 함수
 	void SetBulletSpeed(float Speed);
-	
+
 	// pool에서의 index 설정하는 함수
 	void SetPoolIndex(int index);
-	
+
 	// 총알의 활성 or 비활성 bool 값 반환하는 함수
 	bool IsActive();
-	
+
 	// pool에서의 index 값 반환하는 함수
 	int GetPoolIndex();
 
@@ -72,7 +72,7 @@ public:
 
 	float TimeSinceSpawned; // 생성된 이후 경과 시간
 	int32 FrameCounter; //  프레임 카운터
-	
+
 	// 민들레 패턴에 필요한 변수들
 	FVector InitialDirection; // 초기 방향
 	bool bShouldSpread; // 퍼지기 시작할지 여부
@@ -140,4 +140,12 @@ private:
 	float FloatFrequency;  // 둥실거림 주파수
 	float FloatAmplitude;  // 둥실거림 진폭
 	float InitialZ;  // 초기 Z 위치
+
+	bool bIsFloatIntensitySet;  // 둥실거림 설정이 완료되었는지 여부////0624
+
+private:
+	FVector Velocity;
+	
+
+
 };

@@ -464,21 +464,21 @@ void ABoss::PreAnalyzeMusicData(const FString& MusicTitle, const FString& JsonFi
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::CircularMoving;
+							return Pattern.PatternType == EPatternType::Pinwheel;
 						});
 				}
 				else if (FinalData.Intensity >= 0.7f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Heart;
+							return Pattern.PatternType == EPatternType::CircularMoving;
 						});
 				}
 				else if (FinalData.Intensity >= 0.6f)
 				{
 					FinalData.PatternIndex = BulletPatterns.IndexOfByPredicate([](const FBulletHellPattern& Pattern)
 						{
-							return Pattern.PatternType == EPatternType::Octagon;
+							return Pattern.PatternType == EPatternType::Heart;
 						});
 				}
 				else if (FinalData.Intensity >= 0.5f)
@@ -547,19 +547,18 @@ void ABoss::PreAnalyzeAllMusicData()
 {
 	// 각 음악에 대한 JSON 파일 경로 설정
 	FString ProjectDir = UKismetSystemLibrary::GetProjectDirectory();
-	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
-	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
-	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
-	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_Backlight.json");
+	FString BacklightJsonPath = ProjectDir + TEXT("Content/Data/Ado_backlight.json");
 	FString NOTEJsonPath = ProjectDir + TEXT("Content/Data/AI_NOTE.json");
 	FString UnrealJsonPath = ProjectDir + TEXT("Content/Data/AI_Unreal.json");
-	FString NewWorldJsonPath = ProjectDir + TEXT("Content/Data/Antonín Dvořák_ Symphony No_9.json");
 	FString WaitingForLoveJsonPath = ProjectDir + TEXT("Content/Data/Avicii_WaitingForLove.json");
 	FString PonytailJsonPath = ProjectDir + TEXT("Content/Data/Badanamu_Ponytail.json");
 	FString SymphonyNo_5JsonPath = ProjectDir + TEXT("Content/Data/Beethoven_Symphony No_5.json");
 	FString RabelJsonPath = ProjectDir + TEXT("Content/Data/Boléro_Rabel.json");
+	FString ButterflyJsonPath = ProjectDir + TEXT("Content/Data/butterfly.json");
+	FString EliseJsonPath = ProjectDir + TEXT("Content/Data/Elise.json");
 	FString FantaisieImpromptuJsonPath = ProjectDir + TEXT("Content/Data/Frédéric Chopin_Fantaisie Impromptu.json");
 	FString OrpheusintheUnderworldJsonPath = ProjectDir + TEXT("Content/Data/Jacques Offenbach_Orpheus in the Underworld.json");
+	FString LacrimosaJsonPath = ProjectDir + TEXT("Content/Data/Lacrimosa.json");
 	FString NachtmusikJsonPath = ProjectDir + TEXT("Content/Data/Mozart_Eine Kleine Nachtmusik.json");
 	FString SymphonyNo_25JsonPath = ProjectDir + TEXT("Content/Data/Mozart_Symphony No.json");
 	FString TurkishMarchPath = ProjectDir + TEXT("Content/Data/Mozart_Turkish March.json");
@@ -576,7 +575,6 @@ void ABoss::PreAnalyzeAllMusicData()
 	PreAnalyzeMusicData(TEXT("Backlight"), BacklightJsonPath);
 	PreAnalyzeMusicData(TEXT("NOTE"), NOTEJsonPath);
 	PreAnalyzeMusicData(TEXT("Unreal"), UnrealJsonPath);
-	PreAnalyzeMusicData(TEXT("Symphony No_9 From the New World"), NewWorldJsonPath);
 	PreAnalyzeMusicData(TEXT("Waiting For Love"), WaitingForLoveJsonPath);
 	PreAnalyzeMusicData(TEXT("Ponytail"), PonytailJsonPath);
 	PreAnalyzeMusicData(TEXT("Symphony No_5"), SymphonyNo_5JsonPath);
@@ -978,7 +976,7 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Wall[] = {
-		FVector(0, 200, -300),
+		/*FVector(0, 200, -300),
 		FVector(0, 150, -300),
 		FVector(0, 100, -300),
 		FVector(0, 50, -300),
@@ -1006,7 +1004,10 @@ void ABoss::FireWallPattern(const FBulletHellPattern& Pattern)
 		FVector(0, -50, -100),
 		FVector(0, -100, -100),
 		FVector(0, -150, -100),
-		FVector(0, -200, -100),
+		FVector(0, -200, -100),*/
+		FVector(0, 400, -600), FVector(0, 300, -600), FVector(0, 200, -600), FVector(0, 100, -600), FVector(0, 0, -600), FVector(0, -100, -600), FVector(0, -200, -600), FVector(0, -300, -600), FVector(0, -400, -600),
+		FVector(0, 400, -400), FVector(0, 300, -400), FVector(0, 200, -400), FVector(0, 100, -400), FVector(0, 0, -400), FVector(0, -100, -400), FVector(0, -200, -400), FVector(0, -300, -400), FVector(0, -400, -400),
+		FVector(0, 400, -200), FVector(0, 300, -200), FVector(0, 200, -200), FVector(0, 100, -200), FVector(0, 0, -200), FVector(0, -100, -200), FVector(0, -200, -200), FVector(0, -300, -200), FVector(0, -400, -200),
 	};
 
 	int WallSize = sizeof(Wall) / sizeof(Wall[0]); // 배열의 크기
@@ -1050,22 +1051,22 @@ void ABoss::FireTargetOctagonPattern(const FBulletHellPattern& Pattern)
 	// BossLocation.Z = 500.0f;
 	// 탄환 발사 위치 설정
 	FVector Octagon[] = {
-		FVector(0.0f, 0.0f, 250.0f),
-		FVector(0.0f, -79.255f, 192.42f),
-		FVector(0.0f, -158.51f, 134.835f),
-		FVector(0.0f, -237.765f, 77.255f),
-		FVector(0.0f, -207.49f, -15.915f),
-		FVector(0.0f, -177.22f, -109.085f),
-		FVector(0.0f, -146.945f, -202.255f),
-		FVector(0.0f, -48.98f, -202.255f),
-		FVector(0.0f, 48.98f, -202.255f),
-		FVector(0.0f, 146.945f, -202.255f),
-		FVector(0.0f, 177.22f, -109.085f),
-		FVector(0.0f, 207.49f, -15.915f),
-		FVector(0.0f, 237.765f, 77.255f),
-		FVector(0.0f, 158.51f, 134.835f),
-		FVector(0.0f, 79.255f, 192.42f),
-		FVector(0.0f, 0.0f, 250.0f)
+		FVector(0.0f, 0.0f, 700.0f),
+		FVector(0.0f, -158.51f * 2, 269.67f * 2),  // 간격을 두 배로 늘림 0624
+		FVector(0.0f, -317.02f * 2, 169.67f * 2),
+		FVector(0.0f, -475.53f * 2, 77.26f * 2),
+		FVector(0.0f, -414.98f * 2, -31.83f * 2),
+		FVector(0.0f, -354.44f * 2, -119.17f * 2),
+		FVector(0.0f, -293.89f * 2, -202.26f * 2),
+		FVector(0.0f, -97.96f * 2, -202.26f * 2),
+		FVector(0.0f, 97.96f * 2, -202.26f * 2),
+		FVector(0.0f, 293.89f * 2, -202.26f * 2),
+		FVector(0.0f, 354.44f * 2, -119.17f * 2),
+		FVector(0.0f, 414.98f * 2, -31.83f * 2),
+		FVector(0.0f, 475.53f * 2, 77.26f * 2),
+		FVector(0.0f, 317.02f * 2, 169.67f * 2),
+		FVector(0.0f, 158.51f * 2, 269.67f * 2),
+		FVector(0.0f, 0.0f, 700.0f)
 	};
 
 
@@ -1134,7 +1135,8 @@ void ABoss::DefineHeartShape(TArray<FVector>& OutShape, int32 NumberOfPoints, fl
 		float y = 13 * FMath::Cos(t) - 5 * FMath::Cos(2 * t) - 2 * FMath::Cos(3 * t) - FMath::Cos(4 * t);
 
 		// 여기서 하트 크기 조정 가능 같은 비율로 x랑y 나누는 수 변경해주기~
-		OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
+		//OutShape.Add(FVector(0.0f, x * PatternSize / 8.0f, y * PatternSize / 6.5f));
+		OutShape.Add(FVector(0.0f, x * PatternSize / 5.0f, y * PatternSize / 4.0f));
 	}
 }
 
@@ -1395,7 +1397,7 @@ void ABoss::InitializeDefaultPatterns()
 	DandelionPattern.PatternType = EPatternType::Dandelion;
 	DandelionPattern.NumberOfBullets = 30;
 	DandelionPattern.BulletSpeed = 600.0f;
-	DandelionPattern.SpreadDelay = 1.0f; // 몇 초 후에 퍼짐
+	DandelionPattern.SpreadDelay = 2.0f; // 몇 초 후에 퍼짐
 	BulletPatterns.Add(DandelionPattern);
 
 	// HA 패턴
@@ -1409,8 +1411,8 @@ void ABoss::InitializeDefaultPatterns()
 	FBulletHellPattern CircularMovingPattern;
 	CircularMovingPattern.PatternType = EPatternType::CircularMoving;
 	CircularMovingPattern.NumberOfBullets = 12;
-	CircularMovingPattern.BulletSpeed = 600.0f; // 앞으로 전진하는 속도
-	CircularMovingPattern.OrbitSpeed = 300.0f; // 원을 그리는 속도
+	CircularMovingPattern.BulletSpeed = 700.0f; // 앞으로 전진하는 속도
+	CircularMovingPattern.OrbitSpeed = 150.0f; // 원을 그리는 속도
 	CircularMovingPattern.PatternSize = 300.0f; // 원형 반지름
 	// 초기 위치 설정
 	CircularMovingPattern.InitialPositions = {

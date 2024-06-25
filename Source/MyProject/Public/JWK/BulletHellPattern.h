@@ -31,7 +31,7 @@ enum class EPatternType : uint8
 	// 원형 이동
 	CircularMoving,  
 	// 바람개비
-	Pinwheel          
+	Pinwheel
 };
 
 USTRUCT(BlueprintType)
@@ -74,4 +74,5 @@ public:
 
 	int32 FloatIntensity; // 둥실거림 강도 0619
 
+	float CircleRadius; // 원형 패턴의 반지름 추가//////////0624
 };

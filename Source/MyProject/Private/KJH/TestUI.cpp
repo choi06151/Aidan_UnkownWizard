@@ -41,8 +41,8 @@ void UTestUI::OnMusic1Clicked()
 	if (Boss)
 	{
 		Boss->StopMusic();
-		FString MusicTitle = TEXT("Butter-Fly");
-		FString MusicFilePath = TEXT("/Game/Music/butterfly.butterfly");
+		FString MusicTitle = TEXT("NOTE");
+		FString MusicFilePath = TEXT("/Script/Engine.SoundWave'/Game/Music/AI_NOTE.AI_NOTE'");
 		Boss->LoadMusicDataAndSetPatterns(MusicTitle, MusicFilePath);
 		UE_LOG(LogTemp, Warning, TEXT("UTestUI::OnMusic1Clicked"));
 	}
